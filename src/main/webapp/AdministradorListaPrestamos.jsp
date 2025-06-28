@@ -16,7 +16,7 @@
 	                <tr>
 	                    <th>ID</th>
 	                    <th>Cliente</th>
-	                    <th>Cuenta Asociada pruebaa git</th>
+	                    <th>Cuenta Asociada pruebaa githubb</th>
 	                    <th>Fecha Alta</th>
 	                    <th>Importe Pedido</th>
 	                    <th>Plazo (meses)</th>
