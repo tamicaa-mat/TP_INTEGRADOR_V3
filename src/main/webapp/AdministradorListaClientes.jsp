@@ -15,7 +15,7 @@
         <h4 class="text-center mb-4">Gestión de Clientes (ABML)</h4>
        
         <div class="text-end mb-4">
-            <a href="clientesFormulario.jsp?action=agregar" class="btn btn-secondary btn-sm">Agregar Nuevo Cliente</a>
+            <a href="ClienteServlet?action=mostrarFormulario" class="btn btn-secondary btn-sm">Agregar Nuevo Cliente</a>
         </div>
         
         <div class="table-responsive">
