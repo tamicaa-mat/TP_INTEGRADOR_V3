@@ -38,7 +38,7 @@
 	            <a href="AdministradorListaCuentas.jsp" class="btn btn-secondary btn-sm">Gestión Cuentas</a>
 	            <a href="AdministradorListaPrestamos.jsp" class="btn btn-secondary btn-sm">Autorizar Préstamos</a>
 	            <a href="AdministradorReportes.jsp" class="btn btn-secondary btn-sm">Reportes Admin</a>
-	            <a href="AdministradorListaClientes.jsp" class="btn btn-secondary btn-sm">Listado Clientes</a>
+	            <a href="${pageContext.request.contextPath}/ClienteServlet" class="btn btn-secondary btn-sm">Listado Clientes</a>
                 </div>
             </c:if>
 
