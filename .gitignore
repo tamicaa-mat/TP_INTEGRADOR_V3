@@ -1,0 +1,8 @@
+# Archivos de configuración de Eclipse
+.classpath
+.project
+.settings/
+
+# Carpetas de archivos compilados
+build/
+target/
