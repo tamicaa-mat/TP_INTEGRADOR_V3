@@ -10,7 +10,9 @@ import dominio.Usuario;
 
 public class UsuarioDaoImpl implements UsuarioDao {
     private static final String GET_USUARIO = "SELECT u.IdUsuario, u.NombreUsuario, u.Password, u.Estado, u.IdTipoUsuario, tu.Descripcion as TipoDescripcion FROM Usuario u INNER JOIN TipoUsuario tu ON u.IdTipoUsuario = tu.IdTipoUsuario WHERE u.NombreUsuario = ? AND u.Password = ? AND u.Estado = 1";
-
+    private static final String CAMBIAPASS = "UPDATE Usuario SET Password = ? WHERE IdUsuario = ?";
+    
+    
     public Usuario getUsuario(String username, String password) {
         Connection conn = null;
         PreparedStatement statement = null;
@@ -50,4 +52,48 @@ public class UsuarioDaoImpl implements UsuarioDao {
         System.out.println("DAO: " + (usuario != null ? usuario.toString() : "Usuario no encontrado en BD"));
         return usuario;
     }
+    
+    
+    
+    
+    @Override
+    public boolean actualizarPassword(int idUsuario, String nuevaPassword) {
+        Connection conn = null;
+        PreparedStatement stmt = null;
+
+        try {
+            conn = Conexion.getConexion().getSQLConexion();
+            stmt = conn.prepareStatement(CAMBIAPASS);
+            stmt.setString(1, nuevaPassword); // ¡Este va primero!
+            stmt.setInt(2, idUsuario);
+
+            int filasAfectadas = stmt.executeUpdate(); // para UPDATE se usa executeUpdate()
+
+            if (filasAfectadas > 0) {
+                conn.commit(); // confirmamos la transacción si todo va bien
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            try {
+                if (conn != null) conn.rollback(); // revertimos en caso de error
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        } finally {
+            try {
+                if (stmt != null) stmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return false;
+    }
+
+    
+    
+    
+    
+    
 }

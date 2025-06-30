@@ -1,0 +1,57 @@
+@charset "UTF-8";
+
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.datos-container {
+    max-width: 800px;
+    margin: 30px auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.datos-header {
+    background-color: #2c3e50;
+    color: white;
+    padding: 20px;
+    border-radius: 8px 8px 0 0;
+}
+
+.datos-body {
+    padding: 25px;
+}
+
+.seccion-titulo {
+    color: #2c3e50;
+    border-left: 4px solid #3498db;
+    padding-left: 10px;
+    margin: 25px 0 15px 0;
+    font-weight: 600;
+}
+
+.dato-item {
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.dato-label {
+    font-weight: 500;
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
+
+.dato-valor {
+    font-size: 1rem;
+    color: #2c3e50;
+    font-weight: 400;
+}
+
+.password-dots {
+    letter-spacing: 2px;
+    font-size: 1.2rem;
+}

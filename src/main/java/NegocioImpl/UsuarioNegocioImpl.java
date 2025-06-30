@@ -16,4 +16,12 @@ public class UsuarioNegocioImpl implements UsuarioNegocio {
     public Usuario getUsuario(String username, String password) {
         return usuarioDao.getUsuario(username, password);
     }
+    
+    public boolean actualizarPassword(int idUsuario, String nuevaPassword) {
+      
+        return usuarioDao.actualizarPassword(idUsuario, nuevaPassword);
+    }
+    
+    
+    
 }

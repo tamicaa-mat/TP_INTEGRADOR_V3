@@ -43,6 +43,9 @@ public class ClienteDaoImpl implements ClienteDao {
 				rs = statementUsuario.getGeneratedKeys();
 				if (rs.next()) {
 					idUsuarioGenerado = rs.getInt(1);
+					cliente.getUsuario().setIdUsuario(idUsuarioGenerado); // <--- ¡Esto faltaba!
+
+					
 				}
 			}
 			
