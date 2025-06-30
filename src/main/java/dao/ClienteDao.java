@@ -1,6 +1,6 @@
 package dao;
 
-import java.util.ArrayList; // O java.util.List, lo que prefieras
+import java.util.ArrayList; 
 import dominio.Cliente;
 
 public interface ClienteDao {
