@@ -9,8 +9,8 @@ public class Movimiento {
     private String Referencia;
     private BigDecimal Importe;
     private TipoMovimiento tipoMovimiento; 
-    private Cuenta cuentaOrigen; 
-    private Cuenta cuentaDestino; 
+    private int idCuenta; 
+  
 
     public Movimiento() {
         // Constructor vacío
@@ -18,14 +18,14 @@ public class Movimiento {
 
     public Movimiento(int idMovimiento, LocalDateTime fechaHora, String concepto,
                       BigDecimal importe, TipoMovimiento tipoMovimiento,
-                      Cuenta cuentaOrigen, Cuenta cuentaDestino) {
+                      int idCuentaMov) {
         this.idMovimiento = idMovimiento;
         this.fechaHora = fechaHora;
         this.Referencia = concepto;
         this.Importe = importe;
         this.tipoMovimiento = tipoMovimiento;
-        this.cuentaOrigen = cuentaOrigen;
-        this.cuentaDestino = cuentaDestino;
+        this.idCuenta = idCuentaMov;
+       
     }
 
     // Getters
@@ -49,15 +49,9 @@ public class Movimiento {
         return tipoMovimiento;
     }
 
-    public Cuenta getCuentaOrigen() {
-        return cuentaOrigen;
-    }
-
-    public Cuenta getCuentaDestino() {
-        return cuentaDestino;
-    }
-
-    
+    public int getIdCuenta() {
+		return idCuenta;
+	}
     
     
     
@@ -82,27 +76,20 @@ public class Movimiento {
         this.tipoMovimiento = tipoMovimiento;
     }
 
-    public void setCuentaOrigen(Cuenta cuentaOrigen) {
-        this.cuentaOrigen = cuentaOrigen;
-    }
+    public void setIdCuenta(int idCuentaMov) {
+		this.idCuenta = idCuentaMov;
+	}
 
-    public void setCuentaDestino(Cuenta cuentaDestino) {
-        this.cuentaDestino = cuentaDestino;
-    }
+	@Override
+	public String toString() {
+		return "Movimiento [idMovimiento=" + idMovimiento + ", fechaHora=" + fechaHora + ", Referencia=" + Referencia
+				+ ", Importe=" + Importe + ", tipoMovimiento=" + tipoMovimiento + ", idCuenta=" + idCuenta + "]";
+	}
+    
+    
+  
 
-    
-    
-    
-    @Override
-    public String toString() {
-        return "Movimiento{" +
-               "idMovimiento=" + idMovimiento +
-               ", fechaHora=" + fechaHora +
-               ", concepto='" + Referencia + '\'' +
-               ", importe=" + Importe +
-               ", tipoMovimiento=" + (tipoMovimiento != null ? tipoMovimiento.getDescripcion() : "N/A") +
-               ", cuentaOrigen=" + (cuentaOrigen != null ? cuentaOrigen.getNumeroCuenta() : "N/A") +
-               ", cuentaDestino=" + (cuentaDestino != null ? cuentaDestino.getNumeroCuenta() : "N/A") +
-               '}';
-    }
+	
+
+	
 }
