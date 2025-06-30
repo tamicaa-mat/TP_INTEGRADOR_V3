@@ -5,4 +5,5 @@
 
 # Carpetas de archivos compilados
 build/
+bin/
 target/
