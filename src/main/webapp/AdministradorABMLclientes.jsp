@@ -49,24 +49,29 @@
 			            <div class="mb-3">
 			                <input type="text" class="form-control" id="direccion" name="direccion" placeholder="Dirección" required>
 			            </div>
-			            <div class="mb-3">
-	                        <select class="form-select" id="localidad" name="localidad" required>
-	                            <option value="" disabled selected>Localidad</option>
-			                    <option value="1">1</option>
-			                    <option value="2">2</option>
-			                    <option value="3">3</option>
-			                    <option value="4">4</option>
-	                        </select>
-	                    </div>
-	                    <div class="mb-3">
-	                        <select class="form-select" id="provincia" name="provincia" required>
-	                            <option value="" disabled selected>Provincia</option>
-			                    <option value="1">1</option>
-			                    <option value="2">2</option>
-			                    <option value="3">3</option>
-			                    <option value="4">4</option>
-	                        </select>
-	                    </div>
+			        		
+			        		
+			        	   
+                        <div class="mb-3">
+                            <select class="form-select" name="ddlProvincia" required>
+                                <option value="" disabled selected>Provincia</option>
+                                <c:forEach var="prov" items="${listaProvincias}">
+                                    <option value="${prov.getIdProvincia()}"><c:out value="${prov.getDescripcion()}"/></option>
+                                </c:forEach>
+                            </select>
+                        </div>
+			        
+			        
+			        
+			         
+                        <div class="mb-3">
+                            <select class="form-select" name="ddlLocalidad" required>
+                                <option value="" disabled selected>Localidad</option>
+                                 <c:forEach var="loc" items="${listaLocalidades}">
+                                    <option value="${loc.getIdLocalidad()}"><c:out value="${loc.getDescripcion()}"/></option>
+                                </c:forEach>
+                            </select>
+                        </div>
 			            <div class="mb-3">
 			                <input type="text" class="form-control" id="correo" name="correo" placeholder="Correo Electrónico" required>
 			            </div>

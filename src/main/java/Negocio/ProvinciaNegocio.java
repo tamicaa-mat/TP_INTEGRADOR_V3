@@ -1,7 +1,12 @@
 package Negocio;
 
+import java.util.ArrayList;
+
+
+import dominio.Provincia;
+
 public interface ProvinciaNegocio {
 
+	public ArrayList<Provincia> readAll();
 	
-	 // se declaran los metodos necesarios. para manipular provinccias 
 }
