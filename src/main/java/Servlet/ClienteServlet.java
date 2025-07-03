@@ -14,13 +14,17 @@ import javax.servlet.http.HttpSession;
 import dominio.Cliente;
 import dominio.Localidad;
 import dominio.Provincia;
-import dominio.Usuario;
+
 import Negocio.ClienteNegocio;
 import Negocio.LocalidadNegocio;
 import Negocio.ProvinciaNegocio;
 import NegocioImpl.ClienteNegocioImpl;
+
+
+
 import NegocioImpl.LocalidadNegocioImpl;
 import NegocioImpl.ProvinciaNegocioImpl;
+
 
 @WebServlet("/ClienteServlet")
 public class ClienteServlet extends HttpServlet {
@@ -34,7 +38,11 @@ public class ClienteServlet extends HttpServlet {
         
         String action = request.getParameter("action");
 
-        
+
+        ClienteNegocio clienteNegocio = new ClienteNegocioImpl();
+
+       
+
         if (action != null && action.equals("mostrarFormulario")) {
             
             ProvinciaNegocio provNegocio = new ProvinciaNegocioImpl();
@@ -53,8 +61,8 @@ public class ClienteServlet extends HttpServlet {
             String dni = request.getParameter("dni");
             
            
-            ClienteNegocio clienteNegocio = new ClienteNegocioImpl();
-            Cliente clienteAEditar = clienteNegocio.getClientePorDni(dni);
+            ClienteNegocio clienteNegocio1 = new ClienteNegocioImpl();
+            Cliente clienteAEditar = clienteNegocio1.getClientePorDni(dni);
             
            
             ProvinciaNegocio provNegocio = new ProvinciaNegocioImpl();
@@ -73,7 +81,7 @@ public class ClienteServlet extends HttpServlet {
      
         else if (action != null && action.equals("eliminar")) {
             String dni = request.getParameter("dni");
-            ClienteNegocio clienteNegocio = new ClienteNegocioImpl();
+          
             if (dni != null) {
                 clienteNegocio.delete(dni);
                 request.getSession().setAttribute("mensaje", "Cliente eliminado correctamente.");
@@ -89,7 +97,7 @@ public class ClienteServlet extends HttpServlet {
                 session.removeAttribute("mensaje");
             }
 
-            ClienteNegocio clienteNegocio = new ClienteNegocioImpl();
+           
             ArrayList<Cliente> listaClientes = clienteNegocio.readAll();
             request.setAttribute("listaClientes", listaClientes);
             RequestDispatcher rd = request.getRequestDispatcher("/AdministradorListaClientes.jsp");

@@ -8,7 +8,12 @@ import Negocio.ClienteNegocio;
 
 public class ClienteNegocioImpl implements ClienteNegocio {
     
-    private ClienteDao cdao = new ClienteDaoImpl();
+	private ClienteDao cdao = new ClienteDaoImpl();
+    
+    public ClienteNegocioImpl(){
+    	this.cdao=cdao;
+    }
+    
 
     @Override
     public boolean insert(Cliente cliente) {

@@ -6,10 +6,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+
 import dao.ClienteDao;
 import dominio.Cliente;
 import dominio.Localidad;
-import dominio.Usuario;
+import dominio.Usuario; 
+
+
 
 public class ClienteDaoImpl implements ClienteDao {
 
@@ -43,7 +46,7 @@ public class ClienteDaoImpl implements ClienteDao {
 				rs = statementUsuario.getGeneratedKeys();
 				if (rs.next()) {
 					idUsuarioGenerado = rs.getInt(1);
-					cliente.getUsuario().setIdUsuario(idUsuarioGenerado); // <--- ¡Esto faltaba!
+					cliente.getUsuario().setIdUsuario(idUsuarioGenerado); 
 
 					
 				}
@@ -63,14 +66,15 @@ public class ClienteDaoImpl implements ClienteDao {
 				statementCliente.setString(10, cliente.getCorreoElectronico());
 				statementCliente.setString(11, cliente.getTelefono());
 				statementCliente.setInt(12, idUsuarioGenerado);
+			
 				
 				if(statementCliente.executeUpdate() > 0) {
 					conn.commit();
 					isSuccess = true;
 				} else {
 					conn.rollback();
-				}
-			} else {
+			      	}
+		       	} else {
 				conn.rollback();
 			}
 

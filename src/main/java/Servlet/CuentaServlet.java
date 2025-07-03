@@ -1,7 +1,9 @@
 package Servlet;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -9,11 +11,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import NegocioImpl.CuentaNegocioImpl;
+import daoImpl.CuentaDaoImpl;
 import dominio.Cliente;
 import dominio.Cuenta;
-import dominio.TipoCuenta;
-import Negocio.CuentaNegocio;
-import NegocioImpl.CuentaNegocioImpl;
 
 @WebServlet("/CuentaServlet")
 public class CuentaServlet extends HttpServlet {
@@ -23,62 +24,62 @@ public class CuentaServlet extends HttpServlet {
         super();
     }
 
+  
+    
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String action = request.getParameter("action");
+    	 String action = request.getParameter("action");
 
-        if (action != null && action.equals("listar")) {
-            String dniCliente = request.getParameter("dni");
-            
-            CuentaNegocio cuentaNegocio = new CuentaNegocioImpl();
-            ArrayList<Cuenta> listaCuentas = cuentaNegocio.getCuentasPorCliente(dniCliente);
-            
-            request.setAttribute("listaCuentas", listaCuentas);
-            request.setAttribute("dniCliente", dniCliente); // Para saber a quién pertenece la cuenta
-            
-            RequestDispatcher rd = request.getRequestDispatcher("/AdministradorListaCuentas.jsp");
-            rd.forward(request, response);
-        }
+         if (action != null && action.equals("listar")) {
+             String dniCliente = request.getParameter("dni");
+             
+             CuentaNegocioImpl cuentaNegocio = new CuentaNegocioImpl(new CuentaDaoImpl());
+             ArrayList<Cuenta> listaCuentas = cuentaNegocio.getCuentasPorCliente(dniCliente);
+             
+             request.setAttribute("listaCuentas", listaCuentas);
+             request.setAttribute("dniCliente", dniCliente); 
+             
+             RequestDispatcher rd = request.getRequestDispatcher("/AdministradorListaCuentas.jsp");
+             rd.forward(request, response);
+         }
     }
+
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String action = request.getParameter("action");
-        CuentaNegocio cuentaNegocio = new CuentaNegocioImpl();
+    	String action = request.getParameter("action");
+    	CuentaNegocioImpl cuentaNegocio = new CuentaNegocioImpl(new CuentaDaoImpl());
 
-        if (action != null && action.equals("agregar")) {
-            String dniCliente = request.getParameter("dniCliente");
-            int idTipoCuenta = Integer.parseInt(request.getParameter("idTipoCuenta"));
+    	if (action != null && action.equals("agregar")) {
+    	    String dniCliente = request.getParameter("dniCliente");
+    	    int idTipoCuenta = Integer.parseInt(request.getParameter("idTipoCuenta"));
 
-            Cuenta nuevaCuenta = new Cuenta();
-            Cliente cliente = new Cliente();
-            cliente.setDni(dniCliente);
-            nuevaCuenta.setCliente(cliente);
-            
-            TipoCuenta tipoCuenta = new TipoCuenta();
-            tipoCuenta.setIdTipoCuenta(idTipoCuenta);
-            nuevaCuenta.setTipoCuenta(tipoCuenta);
+    	    Cuenta nuevaCuenta = new Cuenta();
+    	    nuevaCuenta.setTipoCuenta(idTipoCuenta); 
 
-            boolean seAgrego = cuentaNegocio.insert(nuevaCuenta);
+    	    Cliente cliente = new Cliente();
+    	    cliente.setDni(dniCliente); 
+    	    nuevaCuenta.setCliente(cliente);
 
-            if (!seAgrego) {
-                // Si no se agregó (porque ya tiene 3 cuentas), mandamos un mensaje de error
-                request.setAttribute("errorLimiteCuentas", "El cliente ya alcanzó el límite de 3 cuentas activas.");
-            }
-            // Hacemos el forward para mostrar la lista actualizada (con o sin el error)
-            ArrayList<Cuenta> listaCuentas = cuentaNegocio.getCuentasPorCliente(dniCliente);
-            request.setAttribute("listaCuentas", listaCuentas);
-            request.setAttribute("dniCliente", dniCliente);
-            RequestDispatcher rd = request.getRequestDispatcher("/AdministradorListaCuentas.jsp");
-            rd.forward(request, response);
-        }
+    	    nuevaCuenta.setSaldo(0.0);
+    	    nuevaCuenta.setFechaCreacion(LocalDate.now());
+    	    nuevaCuenta.setEstado(true);
+    	  
+    	    
+    	    
+    	    boolean seAgrego = cuentaNegocio.agregarCuenta(nuevaCuenta);
 
-        if (action != null && action.equals("eliminar")) {
-            int idCuenta = Integer.parseInt(request.getParameter("idCuenta"));
-            String dniCliente = request.getParameter("dniCliente");
-            
-            cuentaNegocio.delete(idCuenta);
+    	    if (!seAgrego) {
+    	        request.setAttribute("errorLimiteCuentas", "El cliente ya alcanzó el límite de 3 cuentas activas.");
+    	    }
 
-            // Redirigimos de vuelta a la lista de cuentas de ese cliente
-            response.sendRedirect(request.getContextPath() + "/CuentaServlet?action=listar&dni=" + dniCliente);
-        }
+    	    ArrayList<Cuenta> listaCuentas = cuentaNegocio.getCuentasPorCliente(dniCliente);
+    	    request.setAttribute("listaCuentas", listaCuentas);
+    	    request.setAttribute("dniCliente", dniCliente);
+
+    	    RequestDispatcher rd = request.getRequestDispatcher("/AdministradorListaCuentas.jsp");
+    	    rd.forward(request, response);
+    	}
+
+       
     }
 }
+    

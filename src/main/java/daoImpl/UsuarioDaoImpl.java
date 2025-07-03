@@ -64,19 +64,19 @@ public class UsuarioDaoImpl implements UsuarioDao {
         try {
             conn = Conexion.getConexion().getSQLConexion();
             stmt = conn.prepareStatement(CAMBIAPASS);
-            stmt.setString(1, nuevaPassword); // ¡Este va primero!
+            stmt.setString(1, nuevaPassword);
             stmt.setInt(2, idUsuario);
 
-            int filasAfectadas = stmt.executeUpdate(); // para UPDATE se usa executeUpdate()
+            int filasAfectadas = stmt.executeUpdate(); 
 
             if (filasAfectadas > 0) {
-                conn.commit(); // confirmamos la transacción si todo va bien
+                conn.commit(); 
                 return true;
             }
         } catch (SQLException e) {
             e.printStackTrace();
             try {
-                if (conn != null) conn.rollback(); // revertimos en caso de error
+                if (conn != null) conn.rollback(); 
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }

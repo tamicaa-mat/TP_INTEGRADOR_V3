@@ -6,16 +6,20 @@ import dominio.Cliente;
 public interface ClienteDao {
     
 
-    public boolean insert(Cliente cliente);
+     boolean insert(Cliente cliente);
     
     
-    public boolean delete(String dni);
+     boolean delete(String dni);
     
   
-    public ArrayList<Cliente> readAll();
+    ArrayList<Cliente> readAll();
     
    
-    public boolean update(Cliente cliente);
-    public Cliente getClientePorDni(String dni);
-    public Cliente getClientePorUsuario(int idUsuario);
+    boolean update(Cliente cliente);
+    
+     Cliente getClientePorDni(String dni);
+     
+     Cliente getClientePorUsuario(int idUsuario);
+    
+    
 }

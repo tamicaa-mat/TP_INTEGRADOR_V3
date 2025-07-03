@@ -4,8 +4,19 @@ import dominio.Usuario;
 
 public interface UsuarioDao {
 	
-    public Usuario getUsuario(String username, String password);
-    public boolean actualizarPassword(int idUsuario, String nuevaPassword);
+	    // boolean insert(Usuario usuario);
+	    
+	    
+	     // boolean delete(int IdUsuario);
+	    
+	  
+	    // ArrayList<Usuario> readAll();
+	  
+	   
+	   // boolean update(Usuario usuario);
+	    
+       Usuario getUsuario(String username, String password);
+       boolean actualizarPassword(int idUsuario, String nuevaPassword);
     
     
 }
