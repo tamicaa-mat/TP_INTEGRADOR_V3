@@ -43,7 +43,7 @@
                             <td>
                                 <a href="ClienteServlet?action=editar&dni=${cliente.getDni()}" class="btn btn-success btn-sm">Editar</a>
                                 <a href="ClienteServlet?action=eliminar&dni=${cliente.getDni()}" class="btn btn-danger btn-sm" onclick="return confirm('¿Está seguro?');">Eliminar</a>
-                                <a href="CuentaServlet?action=listar&dni=${cliente.getDni()}" class="btn btn-info btn-sm">Cuentas</a>
+                                <a href="CuentaServlet?action=listar&dni=${cliente.getIdCliente()}" class="btn btn-info btn-sm">Cuentas</a>
                             </td>
                         </tr>
                     </c:forEach>

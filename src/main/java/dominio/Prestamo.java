@@ -1,27 +1,28 @@
 package dominio;
 
-import java.time.LocalDate; // Importar para FechaAlta
+import java.sql.Date;
+
 
 
 public class Prestamo {
     private int idPrestamo;
     private Cliente cliente; 
     private Cuenta cuentaAsociada; 
-    private LocalDate fechaAlta;
+    private Date fechaAlta;
     private double importePedido;
     private int plazoMeses;
     private double importePorMes;
     private double interes; 
     private int CantidadCuotas;
-    private String Estado; 
+    private int Estado; 
 
     public Prestamo() {
         // Constructor vacío
     }
 
-    public Prestamo(int idPrestamo, Cliente cliente, Cuenta cuentaAsociada, LocalDate fechaAlta,
+    public Prestamo(int idPrestamo, Cliente cliente, Cuenta cuentaAsociada, Date fechaAlta,
                      double importePedido, int plazoMeses, double importePorMes,
-                     double interes, int cantidadCuotas, String estado) {
+                     double interes, int cantidadCuotas, int estado) {
         this.idPrestamo = idPrestamo;
         this.cliente = cliente;
         this.cuentaAsociada = cuentaAsociada;
@@ -47,7 +48,7 @@ public class Prestamo {
         return cuentaAsociada;
     }
 
-    public LocalDate getFechaAlta() {
+    public Date getFechaAlta() {
         return fechaAlta;
     }
 
@@ -71,7 +72,7 @@ public class Prestamo {
         return CantidadCuotas;
     }
 
-    public String getEstado() {
+    public int getEstado() {
         return Estado;
     }
 
@@ -88,7 +89,7 @@ public class Prestamo {
         this.cuentaAsociada = cuentaAsociada;
     }
 
-    public void setFechaAlta(LocalDate fechaAlta) {
+    public void setFechaAlta(Date fechaAlta) {
         this.fechaAlta = fechaAlta;
     }
 
@@ -104,7 +105,7 @@ public class Prestamo {
         this.importePorMes = importePorMes;
     }
 
-    public void setInteres(Double interes) {
+    public void setInteres(double interes) {
         this.interes = interes;
     }
 
@@ -112,7 +113,7 @@ public class Prestamo {
         this.CantidadCuotas = cantidadCuotas;
     }
 
-    public void setEstado(String estado) {
+    public void setEstado(int estado) {
         this.Estado = estado;
     }
 

@@ -6,7 +6,8 @@ import dominio.Usuario;
 import Negocio.UsuarioNegocio;
 
 public class UsuarioNegocioImpl implements UsuarioNegocio {
-    private UsuarioDao usuarioDao;
+   
+	private UsuarioDao usuarioDao;
 
     public UsuarioNegocioImpl() {
         this.usuarioDao = new UsuarioDaoImpl();

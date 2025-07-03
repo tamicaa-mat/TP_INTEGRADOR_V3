@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import dominio.Cliente;
 import Negocio.ClienteNegocio;
 import NegocioImpl.ClienteNegocioImpl;
+import daoImpl.ClienteDaoImpl;
 
 @WebServlet("/ClienteServlet")
 public class ClienteServlet extends HttpServlet {
@@ -24,8 +25,9 @@ public class ClienteServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         
         String action = request.getParameter("action");
-        ClienteNegocio clienteNegocio = new ClienteNegocioImpl();
         
+        ClienteNegocio clienteNegocio = new ClienteNegocioImpl(new ClienteDaoImpl());
+
       
         if (action != null && action.equals("eliminar")) {
             String dni = request.getParameter("dni");
