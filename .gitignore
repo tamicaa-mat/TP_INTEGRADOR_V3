@@ -5,4 +5,9 @@
 
 # Carpetas de archivos compilados
 build/
+bin/
 target/
+
+# Archivos de sistema operativo
+.DS_Store
+Thumbs.db

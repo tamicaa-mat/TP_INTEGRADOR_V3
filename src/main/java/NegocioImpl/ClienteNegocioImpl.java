@@ -29,4 +29,18 @@ public class ClienteNegocioImpl implements ClienteNegocio {
     public ArrayList<Cliente> readAll() {
         return cdao.readAll();
     }
+    
+    
+    @Override
+    public Cliente getClientePorDni(String dni) {
+        // pasando la llamada al dao
+        return cdao.getClientePorDni(dni);
+    }
+    
+    
+    @Override
+    public boolean update(Cliente cliente) {
+     
+        return cdao.update(cliente);
+    }
 }

@@ -1,7 +1,21 @@
 package NegocioImpl;
 
-public class ProvinciaNegocioImpl {
+import java.util.ArrayList;
+import dao.ProvinciaDao;
+import daoImpl.ProvinciaDaoImpl;
+import dominio.Provincia;
+import Negocio.ProvinciaNegocio;
 
-	
-	//  sus implementaciones
+public class ProvinciaNegocioImpl implements ProvinciaNegocio {
+
+    private ProvinciaDao provinciaDao;
+
+    public ProvinciaNegocioImpl() {
+        this.provinciaDao = new ProvinciaDaoImpl();
+    }
+
+    @Override
+    public ArrayList<Provincia> readAll() {
+        return provinciaDao.readAll();
+    }
 }

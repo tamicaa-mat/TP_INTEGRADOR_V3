@@ -254,6 +254,8 @@ public class ClienteDaoImpl implements ClienteDao {
 		return cliente;
 	}
 	
+	
+	
 	private Cliente instanciarClienteDesdeRs(ResultSet rs) throws SQLException {
 		Cliente cliente = new Cliente();
 		cliente.setIdCliente(rs.getInt("IdCliente"));
