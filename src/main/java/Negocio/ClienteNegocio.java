@@ -7,4 +7,6 @@ public interface ClienteNegocio {
     public boolean insert(Cliente cliente);
     public boolean delete(String dni);
     public ArrayList<Cliente> readAll();
+    public Cliente getClientePorDni(String dni);
+	public boolean update(Cliente cliente);
 }
