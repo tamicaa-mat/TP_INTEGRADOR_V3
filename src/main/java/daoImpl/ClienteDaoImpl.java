@@ -16,8 +16,7 @@ import dominio.Usuario;
 
 public class ClienteDaoImpl implements ClienteDao {
 
-	private static final String INSERT_USUARIO = "insert into usuario(NombreUsuario, Password, idTipoUsuario, Estado) values(?, ?, ?, 1)";
-	private static final String INSERT_CLIENTE = "insert into cliente(DNI, CUIL, Nombre, Apellido, Sexo, Nacionalidad, FechaNacimiento, Direccion, idLocalidad, CorreoElectronico, Telefono, idUsuario, Estado) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)";
+	private static final String INSERT_CLIENTE_SOLO = "insert into cliente(DNI, CUIL, Nombre, Apellido, Sexo, Nacionalidad, FechaNacimiento, Direccion, idLocalidad, CorreoElectronico, Telefono, Estado) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)";
 	private static final String READ_ALL = "select c.*, u.NombreUsuario, l.Descripcion as LocalidadDescripcion from cliente c inner join usuario u on c.IdUsuario = u.IdUsuario inner join localidad l on c.IdLocalidad = l.IdLocalidad where c.Estado = 1";
 	private static final String DELETE_LOGICO = "update cliente set Estado = 0 where DNI = ?";
 	private static final String UPDATE_CLIENTE = "update cliente set CUIL = ?, Nombre = ?, Apellido = ?, Sexo = ?, Nacionalidad = ?, FechaNacimiento = ?, Direccion = ?, idLocalidad = ?, CorreoElectronico = ?, Telefono = ? where DNI = ?";
@@ -27,75 +26,60 @@ public class ClienteDaoImpl implements ClienteDao {
 	@Override
 	public boolean insert(Cliente cliente) {
 		Connection conn = null;
-		PreparedStatement statementUsuario = null;
-		PreparedStatement statementCliente = null;
+		PreparedStatement statement = null;
 		ResultSet rs = null;
 		boolean isSuccess = false;
-		int idUsuarioGenerado = -1;
+		
 		
 		try {
 			conn = Conexion.getConexion().getSQLConexion();
-			conn.setAutoCommit(false);
+			statement = conn.prepareStatement(INSERT_CLIENTE_SOLO);
+			statement.setString(1, cliente.getDni());
+	        statement.setString(2, cliente.getCuil());
+	        statement.setString(3, cliente.getNombre());
+	        statement.setString(4, cliente.getApellido());
+	        statement.setString(5, cliente.getSexo());
+	        statement.setString(6, cliente.getNacionalidad());
+	        statement.setDate(7, java.sql.Date.valueOf(cliente.getFechaNacimiento()));
+	        statement.setString(8, cliente.getDireccion());
+	        statement.setInt(9, cliente.getLocalidad().getIdLocalidad());
+	        statement.setString(10, cliente.getCorreoElectronico());
+	        statement.setString(11, cliente.getTelefono());
 
-			statementUsuario = conn.prepareStatement(INSERT_USUARIO, Statement.RETURN_GENERATED_KEYS);
-			statementUsuario.setString(1, cliente.getUsuario().getNombreUsuario());
-			statementUsuario.setString(2, cliente.getUsuario().getPassword());
-			statementUsuario.setInt(3, 2); 
 
-			if (statementUsuario.executeUpdate() > 0) {
-				rs = statementUsuario.getGeneratedKeys();
-				if (rs.next()) {
-					idUsuarioGenerado = rs.getInt(1);
-					cliente.getUsuario().setIdUsuario(idUsuarioGenerado); 
-
-					
-				}
-			}
-			
-			if (idUsuarioGenerado != -1) {
-				statementCliente = conn.prepareStatement(INSERT_CLIENTE);
-				statementCliente.setString(1, cliente.getDni());
-				statementCliente.setString(2, cliente.getCuil());
-				statementCliente.setString(3, cliente.getNombre());
-				statementCliente.setString(4, cliente.getApellido());
-				statementCliente.setString(5, cliente.getSexo());
-				statementCliente.setString(6, cliente.getNacionalidad());
-				statementCliente.setDate(7, java.sql.Date.valueOf(cliente.getFechaNacimiento()));
-				statementCliente.setString(8, cliente.getDireccion());
-				statementCliente.setInt(9, cliente.getLocalidad().getIdLocalidad());
-				statementCliente.setString(10, cliente.getCorreoElectronico());
-				statementCliente.setString(11, cliente.getTelefono());
-				statementCliente.setInt(12, idUsuarioGenerado);
-			
+			if (statement.executeUpdate() > 0) {
+				conn.commit();
+				isSuccess = true;
 				
-				if(statementCliente.executeUpdate() > 0) {
-					conn.commit();
-					isSuccess = true;
-				} else {
-					conn.rollback();
-			      	}
-		       	} else {
+			}
+			else {
 				conn.rollback();
 			}
+			
 
-		} catch (SQLException e) {
+		} 
+		catch (SQLException e) {
 			e.printStackTrace();
-			try {
-				if (conn != null) conn.rollback();
-			} catch (SQLException ex) {
-				ex.printStackTrace();
+			try { 
+				if (conn != null) conn.rollback(); 
+				} 
+			
+			catch (SQLException ex) { 
+				ex.printStackTrace(); 
 			}
-		} finally {
-			try {
-				if (rs != null) rs.close();
-				if (statementUsuario != null) statementUsuario.close();
-				if (statementCliente != null) statementCliente.close();
-				if (conn != null) conn.setAutoCommit(true);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-		return isSuccess;
+	    } finally {
+	        try
+	        { 
+	        	if (statement != null) statement.close();
+	        	} 
+	        catch (SQLException e)
+	        {
+	        	e.printStackTrace(); 
+	        	}
+	    }
+	    return isSuccess;
+			
+			
 	}
 
 	@Override
@@ -253,8 +237,6 @@ public class ClienteDaoImpl implements ClienteDao {
 		}
 		return cliente;
 	}
-	
-	
 	
 	private Cliente instanciarClienteDesdeRs(ResultSet rs) throws SQLException {
 		Cliente cliente = new Cliente();
