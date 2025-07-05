@@ -27,7 +27,6 @@ public class ClienteDaoImpl implements ClienteDao {
 	public boolean insert(Cliente cliente) {
 		Connection conn = null;
 		PreparedStatement statement = null;
-		ResultSet rs = null;
 		boolean isSuccess = false;
 		
 		

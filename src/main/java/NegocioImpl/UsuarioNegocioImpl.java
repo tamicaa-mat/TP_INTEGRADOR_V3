@@ -23,6 +23,16 @@ public class UsuarioNegocioImpl implements UsuarioNegocio {
         return usuarioDao.actualizarPassword(idUsuario, nuevaPassword);
     }
     
-    
+ 
+
+    @Override
+    public boolean insert(Usuario usuario, String dniCliente) {
+        
+        // - se puede verificar que el nombre de usuario no este ya en uso
+        // - se puede verificar que la contraseña tenga un mínimo de caracteres por  ejemplo
+
+   
+        return usuarioDao.insert(usuario, dniCliente);
+    }
     
 }

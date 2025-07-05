@@ -49,4 +49,27 @@ public class LocalidadDaoImpl implements LocalidadDao {
         }
         return localidades;
     }
+
+
+
+    
+   public boolean insert(Localidad loc) {
+	   
+	   
+	   //  POR AHORA!! OJO
+     boolean estado= false;
+     
+     return estado;
+    }
+
+	  
+	public boolean delete(int idLocalidad) {
+		
+		
+		// POR AHORA OJO!!
+		 boolean estado = false;
+		 
+		 return estado;
+	 }
+
 }

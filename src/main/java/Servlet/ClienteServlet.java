@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.taglibs.standard.tag.common.fmt.RequestEncodingSupport;
+
 import dominio.Cliente;
 import dominio.Localidad;
 import dominio.Provincia;
@@ -77,34 +79,70 @@ public class ClienteServlet extends HttpServlet {
        
     }
 
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	 String action = request.getParameter("action");
-         
-    	
-    	 if (action != null && action.equals("agregar")) {
-    	     
-    	     String dni = request.getParameter("txtDni");
-    	     String cuil = request.getParameter("txtCuil");
-    	     
+        String action = request.getParameter("action");
+        
+        // Si la acción es "agregar", procesamos el formulario
+        if (action != null && action.equals("agregar")) {
+            
+            // 1. Recuperar TODOS los datos del formulario
+            String dni = request.getParameter("txtDni");
+            String cuil = request.getParameter("txtCuil");
+            String nombre = request.getParameter("txtNombre");
+            String apellido = request.getParameter("txtApellido");
+            String nacionalidad = request.getParameter("txtNacionalidad");
+            LocalDate fechaNacimiento = LocalDate.parse(request.getParameter("txtFechaNacimiento"));
+            String sexo = request.getParameter("ddlSexo");
+            String email = request.getParameter("txtEmail");
+            String telefono = request.getParameter("txtTelefono");
+            String direccion = request.getParameter("txtDireccion");
+            int idLocalidad = Integer.parseInt(request.getParameter("ddlLocalidad"));
+            String nombreUsuario = request.getParameter("txtUsuario");
+            String pass = request.getParameter("txtPassword");
+            
+            // 2. Crear y RELLENAR los objetos de dominio
+            Usuario usuario = new Usuario();
+            usuario.setNombreUsuario(nombreUsuario);
+            usuario.setPassword(pass);
 
-    	    
-    	     Cliente cliente = new Cliente();
-    	     cliente.setDni(dni);
-    	     cliente.setCuil(cuil);
-    	     
-    	     ClienteNegocio clienteNegocio = new ClienteNegocioImpl();
-    	     boolean seAgrego = clienteNegocio.insert(cliente);
+            Localidad loc = new Localidad();
+            loc.setIdLocalidad(idLocalidad);
 
-    	  
-    	     if(seAgrego) {
-    	      
-    	         response.sendRedirect(request.getContextPath() + "/UsuarioServlet?action=mostrarFormularioAlta&dniCliente=" + dni);
-    	     } else {
-    	         // Si falló, volvemos a la lista con un mensaje de error
-    	         HttpSession session = request.getSession();
-    	         session.setAttribute("mensaje", "Error: No se pudo agregar al cliente.");
-    	         response.sendRedirect(request.getContextPath() + "/ClienteServlet");
-    	     }
-    	 }
-      
+            Cliente cliente = new Cliente();
+            cliente.setDni(dni);
+            cliente.setCuil(cuil);
+            cliente.setNombre(nombre);
+            cliente.setApellido(apellido);
+            cliente.setNacionalidad(nacionalidad);
+            cliente.setFechaNacimiento(fechaNacimiento);
+            cliente.setSexo(sexo);
+            cliente.setCorreoElectronico(email);
+            cliente.setTelefono(telefono);
+            cliente.setDireccion(direccion);
+            cliente.setLocalidad(loc);
+            cliente.setUsuario(usuario); // Asociamos el usuario al cliente
+            
+            // 3. Insertar el cliente a través de la capa de negocio
+            ClienteNegocio clienteNegocio = new ClienteNegocioImpl();
+            boolean seAgrego = clienteNegocio.insert(cliente);
+
+            // 4. Preparar mensaje y redirigir
+            if(seAgrego) {
+                // Si se agregó bien, redirigimos para crear el usuario
+                response.sendRedirect(request.getContextPath() + "/UsuarioServlet?action=mostrarFormularioAlta&dniCliente=" + dni);
+            } else {
+                // Si falló, volvemos a la lista con un mensaje de error
+                HttpSession session = request.getSession();
+                session.setAttribute("mensaje", "Error: No se pudo agregar al cliente.");
+                response.sendRedirect(request.getContextPath() + "/ClienteServlet");
+            }
+        }
+        
+        // Aquí iría la lógica para la acción "modificar" si la tuvieras
+        else if (action != null && action.equals("modificar")) {
+            // ...
+        }
     }
+
+}

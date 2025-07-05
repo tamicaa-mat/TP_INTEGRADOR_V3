@@ -4,6 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import com.mysql.jdbc.Statement;
+
 import dao.UsuarioDao;
 import dominio.TipoUsuario;
 import dominio.Usuario;
@@ -12,6 +15,8 @@ public class UsuarioDaoImpl implements UsuarioDao {
     private static final String GET_USUARIO = "SELECT u.IdUsuario, u.NombreUsuario, u.Password, u.Estado, u.IdTipoUsuario, tu.Descripcion as TipoDescripcion FROM Usuario u INNER JOIN TipoUsuario tu ON u.IdTipoUsuario = tu.IdTipoUsuario WHERE u.NombreUsuario = ? AND u.Password = ? AND u.Estado = 1";
     private static final String CAMBIAPASS = "UPDATE Usuario SET Password = ? WHERE IdUsuario = ?";
     
+    
+    private static final String UPDATE_CLIENTE_CON_USUARIO = "UPDATE cliente SET IdUsuario = ? WHERE DNI = ?";
     
     public Usuario getUsuario(String username, String password) {
         Connection conn = null;
@@ -93,7 +98,68 @@ public class UsuarioDaoImpl implements UsuarioDao {
 
     
     
-    
-    
+    //método  inserta un usuario y luego actualiza el cliente.
+    @Override
+    public boolean insert(Usuario usuario, String dniCliente) {
+        Connection conn = null;
+        PreparedStatement stmtUsuario = null;
+        PreparedStatement stmtCliente = null;
+        ResultSet rs = null;
+        boolean isSuccess = false;
+        int idUsuarioGenerado = -1;
+
+        try {
+            conn = Conexion.getConexion().getSQLConexion();
+            conn.setAutoCommit(false);
+
+            // 1. Insertar el Usuario
+            stmtUsuario = conn.prepareStatement("INSERT INTO usuario (NombreUsuario, Password, IdTipoUsuario, Estado) VALUES (?, ?, 2, 1)", Statement.RETURN_GENERATED_KEYS);
+            stmtUsuario.setString(1, usuario.getNombreUsuario());
+            stmtUsuario.setString(2, usuario.getPassword());
+
+            if (stmtUsuario.executeUpdate() > 0) {
+                rs = stmtUsuario.getGeneratedKeys();
+                if (rs.next()) {
+                    idUsuarioGenerado = rs.getInt(1);
+                }
+            }
+
+            // 2. Actualizar el Cliente con el ID del usuario
+            if (idUsuarioGenerado != -1) {
+                stmtCliente = conn.prepareStatement(UPDATE_CLIENTE_CON_USUARIO);
+                stmtCliente.setInt(1, idUsuarioGenerado);
+                stmtCliente.setString(2, dniCliente);
+
+                if(stmtCliente.executeUpdate() > 0) {
+                    conn.commit();
+                    isSuccess = true;
+                } else {
+                    conn.rollback();
+                }
+            } else {
+                conn.rollback();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            try { if (conn != null) conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+        } finally {
+        	 
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (stmtUsuario != null) {
+                    stmtUsuario.close();
+                }
+                if (stmtCliente != null) {
+                    stmtCliente.close();
+                }
+               
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return isSuccess;
+    }
     
 }
