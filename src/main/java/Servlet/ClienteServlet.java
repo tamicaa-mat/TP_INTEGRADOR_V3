@@ -21,6 +21,7 @@ import Negocio.ProvinciaNegocio;
 import NegocioImpl.ClienteNegocioImpl;
 import NegocioImpl.LocalidadNegocioImpl;
 import NegocioImpl.ProvinciaNegocioImpl;
+import daoImpl.ClienteDaoImpl;
 
 @WebServlet("/ClienteServlet")
 public class ClienteServlet extends HttpServlet {
@@ -53,7 +54,7 @@ public class ClienteServlet extends HttpServlet {
         else if (action != null && action.equals("editar")) {
             String dni = request.getParameter("dni");
             
-            ClienteNegocio clienteNegocio = new ClienteNegocioImpl();
+            ClienteNegocio clienteNegocio = new ClienteNegocioImpl(new ClienteDaoImpl());
             Cliente clienteAEditar = clienteNegocio.getClientePorDni(dni);
             
             ProvinciaNegocio provNegocio = new ProvinciaNegocioImpl();
@@ -72,7 +73,7 @@ public class ClienteServlet extends HttpServlet {
        
         else if (action != null && action.equals("eliminar")) {
             String dni = request.getParameter("dni");
-            ClienteNegocio clienteNegocio = new ClienteNegocioImpl();
+            ClienteNegocio clienteNegocio = new ClienteNegocioImpl(new ClienteDaoImpl());
             if(dni != null) {
                 clienteNegocio.delete(dni);
             }
@@ -80,7 +81,7 @@ public class ClienteServlet extends HttpServlet {
         } 
        
         else {
-            ClienteNegocio clienteNegocio = new ClienteNegocioImpl();
+            ClienteNegocio clienteNegocio = new ClienteNegocioImpl(new ClienteDaoImpl());
             ArrayList<Cliente> listaClientes = clienteNegocio.readAll();
             request.setAttribute("listaClientes", listaClientes);
             RequestDispatcher rd = request.getRequestDispatcher("/AdministradorListaClientes.jsp");
@@ -91,7 +92,7 @@ public class ClienteServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
-        ClienteNegocio clienteNegocio = new ClienteNegocioImpl();
+        ClienteNegocio clienteNegocio = new ClienteNegocioImpl(new ClienteDaoImpl());
         HttpSession session = request.getSession();
 
      

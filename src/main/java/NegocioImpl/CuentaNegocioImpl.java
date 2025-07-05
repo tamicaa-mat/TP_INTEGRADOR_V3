@@ -1,43 +1,97 @@
 package NegocioImpl;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import dao.CuentaDao;
 import daoImpl.CuentaDaoImpl;
+import dominio.Cliente;
 import dominio.Cuenta;
 import Negocio.CuentaNegocio;
 
 public class CuentaNegocioImpl implements CuentaNegocio {
 
-    private CuentaDao cuentaDao;
 
-    public CuentaNegocioImpl() {
-        this.cuentaDao = new CuentaDaoImpl();
+	private CuentaDao cuentaDao = new CuentaDaoImpl();
+
+	
+	
+	
+    public CuentaNegocioImpl(CuentaDao cuentaDao) {
+        this.cuentaDao = cuentaDao;
     }
 
-    @Override
-    public boolean insert(Cuenta cuenta) {
-        // Regla de Negocio: No se puede agregar una cuenta si el cliente ya tiene 3.
-        int cantidadCuentas = cuentaDao.countCuentasActivasPorCliente(cuenta.getCliente().getDni());
-        if (cantidadCuentas >= 3) {
-            return false; // No se puede insertar, se alcanzó el límite.
-        }
+
+//    ///////////////////////////////////////////////
+    
+    public Cuenta getCuentaPorCbu(String cbu, Cliente cliente) {
+        return cuentaDao.getCuentaPorCbu(cbu,cliente);
+    }
+
+  
+    public int cuentasActivasPorCliente(String dniCliente) {
+    	  if (dniCliente == null || dniCliente.trim().isEmpty()) {
+    	     
+    	        System.out.println("DNI de cliente inválido.");
+    	        return -1;
+    	    }
+
+    	    return cuentaDao.cuentasActivasPorCliente(dniCliente);
+    }
+
+ 
+    public ArrayList<Cuenta> getCuentasPorCliente(String dniCliente, Cliente cliente) {
+    
+    	  ArrayList<Cuenta> cuentas = cuentaDao.getCuentasPorCliente(dniCliente,cliente);
+
+
+    	    if (cuentas != null) {
+    	        return cuentas;
+    	    }
+    	    
+        return new ArrayList<>();
         
+      
+        
+    }
+
+    public boolean agregarCuenta(Cuenta cuenta,Cliente cliente) {
+        if (cuenta == null || cliente == null) {
+            System.out.println("Cuenta o cliente nulo.");
+            return false;
+        }
+
+        String dniCliente = cliente.getDni();
+
+        if (dniCliente == null || dniCliente.trim().isEmpty()) {
+            System.out.println("DNI inválido.");
+            return false;
+        }
+
+        int cuentasActivas = cuentaDao.cuentasActivasPorCliente(dniCliente);
+
+        if (cuentasActivas >= 3) {
+            System.out.println("El cliente ya tiene 3 cuentas activas.");
+            return false;
+        }
+
         return cuentaDao.insert(cuenta);
     }
 
-    @Override
-    public boolean delete(int idCuenta) {
-        return cuentaDao.delete(idCuenta);
-    }
 
-    @Override
-    public ArrayList<Cuenta> getCuentasPorCliente(String dniCliente) {
-        return cuentaDao.getCuentasPorCliente(dniCliente);
-    }
+	
+	public List<Cuenta> ObtenerCuentasPorIdCliente(int idCliente,Cliente cliente) {
+		
+		
+		  ArrayList<Cuenta> cuentas = cuentaDao.getCuentasPorIdCliente(idCliente,cliente);
 
-    @Override
-    public Cuenta getCuentaPorCbu(String cbu) {
-        return cuentaDao.getCuentaPorCbu(cbu);
-    }
+
+  	    if (cuentas != null) {
+  	        return cuentas;
+  	    }
+  	    
+      return new ArrayList<>();
+	}
+
+
 }

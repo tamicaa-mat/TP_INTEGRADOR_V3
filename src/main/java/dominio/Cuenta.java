@@ -1,108 +1,114 @@
 package dominio;
 
 import java.time.LocalDate; // Importar para FechaCreacion
-import java.math.BigDecimal; // Importar para manejo preciso de dinero
 
 public class Cuenta {
-    private int idCuenta;
-    private Cliente cliente; // Objeto de composición
-    private LocalDate fechaCreacion;
-    private TipoCuenta tipoCuenta; // Objeto de composición
-    private String numeroCuenta;
-    private String cbu;
-    private BigDecimal saldo; // Usar BigDecimal para dinero por precisión
-    private boolean estado; // Coincide con 'Estado' en tu DDL actual
 
-    public Cuenta() {
-        // Constructor vacío
-    }
+	  private int idCuenta;
+	    int IdCliente;
+	    private LocalDate fechaCreacion;
+	    private int tipoCuenta; 
+	    private String numeroCuenta;
+	    private String cbu;
+	    private double saldo; // Usar BigDecimal para dinero por precisión
+	    private boolean estado; // Coincide con 'Estado' en tu DDL actual
 
-    public Cuenta(int idCuenta, Cliente cliente, LocalDate fechaCreacion, TipoCuenta tipoCuenta,
-                  String numeroCuenta, String cbu, BigDecimal saldo, boolean estado) {
-        this.idCuenta = idCuenta;
-        this.cliente = cliente;
-        this.fechaCreacion = fechaCreacion;
-        this.tipoCuenta = tipoCuenta;
-        this.numeroCuenta = numeroCuenta;
-        this.cbu = cbu;
-        this.saldo = saldo;
-        this.estado = estado;
-    }
+	    public Cuenta() {
+	        // Constructor vacío
+	    }
 
-    // Getters
-    public int getIdCuenta() {
-        return idCuenta;
-    }
+	    public Cuenta(int idCuenta, int IdCliente, LocalDate fechaCreacion, int tipoCuenta,
+	                  String numeroCuenta, String cbu, double saldo, boolean estado) {
+	        this.idCuenta = idCuenta;
+	       
+	        this.fechaCreacion = fechaCreacion;
+	        this.tipoCuenta = tipoCuenta;
+	        this.numeroCuenta = numeroCuenta;
+	        this.cbu = cbu;
+	        this.saldo = saldo;
+	        this.estado = estado;
+	    }
 
-    public Cliente getCliente() {
-        return cliente;
-    }
+		public int getIdCuenta() {
+			return idCuenta;
+		}
 
-    public LocalDate getFechaCreacion() {
-        return fechaCreacion;
-    }
+		public void setIdCuenta(int idCuenta) {
+			this.idCuenta = idCuenta;
+		}
 
-    public TipoCuenta getTipoCuenta() {
-        return tipoCuenta;
-    }
+		public int getIdCliente() {
+			return IdCliente;
+		}
 
-    public String getNumeroCuenta() {
-        return numeroCuenta;
-    }
+		public void setIdCliente(int idCliente) {
+			IdCliente = idCliente;
+		}
 
-    public String getCbu() {
-        return cbu;
-    }
+		public LocalDate getFechaCreacion() {
+			return fechaCreacion;
+		}
 
-    public BigDecimal getSaldo() {
-        return saldo;
-    }
+		public void setFechaCreacion(LocalDate fechaCreacion) {
+			this.fechaCreacion = fechaCreacion;
+		}
 
-    public boolean isEstado() {
-        return estado;
-    }
+		public int getTipoCuenta() {
+			return tipoCuenta;
+		}
 
-    // Setters
-    public void setIdCuenta(int idCuenta) {
-        this.idCuenta = idCuenta;
-    }
+		public void setTipoCuenta(int tipoCuenta) {
+			this.tipoCuenta = tipoCuenta;
+		}
 
-    public void setCliente(Cliente cliente) {
-        this.cliente = cliente;
-    }
+		public String getNumeroCuenta() {
+			return numeroCuenta;
+		}
 
-    public void setFechaCreacion(LocalDate fechaCreacion) {
-        this.fechaCreacion = fechaCreacion;
-    }
+		public void setNumeroCuenta(String numeroCuenta) {
+			this.numeroCuenta = numeroCuenta;
+		}
 
-    public void setTipoCuenta(TipoCuenta tipoCuenta) {
-        this.tipoCuenta = tipoCuenta;
-    }
+		public String getCbu() {
+			return cbu;
+		}
 
-    public void setNumeroCuenta(String numeroCuenta) {
-        this.numeroCuenta = numeroCuenta;
-    }
+		public void setCbu(String cbu) {
+			this.cbu = cbu;
+		}
 
-    public void setCbu(String cbu) {
-        this.cbu = cbu;
-    }
+		public double getSaldo() {
+			return saldo;
+		}
 
-    public void setSaldo(BigDecimal saldo) {
-        this.saldo = saldo;
-    }
+		public void setSaldo(double saldo) {
+			this.saldo = saldo;
+		}
 
-    public void setEstado(boolean estado) {
-        this.estado = estado;
-    }
+		public boolean isEstado() {
+			return estado;
+		}
 
-    @Override
-    public String toString() {
-        return "Cuenta{" +
-               "idCuenta=" + idCuenta +
-               ", numeroCuenta='" + numeroCuenta + '\'' +
-               ", saldo=" + saldo +
-               ", tipoCuenta=" + (tipoCuenta != null ? tipoCuenta.getDescripcion() : "N/A") +
-               ", cliente=" + (cliente != null ? cliente.getNombre() : "N/A") +
-               '}';
-    }
+		public void setEstado(boolean estado) {
+			this.estado = estado;
+		}
+
+		@Override
+		public String toString() {
+			return "Cuenta [idCuenta=" + idCuenta + ", IdCliente=" + IdCliente + ", fechaCreacion=" + fechaCreacion
+					+ ", tipoCuenta=" + tipoCuenta + ", numeroCuenta=" + numeroCuenta + ", cbu=" + cbu + ", saldo=" + saldo
+					+ ", estado=" + estado + "]";
+		}
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

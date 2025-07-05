@@ -1,5 +1,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page session="true" %>
+<%@ page import="java.util.List" %>
+<%@ page import="dominio.Cuenta" %>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -15,13 +18,23 @@
 	        <div class="card shadow-sm">
 	            <div class="card-body">
 	                <h4 class="card-title mb-4 text-center">Solicitar Préstamo</h4>
-	                <form action="procesarSolicitud.jsp" method="post">
+	               
+	                <form action="/SolicitarPrestamoServlet" method="get">
 	                    <div class="mb-3">
-	                        <select class="form-select" id="cuenta" name="cuenta" required>
-	                            <option value="" disabled selected>Seleccione una cuenta</option>
-	                            <option value="CA001-123456">CA001-123456</option>
-	                            <option value="CA002-654321">CA002-654321</option>
-	                        </select>
+	                       
+	                     <select class="form-select" id="cuentas" name="cuentas" required>
+    <option value="" disabled selected>Seleccione una cuenta</option>
+    <% 
+        List<Cuenta> cuentas = (List<Cuenta>) request.getAttribute("cuentas");
+        if (cuentas != null) {
+            for (Cuenta c : cuentas) {
+    %>
+        <option value="<%= c.getIdCuenta() %>"><%= c.getNumeroCuenta() %></option>
+    <%      }
+        }
+    %>
+</select>
+	                     
 	                    </div>
 	                    <div class="mb-3">
 	                        <input type="number" class="form-control" id="importe" name="importe" placeholder="Importe solicitado" min="1000" required>
