@@ -19,7 +19,7 @@
 	            <div class="card-body">
 	                <h4 class="card-title mb-4 text-center">Solicitar Préstamo</h4>
 	               
-	                <form action="SolicitarPrestamoServlet" method="post">
+	                <form action="/SolicitarPrestamoServlet" method="get">
 	                    <div class="mb-3">
 	                       
 	                     <select class="form-select" id="cuentas" name="cuentas" required>

@@ -17,7 +17,9 @@ import daoImpl.CuentaDaoImpl;
 import dominio.Cliente;
 import dominio.Cuenta;
 
-
+/**
+ * Servlet implementation class SolicitarPrestamoServlet
+ */
 @WebServlet("/SolicitarPrestamoServlet")
 public class SolicitarPrestamoServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -30,41 +32,42 @@ public class SolicitarPrestamoServlet extends HttpServlet {
         // TODO Auto-generated constructor stub
     }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	
-	
+    
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        Cliente cliente = (Cliente) session.getAttribute("clienteLogueado");  
+
+        if (cliente != null) {
+            CuentaNegocio cuentaNegocio = new CuentaNegocioImpl(new CuentaDaoImpl());
+            List<Cuenta> cuentas = cuentaNegocio.ObtenerCuentasPorIdCliente(cliente.getIdCliente(), cliente);
+
+            if (cuentas == null || cuentas.isEmpty()) {
+                System.out.println("La lista de cuentas está vacía o es null.");
+            } else {
+                System.out.println("Listado de cuentas del cliente:");
+                for (Cuenta cuenta : cuentas) {
+                    System.out.println(cuenta); // 
+                }
+            }
+
+            request.setAttribute("cuentas", cuentas);
+        }
+
+        RequestDispatcher rd = request.getRequestDispatcher("/CLIENTEsolicitarPrestamos.jsp");
+        rd.forward(request, response);
+    }
+
 		
-	}
+	
 	
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	
-		HttpSession session = request.getSession();
-        Cliente cliente = (Cliente) session.getAttribute("clienteLogueado");  
-        
-        if (cliente != null) {
-            CuentaNegocio cuentaNegocio = new CuentaNegocioImpl(new CuentaDaoImpl());
-            List<Cuenta> cuentas = cuentaNegocio.ObtenerCuentasPorIdCliente(cliente.getIdCliente());
-            request.setAttribute("cuentas", cuentas);
-          
-        }
-        RequestDispatcher rd = request.getRequestDispatcher("CLIENTEsolicitarPrestamos.jsp");
-         
-        rd.forward(request, response);
-        
-    }
+	
 		
 	}
-
 	
 	
-	
-	
-	
-
-
+	}
 
 

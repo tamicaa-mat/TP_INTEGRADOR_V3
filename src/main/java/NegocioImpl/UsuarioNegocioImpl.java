@@ -13,6 +13,8 @@ public class UsuarioNegocioImpl implements UsuarioNegocio {
         this.usuarioDao = new UsuarioDaoImpl();
     }
 
+    
+    ////////////////////////////
     @Override
     public Usuario getUsuario(String username, String password) {
         return usuarioDao.getUsuario(username, password);

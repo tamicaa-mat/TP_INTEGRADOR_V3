@@ -3,21 +3,29 @@ package NegocioImpl;
 import java.util.ArrayList;
 import java.util.List;
 
-import Negocio.CuentaNegocio;
 import dao.CuentaDao;
+import daoImpl.CuentaDaoImpl;
+import dominio.Cliente;
 import dominio.Cuenta;
+import Negocio.CuentaNegocio;
 
 public class CuentaNegocioImpl implements CuentaNegocio {
 
-    private CuentaDao cuentaDao;
 
+	private CuentaDao cuentaDao = new CuentaDaoImpl();
+
+	
+	
+	
     public CuentaNegocioImpl(CuentaDao cuentaDao) {
         this.cuentaDao = cuentaDao;
     }
 
 
-    public Cuenta getCuentaPorCbu(String cbu) {
-        return cuentaDao.getCuentaPorCbu(cbu);
+//    ///////////////////////////////////////////////
+    
+    public Cuenta getCuentaPorCbu(String cbu, Cliente cliente) {
+        return cuentaDao.getCuentaPorCbu(cbu,cliente);
     }
 
   
@@ -32,9 +40,9 @@ public class CuentaNegocioImpl implements CuentaNegocio {
     }
 
  
-    public ArrayList<Cuenta> getCuentasPorCliente(String dniCliente) {
+    public ArrayList<Cuenta> getCuentasPorCliente(String dniCliente, Cliente cliente) {
     
-    	  ArrayList<Cuenta> cuentas = cuentaDao.getCuentasPorCliente(dniCliente);
+    	  ArrayList<Cuenta> cuentas = cuentaDao.getCuentasPorCliente(dniCliente,cliente);
 
 
     	    if (cuentas != null) {
@@ -47,13 +55,13 @@ public class CuentaNegocioImpl implements CuentaNegocio {
         
     }
 
-    public boolean agregarCuenta(Cuenta cuenta) {
-        if (cuenta == null || cuenta.getCliente() == null) {
+    public boolean agregarCuenta(Cuenta cuenta,Cliente cliente) {
+        if (cuenta == null || cliente == null) {
             System.out.println("Cuenta o cliente nulo.");
             return false;
         }
 
-        String dniCliente = cuenta.getCliente().getDni();
+        String dniCliente = cliente.getDni();
 
         if (dniCliente == null || dniCliente.trim().isEmpty()) {
             System.out.println("DNI inválido.");
@@ -72,10 +80,10 @@ public class CuentaNegocioImpl implements CuentaNegocio {
 
 
 	
-	public List<Cuenta> ObtenerCuentasPorIdCliente(int idCliente) {
+	public List<Cuenta> ObtenerCuentasPorIdCliente(int idCliente,Cliente cliente) {
 		
 		
-		  ArrayList<Cuenta> cuentas = cuentaDao.getCuentasPorIdCliente(idCliente);
+		  ArrayList<Cuenta> cuentas = cuentaDao.getCuentasPorIdCliente(idCliente,cliente);
 
 
   	    if (cuentas != null) {
@@ -86,8 +94,4 @@ public class CuentaNegocioImpl implements CuentaNegocio {
 	}
 
 
-
-
-	
 }
-
