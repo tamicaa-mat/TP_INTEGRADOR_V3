@@ -108,12 +108,7 @@ public class ClienteServlet extends HttpServlet {
             String telefono = request.getParameter("txtTelefono");
             String direccion = request.getParameter("txtDireccion");
             int idLocalidad = Integer.parseInt(request.getParameter("ddlLocalidad"));
-            String nombreUsuario = request.getParameter("txtUsuario");
-            String pass = request.getParameter("txtPassword");
-
-            Usuario usuario = new Usuario();
-            usuario.setNombreUsuario(nombreUsuario);
-            usuario.setPassword(pass);
+           
 
             Localidad loc = new Localidad();
             loc.setIdLocalidad(idLocalidad);
@@ -130,16 +125,18 @@ public class ClienteServlet extends HttpServlet {
             cliente.setTelefono(telefono);
             cliente.setDireccion(direccion);
             cliente.setLocalidad(loc);
-            cliente.setUsuario(usuario);
+            
 
             boolean seAgrego = clienteNegocio.insert(cliente);
 
             if (seAgrego) {
-                session.setAttribute("mensaje", "¡Cliente agregado correctamente!");
+            	response.sendRedirect(request.getContextPath() + "/UsuarioServlet?action=mostrarFormularioAlta&dniCliente=" + dni);
             } else {
-                session.setAttribute("mensaje", "Error: No se pudo agregar al cliente.");
+            	
+                 session.setAttribute("mensaje", "Error: No se pudo agregar al cliente (posiblemente DNI o CUIL ya existen).");
+                 response.sendRedirect(request.getContextPath() + "/ClienteServlet");
             }
-            response.sendRedirect(request.getContextPath() + "/ClienteServlet");
+        //    response.sendRedirect(request.getContextPath() + "/ClienteServlet");
 
         
         } else if (action != null && action.equals("modificar")) {

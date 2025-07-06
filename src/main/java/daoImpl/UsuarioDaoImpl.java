@@ -101,7 +101,7 @@ public class UsuarioDaoImpl implements UsuarioDao {
     //método  inserta un usuario y luego actualiza el cliente.
     @Override
     public boolean insert(Usuario usuario, String dniCliente) {
-        Connection conn = null;
+    	Connection conn = null;
         PreparedStatement stmtUsuario = null;
         PreparedStatement stmtCliente = null;
         ResultSet rs = null;
@@ -110,10 +110,11 @@ public class UsuarioDaoImpl implements UsuarioDao {
 
         try {
             conn = Conexion.getConexion().getSQLConexion();
-            conn.setAutoCommit(false);
+            conn.setAutoCommit(false); // Iniciar transacción
 
-            // 1. Insertar el Usuario
-            stmtUsuario = conn.prepareStatement("INSERT INTO usuario (NombreUsuario, Password, IdTipoUsuario, Estado) VALUES (?, ?, 2, 1)", Statement.RETURN_GENERATED_KEYS);
+            // 1. Insertar el Usuario (TipoUsuario 2 = Cliente)
+            String sqlUsuario = "INSERT INTO usuario (NombreUsuario, Password, IdTipoUsuario, Estado) VALUES (?, ?, 2, 1)";
+            stmtUsuario = conn.prepareStatement(sqlUsuario, Statement.RETURN_GENERATED_KEYS);
             stmtUsuario.setString(1, usuario.getNombreUsuario());
             stmtUsuario.setString(2, usuario.getPassword());
 
@@ -124,37 +125,30 @@ public class UsuarioDaoImpl implements UsuarioDao {
                 }
             }
 
-            // 2. Actualizar el Cliente con el ID del usuario
+            // 2. Actualizar el Cliente con el ID del usuario nuevo
             if (idUsuarioGenerado != -1) {
                 stmtCliente = conn.prepareStatement(UPDATE_CLIENTE_CON_USUARIO);
                 stmtCliente.setInt(1, idUsuarioGenerado);
                 stmtCliente.setString(2, dniCliente);
 
                 if(stmtCliente.executeUpdate() > 0) {
-                    conn.commit();
+                    conn.commit(); // Si todo salió bien, confirmar la transacción
                     isSuccess = true;
                 } else {
-                    conn.rollback();
+                    conn.rollback(); // Si falla la actualización, deshacer todo
                 }
             } else {
-                conn.rollback();
+                conn.rollback(); // Si falla la inserción del usuario, deshacer todo
             }
         } catch (SQLException e) {
             e.printStackTrace();
             try { if (conn != null) conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
         } finally {
-        	 
+            // Cerrar todos los recursos (rs, stmtUsuario, stmtCliente)
             try {
-                if (rs != null) {
-                    rs.close();
-                }
-                if (stmtUsuario != null) {
-                    stmtUsuario.close();
-                }
-                if (stmtCliente != null) {
-                    stmtCliente.close();
-                }
-               
+                if (rs != null) rs.close();
+                if (stmtUsuario != null) stmtUsuario.close();
+                if (stmtCliente != null) stmtCliente.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }

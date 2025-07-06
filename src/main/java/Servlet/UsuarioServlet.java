@@ -57,7 +57,7 @@ public class UsuarioServlet extends HttpServlet {
             
             String dniCliente = request.getParameter("dniCliente");
             String nombreUsuario = request.getParameter("txtUsuario");
-            String pass = request.getParameter("txtPassword");
+            String pass = request.getParameter("txtContraseña");
             
           
             Usuario usuario = new Usuario();
@@ -66,7 +66,7 @@ public class UsuarioServlet extends HttpServlet {
             
       
             UsuarioNegocio usuarioNegocio = new UsuarioNegocioImpl();
-            boolean seCreo = usuarioNegocio.insert(usuario, dniCliente); // método en el negocio/DAO
+            boolean seCreo = usuarioNegocio.insert(usuario, dniCliente); // método en el negocio y  DAO
 
        
             HttpSession session = request.getSession();

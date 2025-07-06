@@ -15,22 +15,44 @@
 	    <div class="col-md-4">
 	        <div class="card shadow">
 	            <div class="card-body">
-	                <h4 class="card-title text-center mb-4">Datos de Acceso</h4>
-	                <form action="login" method="post">
+	                <h4 class="card-title text-center mb-4">Asignar Acceso a Cliente DNI: ${dniCliente}</h4>
+	                
+	                
+	                
+	                <form action="UsuarioServlet" method="post">
+	                <input type="hidden" name="action" value="crearUsuario">
+	                <input type="hidden" name="dniCliente" value="${dniCliente}">
+	                
 					    <div class="mb-3">
-					        <input type="text" class="form-control" id="usuario" name="usuario" placeholder="Usuario" required>
+					        <input type="text" class="form-control" id="usuario" name="txtUsuario" placeholder="Usuario" required>
 					    </div>
+					    
+					    
+					    
 					    <div class="mb-3">
-					        <input type="password" class="form-control" id="contrasena" name="contrasena" placeholder="Contraseña" required>
+					        <input type="password" class="form-control" id="contraseña" name="txtContraseña" placeholder="Contraseña" required>
 					    </div>
+					    
+					    
+					    
 					    <div class="mb-3">
 					        <input type="password" class="form-control" id="confirmarContrasena" name="confirmarContrasena" placeholder="Confirmar Contraseña" required>
 					    </div>
+					    
+					    
+					    
 					    <div class="d-flex justify-content-center gap-2">
-					        <button type="submit" class="btn btn-secondary btn-sm w-50">Guardar Cliente</button>
+					        <button type="submit" class="btn btn-secondary btn-sm w-50">Crear Usuario y Finalizar</button>
 					        <button type="reset" class="btn btn-secondary btn-sm w-50">Limpiar Formulario</button>
 					    </div>
+					    
+					    
+					    
 					</form>
+					
+					
+					
+					
 	            </div>
 	        </div>
 	    </div>
