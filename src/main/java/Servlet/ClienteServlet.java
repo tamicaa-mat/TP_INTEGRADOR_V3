@@ -54,20 +54,23 @@ public class ClienteServlet extends HttpServlet {
         else if (action != null && action.equals("editar")) {
             String dni = request.getParameter("dni");
             
-            ClienteNegocio clienteNegocio = new ClienteNegocioImpl(new ClienteDaoImpl());
+         // Buscamos los datos del cliente a editar
+            ClienteNegocio clienteNegocio = new ClienteNegocioImpl();
             Cliente clienteAEditar = clienteNegocio.getClientePorDni(dni);
             
+            // También buscamos las listas para los desplegables
             ProvinciaNegocio provNegocio = new ProvinciaNegocioImpl();
             ArrayList<Provincia> listaProvincias = provNegocio.readAll();
-            
             LocalidadNegocio locNegocio = new LocalidadNegocioImpl();
             ArrayList<Localidad> listaLocalidades = locNegocio.readAll();
             
+            // Guardamos todo en el request para que el JSP lo pueda usar
             request.setAttribute("clienteAEditar", clienteAEditar);
             request.setAttribute("listaProvincias", listaProvincias);
             request.setAttribute("listaLocalidades", listaLocalidades);
             
-            RequestDispatcher rd = request.getRequestDispatcher("/clientesFormulario.jsp"); // Usa el mismo formulario
+            // Reenviamos al MISMO formulario que usamos para agregar
+            RequestDispatcher rd = request.getRequestDispatcher("/clientesFormulario.jsp");
             rd.forward(request, response);
         }
        

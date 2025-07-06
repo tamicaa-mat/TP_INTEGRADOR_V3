@@ -28,26 +28,44 @@
                         <th>Correo</th>
                         <th>Teléfono</th>
                         <th>Usuario Acceso</th>
-                        <th style="width: 220px;">Acciones</th>
+                        <th >Acciones</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <c:forEach var="cliente" items="${listaClientes}">
-                        <tr>
-                            <td><c:out value="${cliente.getIdCliente()}" /></td>
-                            <td><c:out value="${cliente.getDni()}" /></td>
-                            <td><c:out value="${cliente.getNombre()} ${cliente.getApellido()}" /></td>
-                            <td><c:out value="${cliente.getCorreoElectronico()}" /></td>
-                            <td><c:out value="${cliente.getTelefono()}" /></td>
-                            <td><c:out value="${cliente.getUsuario().getNombreUsuario()}" /></td>
-                            <td>
-                                <a href="ClienteServlet?action=editar&dni=${cliente.getDni()}" class="btn btn-success btn-sm">Editar</a>
-                                <a href="ClienteServlet?action=eliminar&dni=${cliente.getDni()}" class="btn btn-danger btn-sm" onclick="return confirm('¿Está seguro?');">Eliminar</a>
-                                <a href="CuentaServlet?action=listar&dni=${cliente.getIdCliente()}" class="btn btn-info btn-sm">Cuentas</a>
-                            </td>
-                        </tr>
-                    </c:forEach>
-                </tbody>
+               <tbody>
+    <c:forEach var="cliente" items="${listaClientes}">
+        <tr>
+            <td><c:out value="${cliente.getIdCliente()}" /></td>
+            <td><c:out value="${cliente.getDni()}" /></td>
+            <td><c:out value="${cliente.getNombre()} ${cliente.getApellido()}" /></td>
+            <td><c:out value="${cliente.getCorreoElectronico()}" /></td>
+            <td><c:out value="${cliente.getTelefono()}" /></td>
+
+           
+            <td>
+                <c:choose>
+                   
+                    <c:when test="${not empty cliente.getUsuario() && not empty cliente.getUsuario().getNombreUsuario()}">
+                        <span ><c:out value="${cliente.getUsuario().getNombreUsuario()}" /></span>
+                    </c:when>
+                    
+                    <c:otherwise>
+                        <span  >Sin Acceso</span>
+                    </c:otherwise>
+                </c:choose>
+            </td>
+
+           
+            <td>
+                <a href="ClienteServlet?action=editar&dni=${cliente.getDni()}" >Editar</a>
+                <a href="ClienteServlet?action=eliminar&dni=${cliente.getDni()}"  onclick="return confirm('¿Está seguro?');">Eliminar</a>
+                <a href="CuentaServlet?action=listar&dni=${cliente.getDni()}" >Cuentas</a>
+                <c:if test="${empty cliente.getUsuario() || empty cliente.getUsuario().getNombreUsuario()}">
+                     <a href="UsuarioServlet?action=mostrarFormularioAlta&dniCliente=${cliente.getDni()}" >Crear Acceso</a>
+                </c:if>
+            </td>
+        </tr>
+    </c:forEach>
+</tbody>
             </table>
         </div>
         

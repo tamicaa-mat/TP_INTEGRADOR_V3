@@ -22,7 +22,14 @@ public class ClienteNegocioImpl implements ClienteNegocio {
     
     
 
-    @Override
+    public ClienteNegocioImpl() {
+		// TODO Auto-generated constructor stub
+	}
+
+
+
+
+	@Override
     public boolean insert(Cliente cliente) {
         return cdao.insert(cliente);
     }

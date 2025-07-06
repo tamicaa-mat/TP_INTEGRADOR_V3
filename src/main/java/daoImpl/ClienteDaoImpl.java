@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import dao.ClienteDao;
 import dominio.Cliente;
 import dominio.Localidad;
+import dominio.Provincia;
 import dominio.Usuario; 
 
 
@@ -17,12 +18,30 @@ import dominio.Usuario;
 public class ClienteDaoImpl implements ClienteDao {
 
 	private static final String INSERT_CLIENTE_SOLO = "insert into cliente(DNI, CUIL, Nombre, Apellido, Sexo, Nacionalidad, FechaNacimiento, Direccion, idLocalidad, CorreoElectronico, Telefono, Estado) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)";
-	private static final String READ_ALL = "select c.*, u.NombreUsuario, l.Descripcion as LocalidadDescripcion from cliente c inner join usuario u on c.IdUsuario = u.IdUsuario inner join localidad l on c.IdLocalidad = l.IdLocalidad where c.Estado = 1";
+	private static final String READ_ALL = "select c.*, u.NombreUsuario, l.Descripcion as LocalidadDescripcion, p.IdProvincia, p.Descripcion as ProvinciaDescripcion " +
+            "from cliente c " +
+            "inner join usuario u on c.IdUsuario = u.IdUsuario " +
+            "inner join localidad l on c.IdLocalidad = l.IdLocalidad " +
+            "inner join provincia p on l.IdProvincia = p.IdProvincia " +
+            "where c.Estado = 1";
 	private static final String DELETE_LOGICO = "update cliente set Estado = 0 where DNI = ?";
 	private static final String UPDATE_CLIENTE = "update cliente set CUIL = ?, Nombre = ?, Apellido = ?, Sexo = ?, Nacionalidad = ?, FechaNacimiento = ?, Direccion = ?, idLocalidad = ?, CorreoElectronico = ?, Telefono = ? where DNI = ?";
-	private static final String GET_BY_DNI = "select c.*, u.NombreUsuario, l.Descripcion as LocalidadDescripcion from cliente c inner join usuario u on c.IdUsuario = u.IdUsuario inner join localidad l on c.IdLocalidad = l.IdLocalidad where c.DNI = ? and c.Estado = 1";
-	private static final String GET_BY_USUARIO_ID = "select c.*, u.NombreUsuario, l.Descripcion as LocalidadDescripcion from cliente c inner join usuario u on c.IdUsuario = u.IdUsuario inner join localidad l on c.IdLocalidad = l.IdLocalidad where c.IdUsuario = ? and c.Estado = 1";
+	private static final String GET_BY_DNI = "select c.*, u.NombreUsuario, l.Descripcion as LocalidadDescripcion, p.IdProvincia, p.Descripcion as ProvinciaDescripcion " +
+            "from cliente c " +
+            "inner join usuario u on c.IdUsuario = u.IdUsuario " +
+            "inner join localidad l on c.IdLocalidad = l.IdLocalidad " +
+            "inner join provincia p on l.IdProvincia = p.IdProvincia " + // <-- ESTE JOIN FALTABA
+            "where c.DNI = ? and c.Estado = 1";
 
+	
+	private static final String GET_BY_USUARIO_ID = "select c.*, u.NombreUsuario, l.Descripcion as LocalidadDescripcion, p.IdProvincia, p.Descripcion as ProvinciaDescripcion " +
+            "from cliente c " +
+            "inner join usuario u on c.IdUsuario = u.IdUsuario " +
+            "inner join localidad l on c.IdLocalidad = l.IdLocalidad " +
+            "inner join provincia p on l.IdProvincia = p.IdProvincia " +
+            "where c.IdUsuario = ? and c.Estado = 1";
+	
+	
 	@Override
 	public boolean insert(Cliente cliente) {
 		Connection conn = null;
@@ -189,6 +208,9 @@ public class ClienteDaoImpl implements ClienteDao {
 		PreparedStatement statement = null;
 		ResultSet rs = null;
 		Cliente cliente = null;
+		
+		
+		 System.out.println("DAO: Buscando cliente con DNI: " + dni); // <-- ESPÍA
 		try {
 			conn = Conexion.getConexion().getSQLConexion();
 			statement = conn.prepareStatement(GET_BY_DNI);
@@ -238,31 +260,41 @@ public class ClienteDaoImpl implements ClienteDao {
 	}
 	
 	private Cliente instanciarClienteDesdeRs(ResultSet rs) throws SQLException {
-		Cliente cliente = new Cliente();
-		cliente.setIdCliente(rs.getInt("IdCliente"));
-		cliente.setDni(rs.getString("Dni"));
-		cliente.setCuil(rs.getString("CuiL"));
-		cliente.setNombre(rs.getString("Nombre"));
-		cliente.setApellido(rs.getString("Apellido"));
-		cliente.setSexo(rs.getString("Sexo"));
-		cliente.setNacionalidad(rs.getString("Nacionalidad"));
-		cliente.setFechaNacimiento(rs.getDate("FechaNacimiento").toLocalDate());
-		cliente.setDireccion(rs.getString("Direccion"));
-		cliente.setCorreoElectronico(rs.getString("CorreoElectronico"));
-		cliente.setTelefono(rs.getString("Telefono"));
-		cliente.setEstado(rs.getBoolean("Estado"));
-		
-		Localidad loc = new Localidad();
-		loc.setIdLocalidad(rs.getInt("IdLocalidad"));
-		loc.setDescripcion(rs.getString("LocalidadDescripcion"));
-		cliente.setLocalidad(loc);
-		
-		Usuario user = new Usuario();
-		user.setIdUsuario(rs.getInt("IdUsuario"));
-		user.setNombreUsuario(rs.getString("NombreUsuario"));
-		cliente.setUsuario(user);
+	
+		// 1. Creamos la Provincia
+	    Provincia provincia = new Provincia();
+	    provincia.setIdProvincia(rs.getInt("IdProvincia"));
+	    provincia.setDescripcion(rs.getString("ProvinciaDescripcion"));
+	    
+	    // 2. Creamos la Localidad y le asignamos su Provincia
+	    Localidad localidad = new Localidad();
+	    localidad.setIdLocalidad(rs.getInt("IdLocalidad"));
+	    localidad.setDescripcion(rs.getString("LocalidadDescripcion"));
+	    localidad.setProvincia(provincia); // ¡Este es el paso clave!
+	    
+	    // 3. Creamos el Usuario
+	    Usuario usuario = new Usuario();
+	    usuario.setIdUsuario(rs.getInt("IdUsuario"));
+	    usuario.setNombreUsuario(rs.getString("NombreUsuario"));
+	    
+	    // 4. Creamos el Cliente y le asignamos todo
+	    Cliente cliente = new Cliente();
+	    cliente.setIdCliente(rs.getInt("IdCliente"));
+	    cliente.setDni(rs.getString("Dni"));
+	    cliente.setCuil(rs.getString("CUIL"));
+	    cliente.setNombre(rs.getString("Nombre"));
+	    cliente.setApellido(rs.getString("Apellido"));
+	    cliente.setSexo(rs.getString("Sexo"));
+	    cliente.setNacionalidad(rs.getString("Nacionalidad"));
+	    cliente.setFechaNacimiento(rs.getDate("FechaNacimiento").toLocalDate());
+	    cliente.setDireccion(rs.getString("Direccion"));
+	    cliente.setCorreoElectronico(rs.getString("CorreoElectronico"));
+	    cliente.setTelefono(rs.getString("Telefono"));
+	    cliente.setEstado(rs.getBoolean("Estado"));
+	    cliente.setLocalidad(localidad);
+	    cliente.setUsuario(usuario);
 
-		return cliente;
+	    return cliente;
 	}
 
 
