@@ -43,6 +43,7 @@ public class CuentaServlet extends HttpServlet {
              
              RequestDispatcher rd = request.getRequestDispatcher("/AdministradorListaCuentas.jsp");
              rd.forward(request, response);
+             // aun no trae cuentas
          }
     }
 

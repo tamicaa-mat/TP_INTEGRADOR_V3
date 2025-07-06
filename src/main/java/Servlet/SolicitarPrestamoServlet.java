@@ -17,56 +17,61 @@ import daoImpl.CuentaDaoImpl;
 import dominio.Cliente;
 import dominio.Cuenta;
 
-/**
- * Servlet implementation class SolicitarPrestamoServlet
- */
+
 @WebServlet("/SolicitarPrestamoServlet")
 public class SolicitarPrestamoServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
+  
     public SolicitarPrestamoServlet() {
         super();
-        // TODO Auto-generated constructor stub
+    
     }
 
     
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        Cliente cliente = (Cliente) session.getAttribute("clienteLogueado");  
+        protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+      	  System.out.println("Servlet ejecutado");
+      	  HttpSession session = request.getSession();
+          Cliente cliente = (Cliente) session.getAttribute("clienteLogueado");  
+          int IdCl = cliente.getIdCliente();
+          
+          
+          if (cliente != null) {
+          	System.out.println("Cliente logueado: " + IdCl);
+              CuentaNegocio cuentaNegocio = new CuentaNegocioImpl(new CuentaDaoImpl());
+              List<Cuenta> cuentas = cuentaNegocio.ObtenerCuentasPorIdCliente(IdCl, cliente);
 
-        if (cliente != null) {
-            CuentaNegocio cuentaNegocio = new CuentaNegocioImpl(new CuentaDaoImpl());
-            List<Cuenta> cuentas = cuentaNegocio.ObtenerCuentasPorIdCliente(cliente.getIdCliente(), cliente);
+              
+              if (cuentas == null) {
+                  System.out.println("cuentas == null");
+              } else if (cuentas.isEmpty()) {
+                  System.out.println("cuentas vacía");
+              } else {
+                  System.out.println("Cuentas obtenidas: " + cuentas.size());
+                  for (Cuenta c : cuentas) {
+                      System.out.println("- " + c.getIdCuenta() + " | " + c.getNumeroCuenta());
+                  }
+              }
+              
+              
+            
+              request.setAttribute("cuentas", cuentas);
+          }
 
-            if (cuentas == null || cuentas.isEmpty()) {
-                System.out.println("La lista de cuentas está vacía o es null.");
-            } else {
-                System.out.println("Listado de cuentas del cliente:");
-                for (Cuenta cuenta : cuentas) {
-                    System.out.println(cuenta); // 
-                }
-            }
+          RequestDispatcher rd = request.getRequestDispatcher("/CLIENTEsolicitarPrestamos.jsp");
+          rd.forward(request, response);
+      }
 
-            request.setAttribute("cuentas", cuentas);
-        }
-
-        RequestDispatcher rd = request.getRequestDispatcher("/CLIENTEsolicitarPrestamos.jsp");
-        rd.forward(request, response);
-    }
-
-		
-	
-	
-	
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	
-	
-		
-	}
-	
+  		
+  	
+  	
+  	
+  	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+  	
+  	
+  		
+  	}
+  	
 	
 	}
 

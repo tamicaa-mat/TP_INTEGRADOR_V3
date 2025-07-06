@@ -241,7 +241,7 @@ public class ClienteDaoImpl implements ClienteDao {
 		Cliente cliente = new Cliente();
 		cliente.setIdCliente(rs.getInt("IdCliente"));
 		cliente.setDni(rs.getString("Dni"));
-		cliente.setCuil(rs.getString("CUIL"));
+		cliente.setCuil(rs.getString("CuiL"));
 		cliente.setNombre(rs.getString("Nombre"));
 		cliente.setApellido(rs.getString("Apellido"));
 		cliente.setSexo(rs.getString("Sexo"));

@@ -90,7 +90,7 @@ public class CuentaNegocioImpl implements CuentaNegocio {
   	        return cuentas;
   	    }
   	    
-      return new ArrayList<>();
+      return new ArrayList<Cuenta>(cuentas);
 	}
 
 

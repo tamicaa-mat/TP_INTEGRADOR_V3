@@ -24,7 +24,7 @@ public class CuentaDaoImpl implements CuentaDao {
         "SELECT COUNT(*) AS total FROM Cuenta c JOIN Cliente cl ON c.IdCliente = cl.IdCliente WHERE cl.DNI = ? AND c.Estado = 1";
 
     private static final String GET_CUENTAS_POR_CLIENTE =
-        "SELECT * FROM Cuenta WHERE IdCliente = ? AND Estado = 1";
+        "SELECT * FROM Cuenta WHERE IdCliente = ? ";
 
     private static final String GET_CUENTA_POR_CBU =
         "SELECT * FROM Cuenta WHERE Cbu = ? AND Estado = 1";
@@ -145,6 +145,8 @@ public class CuentaDaoImpl implements CuentaDao {
     }
 
     public ArrayList<Cuenta> getCuentasPorCliente(String dniCliente, Cliente cliente) {
+    	
+    	
         ArrayList<Cuenta> cuentas = new ArrayList<>();
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -231,6 +233,7 @@ public class CuentaDaoImpl implements CuentaDao {
 
     
     public ArrayList<Cuenta> getCuentasPorIdCliente(int idCliente, Cliente cliente) {
+    	System.out.println("ID cliente recibido en DAO: " + idCliente);
         ArrayList<Cuenta> cuentas = new ArrayList<>();
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -246,17 +249,16 @@ public class CuentaDaoImpl implements CuentaDao {
                 Cuenta cuenta = new Cuenta();
                 cuenta.setIdCuenta(rs.getInt("IdCuenta"));
                 cuenta.setIdCliente(idCliente);
-                cuenta.setNumeroCuenta(rs.getString("NumeroCuenta"));
-                cuenta.setCbu(rs.getString("Cbu"));
-                cuenta.setSaldo(rs.getDouble("Saldo"));
-                cuenta.setEstado(rs.getBoolean("Estado"));
-
                 Date fechaSQL = rs.getDate("FechaCreacion");
                 if (fechaSQL != null) {
                     cuenta.setFechaCreacion(fechaSQL.toLocalDate());
                 }
 
-                cuenta.setTipoCuenta(rs.getInt("IdTipoCuenta"));
+                cuenta.setTipoCuenta(rs.getInt("TipoCuenta"));
+                cuenta.setNumeroCuenta(rs.getString("NumeroCuenta"));
+                cuenta.setCbu(rs.getString("Cbu"));
+                cuenta.setSaldo(rs.getDouble("Saldo"));
+                cuenta.setEstado(rs.getBoolean("Estado"));
 
                 cuentas.add(cuenta);
             }
