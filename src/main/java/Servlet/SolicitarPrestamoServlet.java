@@ -22,58 +22,60 @@ import dominio.Usuario;
 @WebServlet("/SolicitarPrestamoServlet")
 public class SolicitarPrestamoServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-  
+
     public SolicitarPrestamoServlet() {
         super();
-    
     }
 
-    
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	 
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-        System.out.println("Servlet ejecutado");
-
-        ClienteNegocio clienteNegocio = new ClienteNegocioImpl(new ClienteDaoImpl()); 
+        System.out.println("Servlet ejecutado (GET)");
         HttpSession session = request.getSession();
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
 
         if (usuario != null) {
-            System.out.println("Usuario logueado: " + usuario.getIdUsuario());
+            String cuentaSeleccionadaStr = request.getParameter("cuentaSeleccionada");
+            String importeStr = request.getParameter("importe");
+            String plazoStr = request.getParameter("plazo");
 
-            Cliente cliente = clienteNegocio.obtenerClienteConCuentasPorUsuario(usuario.getIdUsuario());
+            if (cuentaSeleccionadaStr != null && importeStr != null && plazoStr != null) {
+                // El usuario está enviando la solicitud de préstamo
+                try {
+                    int idCuenta = Integer.parseInt(cuentaSeleccionadaStr);
+                    double importe = Double.parseDouble(importeStr);
+                    int plazo = Integer.parseInt(plazoStr);
 
-            if (cliente != null) {
-                session.setAttribute("clienteLogueado", cliente);
-                List<Cuenta> cuentas = cliente.getCuentas();
+                    System.out.println("Solicitud recibida:");
+                    System.out.println("- Cuenta: " + idCuenta);
+                    System.out.println("- Importe: " + importe);
+                    System.out.println("- Plazo: " + plazo + " meses");
 
-                if (cuentas == null) {
-                    System.out.println("cuentas == null");
-                } else if (cuentas.isEmpty()) {
-                    System.out.println("cuentas vacía");
-                } else {
-                    System.out.println("Cuentas obtenidas: " + cuentas.size());
-                    for (Cuenta c : cuentas) {
-                        System.out.println("- " + c.getIdCuenta() + " | " + c.getNumeroCuenta());
-                    }
+                    // Aquí podés hacer lógica de negocio, guardar el préstamo, etc.
+                    // Por ejemplo: PrestamoNegocio.agregarPrestamo(...)
+
+                    request.setAttribute("mensajeExito", "¡Solicitud enviada con éxito!");
+
+                } catch (NumberFormatException ex) {
+                    request.setAttribute("mensajeError", "Datos inválidos.");
                 }
 
-                request.setAttribute("cuentas", cuentas);
             } else {
-                System.out.println("Cliente es null");
+                // Primera vez que entra: solo cargar cuentas
+                ClienteNegocio clienteNegocio = new ClienteNegocioImpl(new ClienteDaoImpl());
+                Cliente cliente = clienteNegocio.obtenerClienteConCuentasPorUsuario(usuario.getIdUsuario());
+
+                if (cliente != null) {
+                    session.setAttribute("clienteLogueado", cliente);
+                    List<Cuenta> cuentas = cliente.getCuentas();
+                    request.setAttribute("cuentas", cuentas);
+                }
             }
         }
 
-        RequestDispatcher rd = request.getRequestDispatcher("/CLIENTEsolicitarPrestamos.jsp");
-        rd.forward(request, response);
+        request.getRequestDispatcher("/CLIENTEsolicitarPrestamos.jsp").forward(request, response);
     }
 
-  
-  
-
+    
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        doGet(request, response); 
+    }
 }

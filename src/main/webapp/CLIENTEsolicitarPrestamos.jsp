@@ -22,13 +22,13 @@
                     <h4 class="card-title mb-4 text-center">Solicitar Préstamo</h4>
 
                 
-                 <form action="SolicitarPrestamoServlet" method="post">
+                 <form action="SolicitarPrestamoServlet" method="get">
     <div class="mb-3">
         <label class="form-label small text-muted">Cuenta</label>
         <select class="form-select" name="cuentaSeleccionada" required>
             <option value="" disabled selected>Seleccione una cuenta</option>
             <c:forEach var="c" items="${cuentas}">
-                <option value="${c.IdCuenta}">${c.NumeroCuenta}</option>
+                <option value="${c.idCuenta}">${c.numeroCuenta}</option>
             </c:forEach>
         </select>
     </div>

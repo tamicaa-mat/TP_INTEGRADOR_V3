@@ -125,4 +125,13 @@ public class ClienteNegocioImpl implements ClienteNegocio {
      
         return cdao.update(cliente);
     }
+
+
+
+
+	@Override
+	public Cliente obtenerClienteConCuentasPorUsuario(int idUsuario) {
+		
+		return cdao.getClienteConCuentasPorUsuario(idUsuario);
+	}
 }

@@ -47,8 +47,9 @@
                     <span class="fw-bold text-secondary me-3 align-self-center">CLIENTE</span>
                     <a href="ClienteListaMovimientos.jsp" class="btn btn-secondary btn-sm">Movimientos</a>
 	            <a href="CLIENTEtransferencias.jsp" class="btn btn-secondary btn-sm">Transferencias</a>
+	          <a href="${pageContext.request.contextPath}/SolicitarPrestamoServlet" class="btn btn-secondary btn-sm">Solicitar Préstamo</a>
 	          
-	            <a href="CLIENTEsolicitarPrestamos.jsp" class="btn btn-secondary btn-sm">Solicitar Préstamo</a>
+	      
 	            
 	            <a href="CLIENTEpagoPrestamos.jsp" class="btn btn-secondary btn-sm">Pago Préstamos</a>
 	            <a href="ClienteInfoPersonal.jsp" class="btn btn-secondary btn-sm">Mi Información</a>
