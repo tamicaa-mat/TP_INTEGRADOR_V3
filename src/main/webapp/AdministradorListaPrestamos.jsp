@@ -1,3 +1,5 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="es">
@@ -16,53 +18,54 @@
 	                <tr>
 	                    <th>ID</th>
 	                    <th>Cliente</th>
-	                    <th>Cuenta Asociada pruebaa githubb</th>
+	                    <th>Cuenta Asociada</th>
 	                    <th>Fecha Alta</th>
 	                    <th>Importe Pedido</th>
 	                    <th>Plazo (meses)</th>
 	                    <th>Importe por Mes</th>
 	                    <th>Interés</th>
 	                    <th>Estado</th>
+	                    <th>Cantidad de cuotas</th>
 	                </tr>
 	            </thead>
-	            <tbody>
-	                <tr>
-	                    <td>1</td>
-	                    <td>Juan Pérez</td>
-	                    <td>CA001-123456</td>
-	                    <td>2025-06-14</td>
-	                    <td>$100,000</td>
-	                    <td>12</td>
-	                    <td>$9,500</td>
-	                    <td>14%</td>
-	                    <td>
-	                        <button class="btn btn-success btn-sm me-1">Aprobar</button>
-	                        <button class="btn btn-danger btn-sm">Rechazar</button>
-	                    </td>
-	                </tr>
-	                <tr>
-	                    <td>2</td>
-	                    <td>María López</td>
-	                    <td>CA001-654321</td>
-	                    <td>2025-05-01</td>
-	                    <td>$80,000</td>
-	                    <td>24</td>
-	                    <td>$4,200</td>
-	                    <td>12%</td>
-	                    <td class="text-success fw-bold">Aprobado</td>
-	                </tr>
-	                <tr>
-	                    <td>3</td>
-	                    <td>Pedro Gómez</td>
-	                    <td>CA002-789012</td>
-	                    <td>2025-04-10</td>
-	                    <td>$50,000</td>
-	                    <td>6</td>
-	                    <td>$9,000</td>
-	                    <td>10%</td>
-	                    <td class="text-danger fw-bold">Rechazado</td>
-	                </tr>
-	            </tbody>
+	           <tbody>
+    <c:forEach var="p" items="${prestamos}">
+        <tr>
+            <td>${p.idPrestamo}</td>
+            <td>${p.cliente.nombre} ${p.cliente.apellido}</td>
+            <td>${p.cuentaAsociada.numeroCuenta}</td>
+            <td>${p.fechaAlta}</td>
+            <td>$${p.importePedido}</td>
+            <td>${p.plazoMeses}</td>
+            <td>$${p.importePorMes}</td>
+            <td>${p.interes}%</td>
+             <td>${p.cantidadCuotas}%</td>
+            <td>
+                <c:choose>
+                    <c:when test="${p.estado == 0}">
+                        <form action="PrestamoServlet" method="post" style="display:inline">
+                            <input type="hidden" name="idPrestamo" value="${p.idPrestamo}" />
+                            <input type="hidden" name="accion" value="aprobar" />
+                            <button class="btn btn-success btn-sm me-1">Aprobar</button>
+                        </form>
+                        <form action="PrestamoServlet" method="post" style="display:inline">
+                            <input type="hidden" name="idPrestamo" value="${p.idPrestamo}" />
+                            <input type="hidden" name="accion" value="rechazar" />
+                            <button class="btn btn-danger btn-sm">Rechazar</button>
+                        </form>
+                    </c:when>
+                    <c:when test="${p.estado == 1}">
+                        <span class="text-success fw-bold">Aprobado</span>
+                    </c:when>
+                    <c:when test="${p.estado == 2}">
+                        <span class="text-danger fw-bold">Rechazado</span>
+                    </c:when>
+                </c:choose>
+            </td>
+        </tr>
+    </c:forEach>
+</tbody>
+	           
 	        </table>
 	    </div>
 	</main>

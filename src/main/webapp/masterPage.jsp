@@ -1,6 +1,9 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
+
 <%@ page isELIgnored="false" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
 
 <!DOCTYPE html>
 <html lang="es">
@@ -36,7 +39,8 @@
                 <a href="${pageContext.request.contextPath}/ClienteServlet" class="btn btn-secondary btn-sm">Gestión Clientes</a>
 	            <a href="AdministradorABMLusuarios.jsp" class="btn btn-secondary btn-sm">Gestión Usuarios</a>
 	            <a href="AdministradorListaCuentas.jsp" class="btn btn-secondary btn-sm">Gestión Cuentas</a>
-	            <a href="AdministradorListaPrestamos.jsp" class="btn btn-secondary btn-sm">Autorizar Préstamos</a>
+	         <a href="${pageContext.request.contextPath}/PrestamoServlet" class="btn btn-secondary btn-sm">Autorizar Préstamos</a>
+	         
 	            <a href="AdministradorReportes.jsp" class="btn btn-secondary btn-sm">Reportes Admin</a>
 	            <a href="${pageContext.request.contextPath}/ClienteServlet" class="btn btn-secondary btn-sm">Listado Clientes</a>
                 </div>

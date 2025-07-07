@@ -22,7 +22,15 @@ public class PrestamoDaoImpl implements PrestamoDao{
     private static final String SELECT_BY_CLIENTE = "SELECT * FROM Prestamo WHERE IdCliente = ?";
     private static final String GETPRESTAMO = "SELECT * FROM Prestamo WHERE IdPrestamo = ?";
     private static final String ACTUALIZARIMPORTE = "UPDATE Prestamo SET ImportePedido = ? WHERE IdPrestamo = ?";
-    
+    private static final String OBTENER_PRESTAMOS = "SELECT  \r\n"
+    		+ "  p.*, \r\n"
+    		+ "  c.Nombre AS NombreCliente,  \r\n"
+    		+ "  c.Apellido AS ApellidoCliente,  \r\n"
+    		+ "  cu.NumeroCuenta \r\n"
+    		+ "FROM Prestamo p \r\n"
+    		+ "JOIN Cliente c ON p.IdCliente = c.IdCliente \r\n"
+    		+ "JOIN Cuenta cu ON p.IdCuentaAsociada = cu.IdCuenta;";
+    private static final String UPDATE_ESTADO = "UPDATE Prestamo SET Estado = ? WHERE IdPrestamo = ?" ;
 
     public boolean insert(Prestamo prestamo) {
         Connection conn = null;
@@ -248,10 +256,72 @@ public class PrestamoDaoImpl implements PrestamoDao{
         return exito;
     }
 
+	@Override
+	public List<Prestamo> obtenerTodosLosPrestamos() {
+		 List<Prestamo> lista = new ArrayList<>();
+		  
+           
+	        try {
+	            Connection cn = Conexion.getConexion().getSQLConexion();
+	            PreparedStatement stmt = cn.prepareStatement(OBTENER_PRESTAMOS);
+	            ResultSet rs = stmt.executeQuery();
+
+	            while (rs.next()) {
+	                Prestamo p = new Prestamo();
+
+	                p.setIdPrestamo(rs.getInt("IdPrestamo"));
+
+	                Cliente cliente = new Cliente();
+	                cliente.setNombre(rs.getString("NombreCliente"));
+	                cliente.setApellido(rs.getString("ApellidoCliente"));
+	                p.setCliente(cliente);
+
+	                Cuenta cuenta = new Cuenta();
+	                cuenta.setNumeroCuenta(rs.getString("NumeroCuenta"));
+	                p.setCuentaAsociada(cuenta);
+
+	                p.setFechaAlta(rs.getDate("FechaAlta"));
+	                p.setImportePedido(rs.getDouble("ImportePedido"));
+	                p.setPlazoMeses(rs.getInt("PlazoMeses"));
+	                p.setImportePorMes(rs.getDouble("ImportePorMes"));
+	                p.setInteres(rs.getDouble("Interes"));
+	                p.setEstado(rs.getInt("Estado"));
+	                p.setCantidadCuotas(rs.getInt("CantidadCuotas"));
+
+	                lista.add(p);
+	            }
+
+
+	            cn.close();
+
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+
+	        return lista;
+	}
+
+	@Override
+	public boolean actualizarEstado(int idPrestamo, int nuevoEstado) {
+		 try {
+	            Connection cn = Conexion.getConexion().getSQLConexion();
+	            PreparedStatement stmt = cn.prepareStatement(UPDATE_ESTADO);
+	            stmt.setInt(1, nuevoEstado);
+	            stmt.setInt(2, idPrestamo);
+	            int filas = stmt.executeUpdate();
+	            cn.close();
+	            return filas > 0;
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	        return false;
+	    }
+	}
+
     
     
     
     
 	
 	
-}
+

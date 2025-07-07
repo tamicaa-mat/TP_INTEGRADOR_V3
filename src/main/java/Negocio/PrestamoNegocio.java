@@ -2,6 +2,8 @@ package Negocio;
 
 
 
+import java.util.List;
+
 import dominio.Prestamo;
 import dominio.Usuario;
 
@@ -19,6 +21,7 @@ public interface PrestamoNegocio {
     boolean eliminarPrestamo(int idPrestamo);
 
     boolean pagarPrestamo(int idPrestamo, double montoPago); 
-	
+    List<Prestamo> listarPrestamos();
+    boolean actualizarEstadoPrestamo(int idPrestamo, int nuevoEstado);
     
 }

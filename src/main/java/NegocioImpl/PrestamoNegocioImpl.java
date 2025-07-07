@@ -1,5 +1,7 @@
 package NegocioImpl;
 
+import java.util.List;
+
 import Negocio.PrestamoNegocio;
 import dao.PrestamoDao;
 import dominio.Prestamo;
@@ -19,21 +21,21 @@ public class PrestamoNegocioImpl implements PrestamoNegocio	{
 
 	
 
-	    @Override
+	
 	    public boolean solicitarPrestamo(Usuario usuario, Prestamo prestamo) {
 	        if (usuario != null && prestamo != null) {
-	            return prestamoDao.insert(prestamo); // llamás al DAO
+	            return prestamoDao.insert(prestamo); 
 	        }
 	        return false;
 	    }
 
-	    @Override
+	 
 	    public boolean actualizarEstadoPrestamo(int idPrestamo) {
 	   
 	        return false;
 	    }
 
-	    @Override
+
 	    public boolean eliminarPrestamo(int idPrestamo) {
 	        return false; //  prestamoDao.delete(idPrestamo) 
 	    }
@@ -50,5 +52,19 @@ public class PrestamoNegocioImpl implements PrestamoNegocio	{
 	    	    return false;
 	
 }
+
+
+
+
+		public List<Prestamo> listarPrestamos() {
+			  return prestamoDao.obtenerTodosLosPrestamos();
+		}
+
+
+
+	
+		public boolean actualizarEstadoPrestamo(int idPrestamo, int nuevoEstado) {
+			 return prestamoDao.actualizarEstado(idPrestamo, nuevoEstado);
+		}
 	    
 }
