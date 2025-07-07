@@ -16,7 +16,7 @@ public interface CuentaNegocio {
     public boolean agregarCuenta(Cuenta cuenta,Cliente cliente);
 
 
-	public List<Cuenta> ObtenerCuentasPorIdCliente(int idCliente,Cliente cliente); 
+	public List<Cuenta> obtenerCuentasPorIdCliente(int idCliente,Cliente cliente); 
 
 	public ArrayList<Cuenta> getCuentasPorCliente(String dniCliente, Cliente cliente);
 

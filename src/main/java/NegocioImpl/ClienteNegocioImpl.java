@@ -1,10 +1,15 @@
 package NegocioImpl;
 
 import java.util.ArrayList;
-import dao.ClienteDao;
-import daoImpl.ClienteDaoImpl;
-import dominio.Cliente;
+import java.util.List;
+
 import Negocio.ClienteNegocio;
+import dao.ClienteDao;
+import dao.CuentaDao;
+import daoImpl.ClienteDaoImpl;
+import daoImpl.CuentaDaoImpl;
+import dominio.Cliente;
+import dominio.Cuenta;
 
 public class ClienteNegocioImpl implements ClienteNegocio {
     
@@ -57,4 +62,19 @@ public class ClienteNegocioImpl implements ClienteNegocio {
      
         return cdao.update(cliente);
     }
+    
+    
+
+
+   
+    public Cliente obtenerClienteConCuentasPorUsuario(int idUsuario) {
+    	System.out.println("Buscando cliente con idUsuario: " + idUsuario);
+        return cdao.getClienteConCuentasPorUsuario(idUsuario);
+    }
+    
+    
+    
+    
+    
+    
 }

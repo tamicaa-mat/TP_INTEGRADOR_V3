@@ -4,7 +4,8 @@ import java.time.LocalDate; // Importar para FechaCreacion
 
 public class Cuenta {
 
-	  private int idCuenta;
+	    private int idCuenta;
+	    Cliente cliente;
 	    int IdCliente;
 	    private LocalDate fechaCreacion;
 	    private int tipoCuenta; 
@@ -17,24 +18,20 @@ public class Cuenta {
 	        // Constructor vacío
 	    }
 
-	    public Cuenta(int idCuenta, int IdCliente, LocalDate fechaCreacion, int tipoCuenta,
-	                  String numeroCuenta, String cbu, double saldo, boolean estado) {
-	        this.idCuenta = idCuenta;
-	       
-	        this.fechaCreacion = fechaCreacion;
-	        this.tipoCuenta = tipoCuenta;
-	        this.numeroCuenta = numeroCuenta;
-	        this.cbu = cbu;
-	        this.saldo = saldo;
-	        this.estado = estado;
-	    }
-
 		public int getIdCuenta() {
 			return idCuenta;
 		}
 
 		public void setIdCuenta(int idCuenta) {
 			this.idCuenta = idCuenta;
+		}
+
+		public Cliente getCliente() {
+			return cliente;
+		}
+
+		public void setCliente(Cliente cliente) {
+			this.cliente = cliente;
 		}
 
 		public int getIdCliente() {
@@ -95,18 +92,12 @@ public class Cuenta {
 
 		@Override
 		public String toString() {
-			return "Cuenta [idCuenta=" + idCuenta + ", IdCliente=" + IdCliente + ", fechaCreacion=" + fechaCreacion
-					+ ", tipoCuenta=" + tipoCuenta + ", numeroCuenta=" + numeroCuenta + ", cbu=" + cbu + ", saldo=" + saldo
-					+ ", estado=" + estado + "]";
+			return "Cuenta [idCuenta=" + idCuenta + ", cliente=" + cliente + ", IdCliente=" + IdCliente
+					+ ", fechaCreacion=" + fechaCreacion + ", tipoCuenta=" + tipoCuenta + ", numeroCuenta="
+					+ numeroCuenta + ", cbu=" + cbu + ", saldo=" + saldo + ", estado=" + estado + "]";
 		}
 
-	
-	
-	
-	
-	
-	
-	
+	 
 	
 	
 	

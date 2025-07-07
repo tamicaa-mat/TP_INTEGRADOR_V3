@@ -233,7 +233,6 @@ public class CuentaDaoImpl implements CuentaDao {
 
     
     public ArrayList<Cuenta> getCuentasPorIdCliente(int idCliente, Cliente cliente) {
-    	System.out.println("ID cliente recibido en DAO: " + idCliente);
         ArrayList<Cuenta> cuentas = new ArrayList<>();
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -241,27 +240,29 @@ public class CuentaDaoImpl implements CuentaDao {
 
         try {
             conn = Conexion.getConexion().getSQLConexion();
-            stmt = conn.prepareStatement(GET_CUENTAS_POR_CLIENTE);
+            String query = "SELECT * FROM Cuenta WHERE IdCliente = ?";
+            stmt = conn.prepareStatement(query);
             stmt.setInt(1, idCliente);
             rs = stmt.executeQuery();
 
             while (rs.next()) {
+                System.out.println("Cuenta encontrada: " + rs.getString("NumeroCuenta"));
+
                 Cuenta cuenta = new Cuenta();
                 cuenta.setIdCuenta(rs.getInt("IdCuenta"));
-                cuenta.setIdCliente(idCliente);
-                Date fechaSQL = rs.getDate("FechaCreacion");
-                if (fechaSQL != null) {
-                    cuenta.setFechaCreacion(fechaSQL.toLocalDate());
-                }
-
-                cuenta.setTipoCuenta(rs.getInt("TipoCuenta"));
+                cuenta.setIdCliente(rs.getInt("IdCliente"));
+                cuenta.setFechaCreacion(rs.getDate("FechaCreacion").toLocalDate());
+                cuenta.setTipoCuenta(rs.getInt("IdTipoCuenta"));
                 cuenta.setNumeroCuenta(rs.getString("NumeroCuenta"));
                 cuenta.setCbu(rs.getString("Cbu"));
                 cuenta.setSaldo(rs.getDouble("Saldo"));
                 cuenta.setEstado(rs.getBoolean("Estado"));
+                cuenta.setCliente(cliente);
 
                 cuentas.add(cuenta);
             }
+
+            System.out.println("Total cuentas encontradas: " + cuentas.size());
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -269,30 +270,16 @@ public class CuentaDaoImpl implements CuentaDao {
             try {
                 if (rs != null) rs.close();
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close(); // Cerrá la conexión si no es manejada por pool
+                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
 
         return cuentas;
-        /// NECESITAMOS UN MILAGRO DEL SEÑOR
     }
 
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+    
+    
 }
+ 

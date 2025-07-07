@@ -9,4 +9,6 @@ public interface ClienteNegocio {
     public ArrayList<Cliente> readAll();
     public Cliente getClientePorDni(String dni);
 	public boolean update(Cliente cliente);
+	 public Cliente obtenerClienteConCuentasPorUsuario(int idUsuario);
+	
 }

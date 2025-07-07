@@ -22,4 +22,6 @@ public interface ClienteDao {
      Cliente getClientePorUsuario(int idUsuario);
     
     /// probandooooo
+     public Cliente getClienteConCuentasPorUsuario(int idUsuario);
+
 }

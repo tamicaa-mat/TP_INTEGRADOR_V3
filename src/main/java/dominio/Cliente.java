@@ -1,6 +1,9 @@
 package dominio;
 
-import java.time.LocalDate; // Importar para FechaNacimiento
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List; // Importar para FechaNacimiento
+
 
 public class Cliente {
     private int idCliente;
@@ -18,6 +21,9 @@ public class Cliente {
     private Usuario usuario;
     private boolean estado; 
 
+    private List<Cuenta> cuentas = new ArrayList<>();
+    
+    
     public Cliente() {
         // Constructor vacío
     }
@@ -155,16 +161,24 @@ public class Cliente {
         this.estado = estado;
     }
 
-    @Override
-    public String toString() {
-        return "Cliente{" +
-               "idCliente=" + idCliente +
-               ", dni='" + dni + '\'' +
-               ", nombre='" + nombre + " " + apellido + '\'' +
-               ", usuario=" + (usuario != null ? usuario.getNombreUsuario() : "N/A") +
-               ", estado=" + estado +
-               '}';
-    }
+  
+
+	@Override
+	public String toString() {
+		return "Cliente [idCliente=" + idCliente + ", dni=" + dni + ", cuil=" + cuil + ", nombre=" + nombre
+				+ ", apellido=" + apellido + ", sexo=" + sexo + ", nacionalidad=" + nacionalidad + ", fechaNacimiento="
+				+ fechaNacimiento + ", direccion=" + direccion + ", correoElectronico=" + correoElectronico
+				+ ", telefono=" + telefono + ", localidad=" + localidad + ", usuario=" + usuario + ", estado=" + estado
+				+ ", cuentas=" + cuentas + "]";
+	}
+
+	public List<Cuenta> getCuentas() {
+		return cuentas;
+	}
+
+	public void setCuentas(List<Cuenta> cuentas) {
+		this.cuentas = cuentas;
+	}
 
 	
 }

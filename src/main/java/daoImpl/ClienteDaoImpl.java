@@ -4,11 +4,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 
 import dao.ClienteDao;
+import dao.CuentaDao;
 import dominio.Cliente;
+import dominio.Cuenta;
 import dominio.Localidad;
 import dominio.Provincia;
 import dominio.Usuario; 
@@ -297,6 +299,68 @@ public class ClienteDaoImpl implements ClienteDao {
 	    return cliente;
 	}
 
+	@Override
+	public Cliente getClienteConCuentasPorUsuario(int idUsuario) {
+	    Cliente cliente = null;
+	    Connection conn = null;
+	    PreparedStatement stmt = null;
+	    ResultSet rs = null;
+
+	    try {
+	        conn = Conexion.getConexion().getSQLConexion();
+	        String query = "SELECT * FROM Cliente WHERE IdUsuario = ?";
+	        stmt = conn.prepareStatement(query);
+	        stmt.setInt(1, idUsuario);
+	        rs = stmt.executeQuery();
+
+	        if (rs.next()) {
+	            cliente = new Cliente();
+	            cliente.setIdCliente(rs.getInt("IdCliente"));
+	            cliente.setDni(rs.getString("Dni"));
+	            cliente.setCuil(rs.getString("Cuil"));
+	            cliente.setNombre(rs.getString("Nombre"));
+	            cliente.setApellido(rs.getString("Apellido"));
+	            cliente.setSexo(rs.getString("Sexo"));
+	            cliente.setNacionalidad(rs.getString("Nacionalidad"));
+	            cliente.setFechaNacimiento(rs.getDate("FechaNacimiento").toLocalDate());
+	            cliente.setDireccion(rs.getString("Direccion"));
+	          
+	            
+	            cliente.setCorreoElectronico(rs.getString("CorreoElectronico"));
+	            cliente.setTelefono(rs.getString("Telefono"));
+	            
+	            Localidad loc = new Localidad();
+	            loc.setIdLocalidad(rs.getInt("IdLocalidad"));
+	           // loc.setDescripcion(rs.getString("LocalidadDescripcion"));
+
+	            Usuario usu = new Usuario();
+	            usu.setIdUsuario(rs.getInt("IdUsuario"));
+	          //  usu.setNombreUsuario(rs.getString("NombreUsuario"));
+	            cliente.setLocalidad(loc);
+	            cliente.setUsuario(usu);
+	          
+	            cliente.setEstado(rs.getBoolean("Estado"));
+	          
+	           
+	            CuentaDao cuentaDao = new CuentaDaoImpl();
+	            List<Cuenta> cuentas = cuentaDao.getCuentasPorIdCliente(cliente.getIdCliente(), cliente);
+	            cliente.setCuentas(cuentas);
+	        }
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    } finally {
+	        try {
+	            if (rs != null) rs.close();
+	            if (stmt != null) stmt.close();
+	            if (conn != null) conn.close();
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	    }
+
+	    return cliente;
+	}
 
 
 }
