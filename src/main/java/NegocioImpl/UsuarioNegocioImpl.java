@@ -37,4 +37,12 @@ public class UsuarioNegocioImpl implements UsuarioNegocio {
         return usuarioDao.insert(usuario, dniCliente);
     }
     
+    
+    
+    @Override
+    public boolean delete(int idUsuario) {
+
+        return usuarioDao.delete(idUsuario);
+    }
+    
 }

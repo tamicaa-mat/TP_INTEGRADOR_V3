@@ -7,7 +7,7 @@ public interface UsuarioDao {
 	    // boolean insert(Usuario usuario);
 	    
 	    
-	     // boolean delete(int IdUsuario);
+	    public  boolean delete(int IdUsuario); // dará de baja logica
 	    
 	  
 	    // ArrayList<Usuario> readAll();
@@ -17,8 +17,6 @@ public interface UsuarioDao {
 	    
        Usuario getUsuario(String username, String password);
        boolean actualizarPassword(int idUsuario, String nuevaPassword);
-       
-       
        public boolean insert(Usuario usuario, String dniCliente);
     
     

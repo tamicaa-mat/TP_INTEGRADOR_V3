@@ -1,15 +1,15 @@
 package NegocioImpl;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
-
-import Negocio.ClienteNegocio;
 import dao.ClienteDao;
-import dao.CuentaDao;
 import daoImpl.ClienteDaoImpl;
-import daoImpl.CuentaDaoImpl;
+import daoImpl.Conexion;
 import dominio.Cliente;
-import dominio.Cuenta;
+import Negocio.ClienteNegocio;
+import dao.UsuarioDao;
+import daoImpl.UsuarioDaoImpl;
 
 public class ClienteNegocioImpl implements ClienteNegocio {
     
@@ -41,7 +41,70 @@ public class ClienteNegocioImpl implements ClienteNegocio {
 
     @Override
     public boolean delete(String dni) {
-        return cdao.delete(dni);
+      
+    	Connection conn = null;
+        boolean isSuccess = false;
+        
+        try {
+            
+            conn = Conexion.getConexion().getSQLConexion();
+           
+            conn.setAutoCommit(false); 
+
+            
+            ClienteDao clienteDao = new ClienteDaoImpl(); // Creamos una instancia del DAO
+            Cliente clienteAEliminar = clienteDao.getClientePorDni(dni);
+
+            boolean clienteEliminado = false;
+            boolean usuarioEliminado = false;
+
+            if (clienteAEliminar != null) {
+                
+                clienteEliminado = clienteDao.delete(dni);
+
+               
+                if (clienteAEliminar.getUsuario() != null && clienteAEliminar.getUsuario().getIdUsuario() > 0) {
+                    UsuarioDao usuarioDao = new UsuarioDaoImpl();
+                    usuarioEliminado = usuarioDao.delete(clienteAEliminar.getUsuario().getIdUsuario());
+                } else {
+                 
+                    usuarioEliminado = true; 
+                }
+            }
+
+           
+            if (clienteEliminado && usuarioEliminado) {
+                conn.commit();
+                isSuccess = true;
+            } else {
+              
+                conn.rollback();
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+         
+            try { 
+                if (conn != null) {
+                    conn.rollback();
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        } finally {
+           
+            try { 
+                if (conn != null) {
+                    conn.setAutoCommit(true);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        
+        return isSuccess;
+    	
+    	
     }
 
     @Override
@@ -62,19 +125,4 @@ public class ClienteNegocioImpl implements ClienteNegocio {
      
         return cdao.update(cliente);
     }
-    
-    
-
-
-   
-    public Cliente obtenerClienteConCuentasPorUsuario(int idUsuario) {
-    	System.out.println("Buscando cliente con idUsuario: " + idUsuario);
-        return cdao.getClienteConCuentasPorUsuario(idUsuario);
-    }
-    
-    
-    
-    
-    
-    
 }

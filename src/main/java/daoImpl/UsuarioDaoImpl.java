@@ -18,6 +18,10 @@ public class UsuarioDaoImpl implements UsuarioDao {
     
     private static final String UPDATE_CLIENTE_CON_USUARIO = "UPDATE cliente SET IdUsuario = ? WHERE DNI = ?";
     
+    
+    private static final String DELETE_LOGICO_USUARIO = "UPDATE usuario SET Estado = 0 WHERE IdUsuario = ?";
+
+    
     public Usuario getUsuario(String username, String password) {
         Connection conn = null;
         PreparedStatement statement = null;
@@ -155,5 +159,31 @@ public class UsuarioDaoImpl implements UsuarioDao {
         }
         return isSuccess;
     }
+   
+    
+    @Override
+    public boolean delete(int idUsuario) {
+        Connection conn = null;
+        PreparedStatement statement = null;
+        boolean isSuccess = false;
+        try {
+            conn = Conexion.getConexion().getSQLConexion();
+            statement = conn.prepareStatement(DELETE_LOGICO_USUARIO);
+            statement.setInt(1, idUsuario);
+            if (statement.executeUpdate() > 0) {
+                conn.commit();
+                isSuccess = true;
+            } else {
+                conn.rollback();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            try { if (conn != null) conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+        } finally {
+            try { if (statement != null) statement.close(); } catch (SQLException e) { e.printStackTrace(); }
+        }
+        return isSuccess;
+    }
+    
     
 }

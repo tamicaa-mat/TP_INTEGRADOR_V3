@@ -38,7 +38,7 @@
                     
                     <form action="ClienteServlet" method="post">
                         
-                        <%-- 3. LÓGICA PARA DECIDIR LA ACCIÓN DEL FORMULARIO --%>
+                       
                         <% if (clienteAEditar != null) { %>
                             <input type="hidden" name="action" value="modificar"/>
                             <input type="hidden" name="txtDni" value="<%= clienteAEditar.getDni() %>"/>
@@ -78,7 +78,7 @@
                         <div class="mb-3"><input type="date" class="form-control" name="txtFechaNacimiento" value="<%= (clienteAEditar != null && clienteAEditar.getFechaNacimiento() != null) ? clienteAEditar.getFechaNacimiento() : "" %>" required></div>
                         <div class="mb-3"><input type="text" class="form-control" name="txtDireccion" placeholder="Dirección" value="<%= (clienteAEditar != null) ? clienteAEditar.getDireccion() : "" %>" required></div>
                         
-                        <%-- 4. LÓGICA PARA RELLENAR LOS DESPLEGABLES --%>
+                       
                         <div class="mb-3">
                             <select class="form-select" name="ddlProvincia" required>
                                 <option value="" disabled selected>Provincia</option>

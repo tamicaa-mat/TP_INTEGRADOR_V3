@@ -33,8 +33,8 @@
             <c:if test="${sessionScope.usuarioLogueado.getTipoUsuario().getDescripcion() == 'Administrador'}">
                 <div class="mb-3 w-100 d-flex justify-content-center flex-wrap gap-2">
                     <span class="fw-bold text-secondary me-3 align-self-center">ADMINISTRADOR</span>
-                    <a href="${pageContext.request.contextPath}/ClienteServlet" class="btn btn-secondary btn-sm">Gestión Clientes</a>
-	            <a href="${pageContext.request.contextPath}/ClienteServlet" class="btn btn-secondary btn-sm">Gestión Usuarios</a>
+                <a href="${pageContext.request.contextPath}/ClienteServlet" class="btn btn-secondary btn-sm">Gestión Clientes</a>
+	            <a href="AdministradorABMLusuarios.jsp" class="btn btn-secondary btn-sm">Gestión Usuarios</a>
 	            <a href="AdministradorListaCuentas.jsp" class="btn btn-secondary btn-sm">Gestión Cuentas</a>
 	            <a href="AdministradorListaPrestamos.jsp" class="btn btn-secondary btn-sm">Autorizar Préstamos</a>
 	            <a href="AdministradorReportes.jsp" class="btn btn-secondary btn-sm">Reportes Admin</a>
