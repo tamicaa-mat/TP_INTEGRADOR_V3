@@ -20,12 +20,7 @@ import dominio.Usuario;
 public class ClienteDaoImpl implements ClienteDao {
 
 	private static final String INSERT_CLIENTE_SOLO = "insert into cliente(DNI, CUIL, Nombre, Apellido, Sexo, Nacionalidad, FechaNacimiento, Direccion, idLocalidad, CorreoElectronico, Telefono, Estado) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)";
-	private static final String READ_ALL = "select c.*, u.NombreUsuario, l.Descripcion as LocalidadDescripcion, p.IdProvincia, p.Descripcion as ProvinciaDescripcion " +
-            "from cliente c " +
-            "inner join usuario u on c.IdUsuario = u.IdUsuario " +
-            "inner join localidad l on c.IdLocalidad = l.IdLocalidad " +
-            "inner join provincia p on l.IdProvincia = p.IdProvincia " +
-            "where c.Estado = 1";
+	private static final String READ_ALL = "select c.*, u.NombreUsuario, u.Estado as UsuarioEstado, l.Descripcion as LocalidadDescripcion, p.IdProvincia, p.Descripcion as ProvinciaDescripcion from cliente c left join usuario u on c.IdUsuario = u.IdUsuario left join localidad l on c.IdLocalidad = l.IdLocalidad left join provincia p on l.IdProvincia = p.IdProvincia";
 	private static final String DELETE_LOGICO = "update cliente set Estado = 0 where DNI = ?";
 	private static final String UPDATE_CLIENTE = "update cliente set CUIL = ?, Nombre = ?, Apellido = ?, Sexo = ?, Nacionalidad = ?, FechaNacimiento = ?, Direccion = ?, idLocalidad = ?, CorreoElectronico = ?, Telefono = ? where DNI = ?";
 	private static final String GET_BY_DNI = "select c.*, u.NombreUsuario, l.Descripcion as LocalidadDescripcion, p.IdProvincia, p.Descripcion as ProvinciaDescripcion " +
@@ -42,6 +37,10 @@ public class ClienteDaoImpl implements ClienteDao {
             "inner join localidad l on c.IdLocalidad = l.IdLocalidad " +
             "inner join provincia p on l.IdProvincia = p.IdProvincia " +
             "where c.IdUsuario = ? and c.Estado = 1";
+	
+	
+	private static final String LEER_TODOS_POR_ESTADO = "select c.*, u.NombreUsuario, l.Descripcion as LocalidadDescripcion from cliente c left join usuario u ... left join localidad l ... where c.Estado = ?";
+	
 	
 	
 	@Override
@@ -102,32 +101,7 @@ public class ClienteDaoImpl implements ClienteDao {
 			
 	}
 
-	@Override
-	public ArrayList<Cliente> readAll() {
-		Connection conn = null;
-		PreparedStatement statement = null;
-		ResultSet rs = null;
-		ArrayList<Cliente> clientes = new ArrayList<>();
-		
-		try {
-			conn = Conexion.getConexion().getSQLConexion();
-			statement = conn.prepareStatement(READ_ALL);
-			rs = statement.executeQuery();
-			while (rs.next()) {
-				clientes.add(instanciarClienteDesdeRs(rs));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (rs != null) rs.close();
-				if (statement != null) statement.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-		return clientes;
-	}
+	
 	
 	@Override
 	public boolean update(Cliente cliente) {
@@ -262,8 +236,8 @@ public class ClienteDaoImpl implements ClienteDao {
 	}
 	
 	private Cliente instanciarClienteDesdeRs(ResultSet rs) throws SQLException {
-	
-		// 1. Creamos la Provincia
+	    
+	    // 1. Creamos la Provincia
 	    Provincia provincia = new Provincia();
 	    provincia.setIdProvincia(rs.getInt("IdProvincia"));
 	    provincia.setDescripcion(rs.getString("ProvinciaDescripcion"));
@@ -272,14 +246,9 @@ public class ClienteDaoImpl implements ClienteDao {
 	    Localidad localidad = new Localidad();
 	    localidad.setIdLocalidad(rs.getInt("IdLocalidad"));
 	    localidad.setDescripcion(rs.getString("LocalidadDescripcion"));
-	    localidad.setProvincia(provincia); // ¡Este es el paso clave!
+	    localidad.setProvincia(provincia);
 	    
-	    // 3. Creamos el Usuario
-	    Usuario usuario = new Usuario();
-	    usuario.setIdUsuario(rs.getInt("IdUsuario"));
-	    usuario.setNombreUsuario(rs.getString("NombreUsuario"));
-	    
-	    // 4. Creamos el Cliente y le asignamos todo
+	    // 3. Creamos el Cliente y rellenamos sus datos personales
 	    Cliente cliente = new Cliente();
 	    cliente.setIdCliente(rs.getInt("IdCliente"));
 	    cliente.setDni(rs.getString("Dni"));
@@ -294,11 +263,30 @@ public class ClienteDaoImpl implements ClienteDao {
 	    cliente.setTelefono(rs.getString("Telefono"));
 	    cliente.setEstado(rs.getBoolean("Estado"));
 	    cliente.setLocalidad(localidad);
-	    cliente.setUsuario(usuario);
+	    
+	    // --- LÓGICA CORREGIDA PARA EL USUARIO ---
+	    
+	    Usuario user = null; 
+	    // Primero, verificamos si la base de datos trajo un IdUsuario. 
+	    // Usamos getObject y luego verificamos si es nulo, es la forma más segura.
+	    if (rs.getObject("IdUsuario") != null) {
+	        user = new Usuario();
+	        user.setIdUsuario(rs.getInt("IdUsuario"));
+	        user.setNombreUsuario(rs.getString("NombreUsuario"));
+	        // Leemos el estado del usuario desde la columna con el alias que definimos
+	        user.setEstado(rs.getBoolean("UsuarioEstado")); 
+	    }
+
+	    // Finalmente, asignamos el usuario al cliente. 
+	    // El objeto 'user' será null si el cliente no tenía uno, lo cual es correcto.
+	    cliente.setUsuario(user);
 
 	    return cliente;
 	}
-
+	
+	
+	
+	
 	@Override
 	public Cliente getClienteConCuentasPorUsuario(int idUsuario) {
 	    Cliente cliente = null;
@@ -363,4 +351,91 @@ public class ClienteDaoImpl implements ClienteDao {
 	}
 
 
+
+	public ArrayList<Cliente> readAll() {
+		Connection conn = null;
+		PreparedStatement statement = null;
+		ResultSet rs = null;
+		ArrayList<Cliente> clientes = new ArrayList<>();
+		
+		try {
+			conn = Conexion.getConexion().getSQLConexion();
+			statement = conn.prepareStatement(READ_ALL);
+			rs = statement.executeQuery();
+			while (rs.next()) {
+				clientes.add(instanciarClienteDesdeRs(rs));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null) rs.close();
+				if (statement != null) statement.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return clientes;
+	}
+	
+	
+	
+	public ArrayList<Cliente> leerTodosLosActivos() {
+		Connection conn = null;
+	    PreparedStatement statement = null;
+	    ResultSet rs = null;
+	    ArrayList<Cliente> clientes = new ArrayList<>();
+	    try {
+	        conn = Conexion.getConexion().getSQLConexion();
+	        // Usamos la consulta con filtro de estado
+	        statement = conn.prepareStatement(LEER_TODOS_POR_ESTADO);
+	        // Le pasamos el valor '1' al primer '?' de la consulta
+	        statement.setBoolean(1, true); 
+	        rs = statement.executeQuery();
+	        while (rs.next()) {
+	            clientes.add(instanciarClienteDesdeRs(rs));
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    } finally {
+	    	try {
+				if (rs != null) rs.close();
+				if (statement != null) statement.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+	    }
+	    return clientes;
+	}
+
+
+	public ArrayList<Cliente> leerTodosLosInactivos() {
+		 Connection conn = null;
+		    PreparedStatement statement = null;
+		    ResultSet rs = null;
+		    ArrayList<Cliente> clientes = new ArrayList<>();
+		    try {
+		        conn = Conexion.getConexion().getSQLConexion();
+		        // Usamos la misma consulta con filtro de estado
+		        statement = conn.prepareStatement(LEER_TODOS_POR_ESTADO);
+		        // Le pasamos el valor '0' al primer '?' de la consulta
+		        statement.setBoolean(1, false);
+		        rs = statement.executeQuery();
+		        while (rs.next()) {
+		            clientes.add(instanciarClienteDesdeRs(rs));
+		        }
+		    } catch (SQLException e) {
+		        e.printStackTrace();
+		    } finally {
+		    	try {
+					if (rs != null) rs.close();
+					if (statement != null) statement.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+		    }
+		    return clientes;
+	}
+	
+	
 }

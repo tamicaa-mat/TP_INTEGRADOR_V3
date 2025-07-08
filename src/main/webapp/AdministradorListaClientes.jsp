@@ -12,11 +12,21 @@
     <jsp:include page="masterPage.jsp" />
 
     <main class="container py-5">
-        <h4 class="text-center mb-4">Gestión de Clientes (ABML)</h4>
-       
-        <div class="text-end mb-4">
-            <a href="ClienteServlet?action=mostrarFormulario" class="btn btn-secondary btn-sm">Agregar Nuevo Cliente</a>
+        
+         
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            
+            <div>
+                <span class="fw-bold me-2">Ver:</span>
+                <a href="ClienteServlet?filtro=activos" >Activos</a>
+                <a href="ClienteServlet?filtro=inactivos" >Inactivos</a>
+                <a href="ClienteServlet" >Todos</a>
+            </div>
+           
+
+            <a href="ClienteServlet?action=mostrarFormulario" class="btn btn-primary btn-sm">Agregar Nuevo Cliente</a>
         </div>
+        
         
         <div class="table-responsive">
             <table class="table table-bordered table-hover align-middle text-center">

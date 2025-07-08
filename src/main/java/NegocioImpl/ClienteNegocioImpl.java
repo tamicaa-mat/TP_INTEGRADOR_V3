@@ -19,14 +19,14 @@ public class ClienteNegocioImpl implements ClienteNegocio {
  	private ClienteDao cdao = new ClienteDaoImpl();
      
  	
- 	
+ 
      public ClienteNegocioImpl(ClienteDao cdao){
      	this.cdao=cdao;
      }
      
     
     
-
+  
     public ClienteNegocioImpl() {
 		// TODO Auto-generated constructor stub
 	}
@@ -125,13 +125,27 @@ public class ClienteNegocioImpl implements ClienteNegocio {
      
         return cdao.update(cliente);
     }
-
-
-
-
+    
+    
 	@Override
 	public Cliente obtenerClienteConCuentasPorUsuario(int idUsuario) {
 		
 		return cdao.getClienteConCuentasPorUsuario(idUsuario);
 	}
+
+
+	
+	@Override
+	public ArrayList<Cliente> leerTodosLosActivos(){
+		return cdao.leerTodosLosActivos();
+	}
+	
+	
+	
+	@Override
+	public ArrayList<Cliente> leerTodosLosInactivos(){
+		return cdao.leerTodosLosInactivos();
+	}
+	
+	
 }

@@ -14,7 +14,7 @@ import javax.servlet.http.HttpSession;
 import dominio.Cliente;
 import dominio.Localidad;
 import dominio.Provincia;
-import dominio.Usuario;
+
 import Negocio.ClienteNegocio;
 import Negocio.LocalidadNegocio;
 import Negocio.ProvinciaNegocio;
@@ -35,6 +35,7 @@ public class ClienteServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         
         String action = request.getParameter("action");
+        String filtro = request.getParameter("filtro");
         
       
         if (action != null && action.equals("mostrarFormulario")) {
@@ -84,11 +85,23 @@ public class ClienteServlet extends HttpServlet {
         } 
        
         else {
-            ClienteNegocio clienteNegocio = new ClienteNegocioImpl(new ClienteDaoImpl());
-            ArrayList<Cliente> listaClientes = clienteNegocio.readAll();
-            request.setAttribute("listaClientes", listaClientes);
-            RequestDispatcher rd = request.getRequestDispatcher("/AdministradorListaClientes.jsp");
-            rd.forward(request, response);
+        	 ArrayList<Cliente> listaClientes;
+        	 ClienteNegocio clienteNegocio = new ClienteNegocioImpl();
+             
+             // Decidimos qué método del negocio llamar según el filtro
+             if (filtro != null && filtro.equals("inactivos")) {
+                 listaClientes = clienteNegocio.leerTodosLosInactivos();
+             }
+             else if (filtro != null && filtro.equals("activos")) {
+                 listaClientes = clienteNegocio.leerTodosLosActivos();
+             }
+             else { // Por defecto, o si el filtro es "todos"
+                 listaClientes = clienteNegocio.readAll();
+             }
+             
+             request.setAttribute("listaClientes", listaClientes);
+             RequestDispatcher rd = request.getRequestDispatcher("/AdministradorListaClientes.jsp");
+             rd.forward(request, response);
         }
     }
     

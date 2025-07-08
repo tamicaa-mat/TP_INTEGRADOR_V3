@@ -12,7 +12,7 @@ public interface ClienteDao {
      boolean delete(String dni);
     
   
-    ArrayList<Cliente> readAll();
+  
     
    
     boolean update(Cliente cliente);
@@ -23,5 +23,10 @@ public interface ClienteDao {
     
     /// probandooooo
      public Cliente getClienteConCuentasPorUsuario(int idUsuario);
+     
+     
+      ArrayList<Cliente> readAll();
+      ArrayList<Cliente> leerTodosLosActivos(); // Para ver solo activos (Estado = 1)
+      ArrayList<Cliente> leerTodosLosInactivos();
 
 }
