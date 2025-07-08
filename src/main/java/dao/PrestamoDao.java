@@ -18,5 +18,7 @@ public interface PrestamoDao {
 	
 	List<Prestamo> obtenerTodosLosPrestamos();
     boolean actualizarEstado(int idPrestamo, int nuevoEstado);
+   
+    
     
 }

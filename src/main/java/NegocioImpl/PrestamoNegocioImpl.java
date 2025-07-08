@@ -66,5 +66,42 @@ public class PrestamoNegocioImpl implements PrestamoNegocio	{
 		public boolean actualizarEstadoPrestamo(int idPrestamo, int nuevoEstado) {
 			 return prestamoDao.actualizarEstado(idPrestamo, nuevoEstado);
 		}
+
+
+	
+		public boolean solicitarPrestamo(Prestamo prestamo) {
+			
+			//   interes
+		    if (prestamo.getInteres() == 0) {
+		        prestamo.setInteres(5.0);
+		    }
+
+		    ///importe por mes 
+		    if (prestamo.getImportePorMes() == 0 && prestamo.getPlazoMeses() > 0) {
+		        double importePedido = prestamo.getImportePedido();
+		        double interes = prestamo.getInteres();
+		        int plazo = prestamo.getPlazoMeses();
+
+		        // Fórmula: importe * (1 + interes/100) / plazo
+		        double importeTotalConInteres = importePedido * (1 + interes / 100.0);
+		        double cuotaMensual = importeTotalConInteres / plazo;
+
+		        prestamo.setImportePorMes(cuotaMensual);
+		    }
+
+		 
+		    if (prestamo.getCantidadCuotas() == 0) {
+		        prestamo.setCantidadCuotas(prestamo.getPlazoMeses());
+		    }
+
+		    prestamo.setEstado(1);
+		    // Llamada al DAO para insertar
+		    return prestamoDao.insert(prestamo);
+			
+			
+			
+			
+			
+		}
 	    
 }

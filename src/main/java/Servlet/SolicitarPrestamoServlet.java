@@ -1,9 +1,7 @@
 package Servlet;
 
 import java.io.IOException;
-import java.util.List;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -13,9 +11,12 @@ import javax.servlet.http.HttpSession;
 
 import Negocio.ClienteNegocio;
 import NegocioImpl.ClienteNegocioImpl;
+import NegocioImpl.PrestamoNegocioImpl;
 import daoImpl.ClienteDaoImpl;
+import daoImpl.PrestamoDaoImpl;
 import dominio.Cliente;
 import dominio.Cuenta;
+import dominio.Prestamo;
 import dominio.Usuario;
 
 
@@ -27,59 +28,97 @@ public class SolicitarPrestamoServlet extends HttpServlet {
         super();
     }
 
+  
+    
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	
-    	doPost(request, response); 
+        doPost(request, response); 
     }
 
-    
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	 System.out.println("Servlet ejecutado (GET)");
-         HttpSession session = request.getSession();
-         Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        System.out.println("Servlet ejecutado");
 
-         if (usuario != null) {
-             String cuentaSeleccionadaStr = request.getParameter("cuentaSeleccionada");
-             String importeStr = request.getParameter("importe");
-             String plazoStr = request.getParameter("plazo");
+        HttpSession session = request.getSession();
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
 
-             if (cuentaSeleccionadaStr != null && importeStr != null && plazoStr != null) {
-                 // El usuario está enviando la solicitud de préstamo
-                 try {
-                     int idCuenta = Integer.parseInt(cuentaSeleccionadaStr);
-                     double importe = Double.parseDouble(importeStr);
-                     int plazo = Integer.parseInt(plazoStr);
+        if (usuario != null) {
+            String cuentaSeleccionadaStr = request.getParameter("cuentaSeleccionada");
+            String importeStr = request.getParameter("importe");
+            String plazoStr = request.getParameter("plazo");
 
-                     System.out.println("Solicitud recibida:");
-                     System.out.println("- Cuenta: " + idCuenta);
-                     System.out.println("- Importe: " + importe);
-                     System.out.println("- Plazo: " + plazo + " meses");
+            if (cuentaSeleccionadaStr != null && importeStr != null && plazoStr != null) {
+                try {
+                    int idCuenta = Integer.parseInt(cuentaSeleccionadaStr);
+                    double importe = Double.parseDouble(importeStr);
+                    int plazo = Integer.parseInt(plazoStr);
 
-                     // Aquí podés hacer lógica de negocio, guardar el préstamo, etc.
-                     // Por ejemplo: PrestamoNegocio.agregarPrestamo(...)
+                    // Construir objeto Prestamo
+                    Prestamo prestamo = new Prestamo();
 
-                     request.setAttribute("mensajeExito", "¡Solicitud enviada con éxito!");
+                    // Cliente desde capa negocio
+                    ClienteNegocio clienteNegocio = new ClienteNegocioImpl(new ClienteDaoImpl());
+                    Cliente cliente = clienteNegocio.obtenerClienteConCuentasPorUsuario(usuario.getIdUsuario());
 
-                 } catch (NumberFormatException ex) {
-                     request.setAttribute("mensajeError", "Datos inválidos.");
-                 }
+                    Cuenta cuenta = new Cuenta();
+                    cuenta.setIdCuenta(idCuenta);
 
-             } else {
-                 // Primera vez que entra: solo cargar cuentas
-                 ClienteNegocio clienteNegocio = new ClienteNegocioImpl(new ClienteDaoImpl());
-                 Cliente cliente = clienteNegocio.obtenerClienteConCuentasPorUsuario(usuario.getIdUsuario());
+                    prestamo.setCliente(cliente);
+                    prestamo.setCuentaAsociada(cuenta);
+                    prestamo.setImportePedido(importe);
+                    prestamo.setPlazoMeses(plazo);
 
-                 if (cliente != null) {
-                     session.setAttribute("clienteLogueado", cliente);
-                     List<Cuenta> cuentas = cliente.getCuentas();
-                     request.setAttribute("cuentas", cuentas);
-                 }
-             }
-         }
+                    // Interés fijo, por ejemplo
+                    double interes = 5.0;
+                    prestamo.setInteres(interes);
 
-         request.getRequestDispatcher("/CLIENTEsolicitarPrestamos.jsp").forward(request, response);
-    	
-    	
+                    // Calcular importe por mes
+                    double importeFinal = importe * (1 + interes / 100.0);
+                    double cuotaMensual = importeFinal / plazo;
+                    prestamo.setImportePorMes(cuotaMensual);
+                    prestamo.setCantidadCuotas(plazo);
+                   
+                    PrestamoNegocioImpl prestamoNegocio = new PrestamoNegocioImpl(new PrestamoDaoImpl());
+                    boolean exito = prestamoNegocio.solicitarPrestamo(prestamo);
+
+                    if (exito) {
+                        request.setAttribute("mensajeExito", "¡Solicitud enviada con éxito!");
+                    } else {
+                        request.setAttribute("mensajeError", "Error al registrar la solicitud.");
+                    }
+
+                } catch (NumberFormatException ex) {
+                    request.setAttribute("mensajeError", "Datos inválidos. Verifique los campos.");
+                }
+
+            } else {
+                // Primera vez: cargar cuentas del cliente
+                ClienteNegocio clienteNegocio = new ClienteNegocioImpl(new ClienteDaoImpl());
+                Cliente cliente = clienteNegocio.obtenerClienteConCuentasPorUsuario(usuario.getIdUsuario());
+
+                if (cliente != null) {
+                    session.setAttribute("clienteLogueado", cliente);
+                    request.setAttribute("cuentas", cliente.getCuentas());
+                }
+            }
+        } else {
+            request.setAttribute("mensajeError", "Debe iniciar sesión.");
+        }
+
+        request.getRequestDispatcher("/CLIENTEsolicitarPrestamos.jsp").forward(request, response);
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     }
-}
+

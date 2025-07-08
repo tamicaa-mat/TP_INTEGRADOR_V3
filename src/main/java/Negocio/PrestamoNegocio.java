@@ -24,4 +24,7 @@ public interface PrestamoNegocio {
     List<Prestamo> listarPrestamos();
     boolean actualizarEstadoPrestamo(int idPrestamo, int nuevoEstado);
     
+    boolean solicitarPrestamo(Prestamo prestamo);
+
+    
 }

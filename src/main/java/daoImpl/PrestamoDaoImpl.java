@@ -16,7 +16,7 @@ import dominio.Prestamo;
 
 public class PrestamoDaoImpl implements PrestamoDao{
 
-    private static final String INSERT = "INSERT INTO Prestamo (IdCliente, IdCuentaAsociada, FechaAlta, ImportePedido, PlazoMeses, ImportePorMes, Interes, CantidadCuotas, Estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)";
+    private static final String INSERT = "INSERT INTO Prestamo (IdCliente, IdCuentaAsociada, FechaAlta, ImportePedido, PlazoMeses, ImportePorMes, Interes, CantidadCuotas, Estado) VALUES (?, ?, CURRENT_DATE, ?, ?, ?, ?, ?, 0)";
     private static final String UPDATE = "UPDATE Prestamo SET Estado = ? WHERE IdPrestamo = ?";
     private static final String SELECT_ALL = "SELECT * FROM Prestamo";
     private static final String SELECT_BY_CLIENTE = "SELECT * FROM Prestamo WHERE IdCliente = ?";
@@ -32,6 +32,9 @@ public class PrestamoDaoImpl implements PrestamoDao{
     		+ "JOIN Cuenta cu ON p.IdCuentaAsociada = cu.IdCuenta;";
     private static final String UPDATE_ESTADO = "UPDATE Prestamo SET Estado = ? WHERE IdPrestamo = ?" ;
 
+    
+    
+    
     public boolean insert(Prestamo prestamo) {
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -41,13 +44,13 @@ public class PrestamoDaoImpl implements PrestamoDao{
             stmt = conn.prepareStatement(INSERT);
             stmt.setInt(1, prestamo.getCliente().getIdCliente());
             stmt.setInt(2, prestamo.getCuentaAsociada().getIdCuenta());
-            stmt.setDate(3, new java.sql.Date(prestamo.getFechaAlta().getTime()));
-            stmt.setDouble(4, prestamo.getImportePedido());
-            stmt.setInt(5, prestamo.getPlazoMeses());
-            stmt.setDouble(6, prestamo.getImportePorMes());
-            stmt.setDouble(7, prestamo.getInteres());
-            stmt.setInt(8, prestamo.getCantidadCuotas());
-
+          
+            stmt.setDouble(3, prestamo.getImportePedido());
+            stmt.setInt(4, prestamo.getPlazoMeses());
+            stmt.setDouble(5, prestamo.getImportePorMes());
+            stmt.setDouble(6, prestamo.getInteres());
+            stmt.setInt(7, prestamo.getCantidadCuotas());
+            stmt.setInt(8, prestamo.getEstado());       
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -316,10 +319,47 @@ public class PrestamoDaoImpl implements PrestamoDao{
 	        }
 	        return false;
 	    }
-	}
 
-    
-    
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+}
+
     
     
 	
