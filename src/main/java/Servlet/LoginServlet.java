@@ -12,6 +12,9 @@ import dao.ClienteDao;
 import daoImpl.ClienteDaoImpl;
 import dominio.Cliente;
 import dominio.Usuario;
+import excepciones.ClaveIncorrectaException;
+import excepciones.UsuarioInactivoException;
+import excepciones.UsuarioInexistenteException;
 import Negocio.UsuarioNegocio;
 import NegocioImpl.UsuarioNegocioImpl;
 
@@ -28,26 +31,28 @@ public class LoginServlet extends HttpServlet {
         String pass = request.getParameter("contrasena");
 
         UsuarioNegocio usuarioNegocio = new UsuarioNegocioImpl();
-        Usuario usuario = usuarioNegocio.obtenerUsuario(user, pass);
+        Usuario usuario = null;
 
-        System.out.println("Servlet: " + (usuario != null ? usuario.toString() : "Usuario es nulo"));
-        if (usuario != null) {
+        try {
+            usuario = usuarioNegocio.login(user, pass);
+
             HttpSession session = request.getSession();
             session.setAttribute("usuarioLogueado", usuario);
 
-            // Si es un cliente, también buscamos sus datos de cliente y los guardamos en sesión
             if (usuario.getTipoUsuario().getDescripcion().equalsIgnoreCase("Cliente")) {
                 ClienteDao clienteDao = new ClienteDaoImpl();
                 Cliente cliente = clienteDao.obtenerClientePorUsuario(usuario.getIdUsuario());
                 session.setAttribute("clienteLogueado", cliente);
             }
-            
+
             response.sendRedirect("masterPage.jsp");
-        } else {
-            // Si el login falla, volvemos a login.jsp con un mensaje de error
-            request.setAttribute("errorLogin", "Usuario o contraseña incorrectos.");
+
+        } catch (UsuarioInexistenteException | UsuarioInactivoException | ClaveIncorrectaException e) {
+            request.setAttribute("errorLogin", e.getMessage());
             RequestDispatcher rd = request.getRequestDispatcher("/login.jsp");
             rd.forward(request, response);
         }
     }
+
+
 }

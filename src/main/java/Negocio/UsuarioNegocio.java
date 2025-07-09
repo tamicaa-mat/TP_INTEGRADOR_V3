@@ -3,6 +3,9 @@ package Negocio;
 import java.util.ArrayList;
 
 import dominio.Usuario;
+import excepciones.ClaveIncorrectaException;
+import excepciones.UsuarioInactivoException;
+import excepciones.UsuarioInexistenteException;
 
 public interface UsuarioNegocio {
     public Usuario obtenerUsuario(String username, String password);
@@ -11,5 +14,6 @@ public interface UsuarioNegocio {
     public boolean bajaLogicaUsuario(int idUsuario); 
     public boolean insertarUsuario(Usuario usuario, String dniCliente);
     public ArrayList<Usuario> leerTodosLosUsuarios();
+    Usuario login(String username, String password) throws UsuarioInexistenteException, ClaveIncorrectaException, UsuarioInactivoException;
 
 }

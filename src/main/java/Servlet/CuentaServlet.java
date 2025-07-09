@@ -1,8 +1,11 @@
 package Servlet;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -12,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import Negocio.CuentaNegocio;
 import NegocioImpl.CuentaNegocioImpl;
 import daoImpl.CuentaDaoImpl;
 import dominio.Cliente;
@@ -31,6 +35,35 @@ public class CuentaServlet extends HttpServlet {
     	 String action = request.getParameter("action");
     		HttpSession session = request.getSession();
             Cliente cliente = (Cliente) session.getAttribute("clienteLogueado");  
+            
+            if (action != null && action.equals("reporteCuentas")) {
+                String fechaDesdeStr = request.getParameter("fechaInicio");
+                String fechaHastaStr = request.getParameter("fechaFin");
+
+                try {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    Date fechaDesde = sdf.parse(fechaDesdeStr);
+                    Date fechaHasta = sdf.parse(fechaHastaStr);
+
+                    CuentaNegocio cuentaNegocio = new CuentaNegocioImpl(new CuentaDaoImpl());
+                    int totalCuentas = cuentaNegocio.contarCuentasCreadasEntreFechas(fechaDesde, fechaHasta);
+                    double saldoTotal = cuentaNegocio.obtenerSaldoTotalCuentasCreadasEntreFechas(fechaDesde, fechaHasta);
+
+                    request.setAttribute("totalCuentas", totalCuentas);
+                    request.setAttribute("saldoTotalCuentas", saldoTotal);
+                    request.setAttribute("fechaDesde", fechaDesdeStr);
+                    request.setAttribute("fechaHasta", fechaHastaStr);
+
+                    RequestDispatcher rd = request.getRequestDispatcher("/AdministradorReportes.jsp");
+                    rd.forward(request, response);
+                    return;
+                } catch (ParseException e) {
+                    request.setAttribute("error", "Formato de fecha inválido");
+                    RequestDispatcher rd = request.getRequestDispatcher("/AdministradorReportes.jsp");
+                    rd.forward(request, response);
+                    return;
+                }
+            }
             
          if (action != null && action.equals("listar")) {
              String dniCliente = request.getParameter("dni");
