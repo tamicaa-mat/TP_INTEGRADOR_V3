@@ -16,7 +16,7 @@ public interface PrestamoNegocio {
 
     boolean solicitarPrestamo(Usuario usuario, Prestamo prestamo);
 
-    boolean actualizarEstadoPrestamo(int idPrestamo); 
+  
 
     boolean eliminarPrestamo(int idPrestamo);
 

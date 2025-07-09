@@ -38,14 +38,16 @@ public class PrestamoServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
 		String id = request.getParameter("idPrestamo");
 		String accion = request.getParameter("accion");
 
+		System.out.println("doPost id=" + id + ", accion=" + accion);
 		if (id != null && accion != null) {
 			int idPrestamo = Integer.parseInt(id);
 			int nuevoEstado = accion.equals("aprobar") ? 1 : 2;
-
-			prestamoNegocio.actualizarEstadoPrestamo(idPrestamo, nuevoEstado);
+		    prestamoNegocio.actualizarEstadoPrestamo(idPrestamo, nuevoEstado);
+			
 		}
 
 		response.sendRedirect("PrestamoServlet"); 

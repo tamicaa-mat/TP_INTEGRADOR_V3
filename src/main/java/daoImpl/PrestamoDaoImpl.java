@@ -17,7 +17,7 @@ import dominio.Prestamo;
 public class PrestamoDaoImpl implements PrestamoDao{
 
     private static final String INSERT = "INSERT INTO Prestamo (IdCliente, IdCuentaAsociada, FechaAlta, ImportePedido, PlazoMeses, ImportePorMes, Interes, CantidadCuotas, Estado) VALUES (?, ?, CURRENT_DATE, ?, ?, ?, ?, ?, 0)";
-    private static final String UPDATE = "UPDATE Prestamo SET Estado = ? WHERE IdPrestamo = ?";
+    //private static final String UPDATE = "UPDATE Prestamo SET Estado = ? WHERE IdPrestamo = ?";
     private static final String SELECT_ALL = "SELECT * FROM Prestamo";
     private static final String SELECT_BY_CLIENTE = "SELECT * FROM Prestamo WHERE IdCliente = ?";
     private static final String GETPRESTAMO = "SELECT * FROM Prestamo WHERE IdPrestamo = ?";
@@ -36,58 +36,50 @@ public class PrestamoDaoImpl implements PrestamoDao{
     
     
     public boolean insert(Prestamo prestamo) {
-        Connection conn = null;
-        PreparedStatement stmt = null;
+        
+        try (Connection conn = Conexion.getConexion().getSQLConexion()) {
+           
+            conn.setAutoCommit(false);
 
-        try {
-            conn = Conexion.getConexion().getSQLConexion();
-            stmt = conn.prepareStatement(INSERT);
-            stmt.setInt(1, prestamo.getCliente().getIdCliente());
-            stmt.setInt(2, prestamo.getCuentaAsociada().getIdCuenta());
-          
-            stmt.setDouble(3, prestamo.getImportePedido());
-            stmt.setInt(4, prestamo.getPlazoMeses());
-            stmt.setDouble(5, prestamo.getImportePorMes());
-            stmt.setDouble(6, prestamo.getInteres());
-            stmt.setInt(7, prestamo.getCantidadCuotas());
-            stmt.setInt(8, prestamo.getEstado());       
-            return stmt.executeUpdate() > 0;
+            try (PreparedStatement stmt = conn.prepareStatement(INSERT)) {
+                stmt.setInt(1, prestamo.getCliente().getIdCliente());
+                stmt.setInt(2, prestamo.getCuentaAsociada().getIdCuenta());
+                stmt.setDouble(3, prestamo.getImportePedido());
+                stmt.setInt(4, prestamo.getPlazoMeses());
+                stmt.setDouble(5, prestamo.getImportePorMes());
+                stmt.setDouble(6, prestamo.getInteres());
+                stmt.setInt(7, prestamo.getCantidadCuotas());
+               // stmt.setInt(8, prestamo.getEstado());
+
+                int filas = stmt.executeUpdate();
+                System.out.println("Insert ejecutado, filas afectadas: " + filas);
+
+                if (filas > 0) {
+                    conn.commit();
+                    System.out.println("Transacción commit OK");
+                    return true;
+                } else {
+                    conn.rollback();
+                    System.err.println("No se insertó ninguna fila, se hizo rollback");
+                    return false;
+                }
+            } catch (SQLException e) {
+                conn.rollback();
+                System.err.println("Error en insert, se hace rollback");
+                e.printStackTrace();
+                return false;
+            } finally {
+             
+                conn.setAutoCommit(true);
+            }
         } catch (SQLException e) {
+            System.err.println("Error grave en la conexión");
             e.printStackTrace();
             return false;
-        } finally {
-            try {
-                if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
         }
     }
 
-    @Override
-    public boolean update(Prestamo prestamo) {
-        Connection conn = null;
-        PreparedStatement stmt = null;
-        try {
-            conn = Conexion.getConexion().getSQLConexion();
-            stmt = conn.prepareStatement(UPDATE);
-            stmt.setInt(1, prestamo.getEstado());
-            stmt.setInt(2, prestamo.getIdPrestamo());
-
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        } finally {
-            try {
-                if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+   
 
     @Override
     public ArrayList<Prestamo> readAll() {
@@ -306,18 +298,17 @@ public class PrestamoDaoImpl implements PrestamoDao{
 
 	@Override
 	public boolean actualizarEstado(int idPrestamo, int nuevoEstado) {
-		 try {
-	            Connection cn = Conexion.getConexion().getSQLConexion();
-	            PreparedStatement stmt = cn.prepareStatement(UPDATE_ESTADO);
-	            stmt.setInt(1, nuevoEstado);
-	            stmt.setInt(2, idPrestamo);
-	            int filas = stmt.executeUpdate();
-	            cn.close();
-	            return filas > 0;
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	        }
-	        return false;
+		 try (Connection cn = Conexion.getConexion().getSQLConexion();
+		        PreparedStatement stmt = cn.prepareStatement(UPDATE_ESTADO)){
+		        stmt.setInt(1, nuevoEstado);
+		        stmt.setInt(2, idPrestamo);
+		        int filas = stmt.executeUpdate();
+		        System.out.println("updateEstado: filas afectadas = " + filas);
+		        return filas > 0;
+		    } catch (SQLException e) {
+		        e.printStackTrace();
+		        return false;
+		    }
 	    }
 
 	

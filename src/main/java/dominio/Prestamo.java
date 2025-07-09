@@ -117,14 +117,13 @@ public class Prestamo {
         this.Estado = estado;
     }
 
-    @Override
-    public String toString() {
-        return "Prestamo{" +
-               "idPrestamo=" + idPrestamo +
-               ", importePedido=" + importePedido +
-               ", plazoMeses=" + plazoMeses +
-               ", estado='" + Estado + '\'' +
-               ", cliente=" + (cliente != null ? cliente.getNombre() : "N/A") +
-               '}';
-    }
+	@Override
+	public String toString() {
+		return "Prestamo [idPrestamo=" + idPrestamo + ", cliente=" + cliente + ", cuentaAsociada=" + cuentaAsociada
+				+ ", fechaAlta=" + fechaAlta + ", importePedido=" + importePedido + ", plazoMeses=" + plazoMeses
+				+ ", importePorMes=" + importePorMes + ", interes=" + interes + ", CantidadCuotas=" + CantidadCuotas
+				+ ", Estado=" + Estado + "]";
+	}
+
+
 }

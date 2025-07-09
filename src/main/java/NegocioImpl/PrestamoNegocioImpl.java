@@ -30,10 +30,7 @@ public class PrestamoNegocioImpl implements PrestamoNegocio	{
 	    }
 
 	 
-	    public boolean actualizarEstadoPrestamo(int idPrestamo) {
 	   
-	        return false;
-	    }
 
 
 	    public boolean eliminarPrestamo(int idPrestamo) {
@@ -103,5 +100,9 @@ public class PrestamoNegocioImpl implements PrestamoNegocio	{
 			
 			
 		}
+
+
+
+
 	    
 }

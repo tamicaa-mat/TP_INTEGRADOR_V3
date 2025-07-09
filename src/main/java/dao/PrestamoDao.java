@@ -10,7 +10,7 @@ import dominio.Prestamo;
 public interface PrestamoDao {
 	
     boolean insert(Prestamo prestamo);
-    boolean update(Prestamo prestamo);
+   // boolean update(Prestamo prestamo);
     ArrayList<Prestamo> readAll();
     List<Prestamo> obtenerPrestamosPorCliente(int idCliente);
     Prestamo getPrestamoPorId(int idPrestamo);
