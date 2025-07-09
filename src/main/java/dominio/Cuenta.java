@@ -9,6 +9,7 @@ public class Cuenta {
 	    int IdCliente;
 	    private LocalDate fechaCreacion;
 	    private int tipoCuenta; 
+	    private TipoCuenta tipoCuentaObjeto;
 	    private String numeroCuenta;
 	    private String cbu;
 	    private double saldo; // Usar BigDecimal para dinero por precisión
@@ -58,6 +59,14 @@ public class Cuenta {
 			this.tipoCuenta = tipoCuenta;
 		}
 
+		public TipoCuenta getTipoCuentaObjeto() {
+			return tipoCuentaObjeto;
+		}
+
+		public void setTipoCuentaObjeto(TipoCuenta tipoCuentaObjeto) {
+			this.tipoCuentaObjeto = tipoCuentaObjeto;
+		}
+
 		public String getNumeroCuenta() {
 			return numeroCuenta;
 		}
@@ -93,11 +102,12 @@ public class Cuenta {
 		@Override
 		public String toString() {
 			return "Cuenta [idCuenta=" + idCuenta + ", cliente=" + cliente + ", IdCliente=" + IdCliente
-					+ ", fechaCreacion=" + fechaCreacion + ", tipoCuenta=" + tipoCuenta + ", numeroCuenta="
-					+ numeroCuenta + ", cbu=" + cbu + ", saldo=" + saldo + ", estado=" + estado + "]";
+					+ ", fechaCreacion=" + fechaCreacion + ", tipoCuenta=" + tipoCuenta + ", tipoCuentaObjeto="
+					+ tipoCuentaObjeto + ", numeroCuenta=" + numeroCuenta + ", cbu=" + cbu + ", saldo=" + saldo
+					+ ", estado=" + estado + "]";
 		}
 
-	 
+	
 	
 	
 	

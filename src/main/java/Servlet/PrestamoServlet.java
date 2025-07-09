@@ -38,7 +38,7 @@ public class PrestamoServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
+		// AQUI PARA RECIBIR ACCCION E ID PRESTAMO
 		String id = request.getParameter("idPrestamo");
 		String accion = request.getParameter("accion");
 

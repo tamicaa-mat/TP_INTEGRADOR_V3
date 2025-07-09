@@ -302,7 +302,7 @@ public class PrestamoDaoImpl implements PrestamoDao{
 		    PreparedStatement stmt = null;
 		    try {
 		        conn = Conexion.getConexion().getSQLConexion();
-		        conn.setAutoCommit(false); // comparamos manualmente sin el autocomit no funciona por que??
+		        conn.setAutoCommit(false); 
 
 		        stmt = conn.prepareStatement(UPDATE_ESTADO);
 		        stmt.setInt(1, nuevoEstado);

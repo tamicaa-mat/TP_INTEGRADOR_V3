@@ -28,56 +28,52 @@ public class Movimiento {
        
     }
 
-    // Getters
-    public int getIdMovimiento() {
-        return idMovimiento;
-    }
+	public int getIdMovimiento() {
+		return idMovimiento;
+	}
 
-    public LocalDateTime getFechaHora() {
-        return fechaHora;
-    }
+	public void setIdMovimiento(int idMovimiento) {
+		this.idMovimiento = idMovimiento;
+	}
 
-    public String getConcepto() {
-        return Referencia;
-    }
+	public LocalDateTime getFechaHora() {
+		return fechaHora;
+	}
 
-    public BigDecimal getImporte() {
-        return Importe;
-    }
+	public void setFechaHora(LocalDateTime fechaHora) {
+		this.fechaHora = fechaHora;
+	}
 
-    public TipoMovimiento getTipoMovimiento() {
-        return tipoMovimiento;
-    }
+	public String getReferencia() {
+		return Referencia;
+	}
 
-    public int getIdCuenta() {
+	public void setReferencia(String referencia) {
+		Referencia = referencia;
+	}
+
+	public BigDecimal getImporte() {
+		return Importe;
+	}
+
+	public void setImporte(BigDecimal importe) {
+		Importe = importe;
+	}
+
+	public TipoMovimiento getTipoMovimiento() {
+		return tipoMovimiento;
+	}
+
+	public void setTipoMovimiento(TipoMovimiento tipoMovimiento) {
+		this.tipoMovimiento = tipoMovimiento;
+	}
+
+	public int getIdCuenta() {
 		return idCuenta;
 	}
-    
-    
-    
-    // Setters
-    public void setIdMovimiento(int idMovimiento) {
-        this.idMovimiento = idMovimiento;
-    }
 
-    public void setFechaHora(LocalDateTime fechaHora) {
-        this.fechaHora = fechaHora;
-    }
-
-    public void setConcepto(String concepto) {
-        this.Referencia = concepto;
-    }
-
-    public void setImporte(BigDecimal importe) {
-        this.Importe = importe;
-    }
-
-    public void setTipoMovimiento(TipoMovimiento tipoMovimiento) {
-        this.tipoMovimiento = tipoMovimiento;
-    }
-
-    public void setIdCuenta(int idCuentaMov) {
-		this.idCuenta = idCuentaMov;
+	public void setIdCuenta(int idCuenta) {
+		this.idCuenta = idCuenta;
 	}
 
 	@Override
@@ -85,7 +81,7 @@ public class Movimiento {
 		return "Movimiento [idMovimiento=" + idMovimiento + ", fechaHora=" + fechaHora + ", Referencia=" + Referencia
 				+ ", Importe=" + Importe + ", tipoMovimiento=" + tipoMovimiento + ", idCuenta=" + idCuenta + "]";
 	}
-    
+
     
   
 

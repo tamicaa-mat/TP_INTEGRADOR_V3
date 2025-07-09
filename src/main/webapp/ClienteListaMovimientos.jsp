@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page session="true" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -12,25 +13,25 @@
     <main class="container py-5">
         <h4 class="text-center mb-4">Movimientos Bancarios</h4>
         <div class="container mb-4">
-            <form method="get" action="CLIENTElistaMovimientos.jsp" class="row g-3 align-items-end">
+            <form method="get" action="MovimientoServlet" class="row g-3 align-items-end">
                 <div class="col-md-4">
                     <label for="cuenta" class="form-label">Cuenta</label>
                     <select name="cuenta" id="cuenta" class="form-select">
-                        <option value="">Todas</option>
-                        <option value="CA001">CA001-123456</option>
-                        <option value="CA002">CA002-654321</option>
+                        <option value="0" ${filtroCuenta == 0 ? "selected" : ""}>Todas</option>
+                        <option value="1" ${filtroCuenta == 1 ? "selected" : ""}>CA001-123456</option>
+                        <option value="2" ${filtroCuenta == 2 ? "selected" : ""}>CA002-654321</option>
                     </select>
                 </div>
                 <div class="col-md-4">
                     <label for="tipo" class="form-label">Tipo de Movimiento</label>
                     <select name="tipo" id="tipo" class="form-select">
-                        <option value="">Todos</option>
-                        <option value="Transferencia">Transferencia</option>
-                        <option value="Pago Préstamo">Pago Préstamo</option>
-                        <option value="Depósito">Depósito</option>
-                        <option value="Extracción">Extracción</option>
-                        <option value="Cobro">Cobro</option>
-                        <option value="Débito Automático">Débito Automático</option>
+                        <option value="0" ${filtroTipo == 0 ? "selected" : ""}>Todos</option>
+                        <option value="1" ${filtroTipo == 1 ? "selected" : ""}>Transferencia</option>
+                        <option value="2" ${filtroTipo == 2 ? "selected" : ""}>Pago Préstamo</option>
+                        <option value="3" ${filtroTipo == 3 ? "selected" : ""}>Depósito</option>
+                        <option value="4" ${filtroTipo == 4 ? "selected" : ""}>Extracción</option>
+                        <option value="5" ${filtroTipo == 5 ? "selected" : ""}>Cobro</option>
+                        <option value="6" ${filtroTipo == 6 ? "selected" : ""}>Débito Automático</option>
                     </select>
                 </div>
                 <div class="col-md-2">
@@ -38,6 +39,7 @@
                 </div>
             </form>
         </div>
+        
         <div class="table-responsive">
             <table class="table table-bordered table-hover align-middle text-center">
                 <thead class="table-secondary">
@@ -49,30 +51,14 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>2025-06-14 10:30</td>
-                        <td>Alta de Cuenta: CA001-123456</td>
-                        <td>$10,000.00</td>
-                        <td>Depósito</td>
-                    </tr>
-                    <tr>
-                        <td>2025-06-15 09:00</td>
-                        <td>Transferencia a CA002-654321</td>
-                        <td>-$2,000.00</td>
-                        <td>Débito</td>
-                    </tr>
-                    <tr>
-                        <td>2025-06-16 12:45</td>
-                        <td>Pago de servicio</td>
-                        <td>-$1,200.00</td>
-                        <td>Débito</td>
-                    </tr>
-                    <tr>
-                        <td>2025-06-17 14:00</td>
-                        <td>Transferencia recibida de CA003-789456</td>
-                        <td>$3,500.00</td>
-                        <td>Crédito</td>
-                    </tr>
+                    <c:forEach var="m" items="${movimientos}">
+                        <tr>
+                            <td>${m.fechaHora}</td>
+                            <td>${m.referencia}</td>
+                            <td>$${m.importe}</td>
+                            <td>${m.tipoMovimiento.descripcion}</td>
+                        </tr>
+                    </c:forEach>
                 </tbody>
             </table>
         </div>
