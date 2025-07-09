@@ -1,6 +1,7 @@
 package Negocio;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import dominio.Cliente;
@@ -19,5 +20,8 @@ public interface CuentaNegocio {
 	public List<Cuenta> obtenerCuentasPorIdCliente(int idCliente,Cliente cliente); 
 
 	public ArrayList<Cuenta> getCuentasPorCliente(String dniCliente, Cliente cliente);
+	
+	int contarCuentasCreadasEntreFechas(Date desde, Date hasta);
+    double obtenerSaldoTotalCuentasCreadasEntreFechas(Date desde, Date hasta);
 
 }

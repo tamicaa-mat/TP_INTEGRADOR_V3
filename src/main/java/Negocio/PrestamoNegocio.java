@@ -2,6 +2,7 @@ package Negocio;
 
 
 
+import java.util.Date;
 import java.util.List;
 
 import dominio.Prestamo;
@@ -26,5 +27,7 @@ public interface PrestamoNegocio {
     
     boolean solicitarPrestamo(Prestamo prestamo);
 
-    
+    double obtenerSumaImporteEntreFechas(Date desde, Date hasta);
+    int contarPrestamosEntreFechas(Date desde, Date hasta);
+
 }

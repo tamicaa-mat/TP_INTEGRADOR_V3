@@ -1,6 +1,7 @@
 package dao;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import dominio.Cliente;
 import dominio.Cuenta;
@@ -15,8 +16,7 @@ public interface CuentaDao {
 	ArrayList<Cuenta> getCuentasPorCliente(String dniCliente, Cliente cliente);
 	Cuenta getCuentaPorCbu(String cbu, Cliente cliente);
 	
-	/// DOS MILAGROS
- 
-
-
+	int contarCuentasCreadasEntreFechas(Date desde, Date hasta);
+	double obtenerSaldoTotalCuentasCreadasEntreFechas(Date desde, Date hasta);
+	
 }

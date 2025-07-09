@@ -1,5 +1,6 @@
 package NegocioImpl;
 
+import java.util.Date;
 import java.util.List;
 
 import Negocio.PrestamoNegocio;
@@ -101,8 +102,15 @@ public class PrestamoNegocioImpl implements PrestamoNegocio	{
 			
 		}
 
+		
+		@Override
+		public double obtenerSumaImporteEntreFechas(Date desde, Date hasta) {
+		    return prestamoDao.obtenerSumaImporteEntreFechas(desde, hasta);
+		}
 
-
-
+		@Override
+		public int contarPrestamosEntreFechas(Date desde, Date hasta) {
+		    return prestamoDao.contarPrestamosEntreFechas(desde, hasta);
+		}
 	    
 }

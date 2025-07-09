@@ -1,6 +1,7 @@
 package NegocioImpl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import dao.CuentaDao;
@@ -95,6 +96,16 @@ public class CuentaNegocioImpl implements CuentaNegocio {
 		    return cuentas;
 		}
 
+		
+		@Override
+	    public int contarCuentasCreadasEntreFechas(Date desde, Date hasta) {
+	        return cuentaDao.contarCuentasCreadasEntreFechas(desde, hasta);
+	    }
+	    
+	    @Override
+	    public double obtenerSaldoTotalCuentasCreadasEntreFechas(Date desde, Date hasta) {
+	        return cuentaDao.obtenerSaldoTotalCuentasCreadasEntreFechas(desde, hasta);
+	    }
 
 
 }
