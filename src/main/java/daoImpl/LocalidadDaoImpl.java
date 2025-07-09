@@ -15,24 +15,24 @@ public class LocalidadDaoImpl implements LocalidadDao {
     private static final String READ_ALL = "SELECT loc.IdLocalidad, loc.Descripcion, prov.IdProvincia, prov.Descripcion AS ProvinciaDescripcion FROM localidad loc INNER JOIN provincia prov ON loc.IdProvincia = prov.IdProvincia";
 
     @Override
-    public ArrayList<Localidad> readAll() {
-        Connection conn = null;
-        PreparedStatement statement = null;
-        ResultSet rs = null;
+    public ArrayList<Localidad> leerTodasLasLocalidades() {
+        Connection conexion = null;
+        PreparedStatement mensajero = null;
+        ResultSet resultado = null;
         ArrayList<Localidad> localidades = new ArrayList<>();
         
         try {
-            conn = Conexion.getConexion().getSQLConexion();
-            statement = conn.prepareStatement(READ_ALL);
-            rs = statement.executeQuery();
-            while (rs.next()) {
+            conexion = Conexion.getConexion().getSQLConexion();
+            mensajero = conexion.prepareStatement(READ_ALL);
+            resultado = mensajero.executeQuery();
+            while (resultado.next()) {
                 Provincia provincia = new Provincia();
-                provincia.setIdProvincia(rs.getInt("IdProvincia"));
-                provincia.setDescripcion(rs.getString("ProvinciaDescripcion"));
+                provincia.setIdProvincia(resultado.getInt("IdProvincia"));
+                provincia.setDescripcion(resultado.getString("ProvinciaDescripcion"));
                 
                 Localidad localidad = new Localidad();
-                localidad.setIdLocalidad(rs.getInt("IdLocalidad"));
-                localidad.setDescripcion(rs.getString("Descripcion"));
+                localidad.setIdLocalidad(resultado.getInt("IdLocalidad"));
+                localidad.setDescripcion(resultado.getString("Descripcion"));
                 localidad.setProvincia(provincia);
                 
                 localidades.add(localidad);
@@ -41,8 +41,8 @@ public class LocalidadDaoImpl implements LocalidadDao {
             e.printStackTrace();
         } finally {
             try {
-                if (rs != null) rs.close();
-                if (statement != null) statement.close();
+                if (resultado != null) resultado.close();
+                if (mensajero != null) mensajero.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -53,7 +53,7 @@ public class LocalidadDaoImpl implements LocalidadDao {
 
 
     
-   public boolean insert(Localidad loc) {
+   public boolean insertarLocalidad(Localidad loc) {
 	   
 	   
 	   //  POR AHORA!! OJO
@@ -63,7 +63,7 @@ public class LocalidadDaoImpl implements LocalidadDao {
     }
 
 	  
-	public boolean delete(int idLocalidad) {
+	public boolean bajaLogicaLocalidad(int idLocalidad) {
 		
 		
 		// POR AHORA OJO!!

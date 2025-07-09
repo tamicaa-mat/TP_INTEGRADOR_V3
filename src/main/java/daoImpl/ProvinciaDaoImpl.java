@@ -14,28 +14,28 @@ public class ProvinciaDaoImpl implements ProvinciaDao {
     private static final String READ_ALL = "SELECT * FROM provincia";
 
     @Override
-    public ArrayList<Provincia> readAll() {
-        Connection conn = null;
-        PreparedStatement statement = null;
-        ResultSet rs = null;
+    public ArrayList<Provincia> leerTodasLasProvincias() {
+        Connection conexion = null;
+        PreparedStatement mensajero = null;
+        ResultSet resultado = null;
         ArrayList<Provincia> provincias = new ArrayList<>();
         
         try {
-            conn = Conexion.getConexion().getSQLConexion();
-            statement = conn.prepareStatement(READ_ALL);
-            rs = statement.executeQuery();
-            while (rs.next()) {
+            conexion = Conexion.getConexion().getSQLConexion();
+            mensajero = conexion.prepareStatement(READ_ALL);
+            resultado = mensajero.executeQuery();
+            while (resultado.next()) {
                 Provincia provincia = new Provincia();
-                provincia.setIdProvincia(rs.getInt("IdProvincia"));
-                provincia.setDescripcion(rs.getString("Descripcion"));
+                provincia.setIdProvincia(resultado.getInt("IdProvincia"));
+                provincia.setDescripcion(resultado.getString("Descripcion"));
                 provincias.add(provincia);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             try {
-                if (rs != null) rs.close();
-                if (statement != null) statement.close();
+                if (resultado != null) resultado.close();
+                if (mensajero != null) mensajero.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }

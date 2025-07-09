@@ -11,6 +11,6 @@ public interface ProvinciaDao {
 	//listar
 	// eliminar
 	
-	public ArrayList<Provincia> readAll();
+	public ArrayList<Provincia> leerTodasLasProvincias();
 	
 }

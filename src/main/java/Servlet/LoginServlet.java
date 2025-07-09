@@ -28,7 +28,7 @@ public class LoginServlet extends HttpServlet {
         String pass = request.getParameter("contrasena");
 
         UsuarioNegocio usuarioNegocio = new UsuarioNegocioImpl();
-        Usuario usuario = usuarioNegocio.getUsuario(user, pass);
+        Usuario usuario = usuarioNegocio.obtenerUsuario(user, pass);
 
         System.out.println("Servlet: " + (usuario != null ? usuario.toString() : "Usuario es nulo"));
         if (usuario != null) {
@@ -38,7 +38,7 @@ public class LoginServlet extends HttpServlet {
             // Si es un cliente, también buscamos sus datos de cliente y los guardamos en sesión
             if (usuario.getTipoUsuario().getDescripcion().equalsIgnoreCase("Cliente")) {
                 ClienteDao clienteDao = new ClienteDaoImpl();
-                Cliente cliente = clienteDao.getClientePorUsuario(usuario.getIdUsuario());
+                Cliente cliente = clienteDao.obtenerClientePorUsuario(usuario.getIdUsuario());
                 session.setAttribute("clienteLogueado", cliente);
             }
             

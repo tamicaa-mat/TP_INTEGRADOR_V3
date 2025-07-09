@@ -19,11 +19,11 @@ import dominio.Usuario;
 
 public class ClienteDaoImpl implements ClienteDao {
 
-	private static final String INSERT_CLIENTE_SOLO = "insert into cliente(DNI, CUIL, Nombre, Apellido, Sexo, Nacionalidad, FechaNacimiento, Direccion, idLocalidad, CorreoElectronico, Telefono, Estado) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)";
-	private static final String READ_ALL = "select c.*, u.NombreUsuario, u.Estado as UsuarioEstado, l.Descripcion as LocalidadDescripcion, p.IdProvincia, p.Descripcion as ProvinciaDescripcion from cliente c left join usuario u on c.IdUsuario = u.IdUsuario left join localidad l on c.IdLocalidad = l.IdLocalidad left join provincia p on l.IdProvincia = p.IdProvincia";
-	private static final String DELETE_LOGICO = "update cliente set Estado = 0 where DNI = ?";
-	private static final String UPDATE_CLIENTE = "update cliente set CUIL = ?, Nombre = ?, Apellido = ?, Sexo = ?, Nacionalidad = ?, FechaNacimiento = ?, Direccion = ?, idLocalidad = ?, CorreoElectronico = ?, Telefono = ? where DNI = ?";
-	private static final String GET_BY_DNI = "select c.*, u.NombreUsuario, l.Descripcion as LocalidadDescripcion, p.IdProvincia, p.Descripcion as ProvinciaDescripcion " +
+	private static final String INSERTAR_CLIENTE_SOLO = "insert into cliente(DNI, CUIL, Nombre, Apellido, Sexo, Nacionalidad, FechaNacimiento, Direccion, idLocalidad, CorreoElectronico, Telefono, Estado) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)";
+	private static final String LEER_TODOS = "select c.*, u.NombreUsuario, u.Estado as UsuarioEstado, l.Descripcion as LocalidadDescripcion, p.IdProvincia, p.Descripcion as ProvinciaDescripcion from cliente c left join usuario u on c.IdUsuario = u.IdUsuario left join localidad l on c.IdLocalidad = l.IdLocalidad left join provincia p on l.IdProvincia = p.IdProvincia";
+	private static final String BAJA_LOGICA = "update cliente set Estado = 0 where DNI = ?";
+	private static final String ACTUALIZAR_CLIENTE = "update cliente set CUIL = ?, Nombre = ?, Apellido = ?, Sexo = ?, Nacionalidad = ?, FechaNacimiento = ?, Direccion = ?, idLocalidad = ?, CorreoElectronico = ?, Telefono = ? where DNI = ?";
+	private static final String OBTENER_CLIENTE_POR_DNI = "select c.*, u.NombreUsuario, l.Descripcion as LocalidadDescripcion, p.IdProvincia, p.Descripcion as ProvinciaDescripcion " +
             "from cliente c " +
             "inner join usuario u on c.IdUsuario = u.IdUsuario " +
             "inner join localidad l on c.IdLocalidad = l.IdLocalidad " +
@@ -31,7 +31,7 @@ public class ClienteDaoImpl implements ClienteDao {
             "where c.DNI = ? and c.Estado = 1";
 
 	
-	private static final String GET_BY_USUARIO_ID = "select c.*, u.NombreUsuario, l.Descripcion as LocalidadDescripcion, p.IdProvincia, p.Descripcion as ProvinciaDescripcion " +
+	private static final String OBTENER_CLIENTE_POR_ID_USUARIO = "select c.*, u.NombreUsuario, l.Descripcion as LocalidadDescripcion, p.IdProvincia, p.Descripcion as ProvinciaDescripcion " +
             "from cliente c " +
             "inner join usuario u on c.IdUsuario = u.IdUsuario " +
             "inner join localidad l on c.IdLocalidad = l.IdLocalidad " +
@@ -39,40 +39,40 @@ public class ClienteDaoImpl implements ClienteDao {
             "where c.IdUsuario = ? and c.Estado = 1";
 	
 	
-	private static final String LEER_TODOS_POR_ESTADO = "select c.*, u.NombreUsuario, l.Descripcion as LocalidadDescripcion from cliente c left join usuario u ... left join localidad l ... where c.Estado = ?";
+	private static final String LEER_TODOS_LOS_CLIENTE_POR_ESTADO = "select c.*, u.NombreUsuario, l.Descripcion as LocalidadDescripcion from cliente c left join usuario u ... left join localidad l ... where c.Estado = ?";
 	
 	
 	
 	@Override
-	public boolean insert(Cliente cliente) {
-		Connection conn = null;
-		PreparedStatement statement = null;
-		boolean isSuccess = false;
+	public boolean insertarCliente(Cliente cliente) {
+		Connection conexion = null;
+		PreparedStatement mensajero = null;
+		boolean exito = false;
 		
 		
 		try {
-			conn = Conexion.getConexion().getSQLConexion();
-			statement = conn.prepareStatement(INSERT_CLIENTE_SOLO);
-			statement.setString(1, cliente.getDni());
-	        statement.setString(2, cliente.getCuil());
-	        statement.setString(3, cliente.getNombre());
-	        statement.setString(4, cliente.getApellido());
-	        statement.setString(5, cliente.getSexo());
-	        statement.setString(6, cliente.getNacionalidad());
-	        statement.setDate(7, java.sql.Date.valueOf(cliente.getFechaNacimiento()));
-	        statement.setString(8, cliente.getDireccion());
-	        statement.setInt(9, cliente.getLocalidad().getIdLocalidad());
-	        statement.setString(10, cliente.getCorreoElectronico());
-	        statement.setString(11, cliente.getTelefono());
+			conexion = Conexion.getConexion().getSQLConexion();
+			mensajero = conexion.prepareStatement(INSERTAR_CLIENTE_SOLO);
+			mensajero.setString(1, cliente.getDni());
+	        mensajero.setString(2, cliente.getCuil());
+	        mensajero.setString(3, cliente.getNombre());
+	        mensajero.setString(4, cliente.getApellido());
+	        mensajero.setString(5, cliente.getSexo());
+	        mensajero.setString(6, cliente.getNacionalidad());
+	        mensajero.setDate(7, java.sql.Date.valueOf(cliente.getFechaNacimiento()));
+	        mensajero.setString(8, cliente.getDireccion());
+	        mensajero.setInt(9, cliente.getLocalidad().getIdLocalidad());
+	        mensajero.setString(10, cliente.getCorreoElectronico());
+	        mensajero.setString(11, cliente.getTelefono());
 
 
-			if (statement.executeUpdate() > 0) {
-				conn.commit();
-				isSuccess = true;
+			if (mensajero.executeUpdate() > 0) {
+				conexion.commit();
+				exito = true;
 				
 			}
 			else {
-				conn.rollback();
+				conexion.rollback();
 			}
 			
 
@@ -80,7 +80,7 @@ public class ClienteDaoImpl implements ClienteDao {
 		catch (SQLException e) {
 			e.printStackTrace();
 			try { 
-				if (conn != null) conn.rollback(); 
+				if (conexion != null) conexion.rollback(); 
 				} 
 			
 			catch (SQLException ex) { 
@@ -89,14 +89,14 @@ public class ClienteDaoImpl implements ClienteDao {
 	    } finally {
 	        try
 	        { 
-	        	if (statement != null) statement.close();
+	        	if (mensajero != null) mensajero.close();
 	        	} 
 	        catch (SQLException e)
 	        {
 	        	e.printStackTrace(); 
 	        	}
 	    }
-	    return isSuccess;
+	    return exito;
 			
 			
 	}
@@ -104,103 +104,103 @@ public class ClienteDaoImpl implements ClienteDao {
 	
 	
 	@Override
-	public boolean update(Cliente cliente) {
-		Connection conn = null;
-		PreparedStatement statement = null;
-		boolean isSuccess = false;
+	public boolean actualizarCliente(Cliente cliente) {
+		Connection conexion = null;
+		PreparedStatement mensajero = null;
+		boolean exito = false;
 		try {
-			conn = Conexion.getConexion().getSQLConexion();
-			statement = conn.prepareStatement(UPDATE_CLIENTE);
-			statement.setString(1, cliente.getCuil());
-			statement.setString(2, cliente.getNombre());
-			statement.setString(3, cliente.getApellido());
-			statement.setString(4, cliente.getSexo());
-			statement.setString(5, cliente.getNacionalidad());
-			statement.setDate(6, java.sql.Date.valueOf(cliente.getFechaNacimiento()));
-			statement.setString(7, cliente.getDireccion());
-			statement.setInt(8, cliente.getLocalidad().getIdLocalidad());
-			statement.setString(9, cliente.getCorreoElectronico());
-			statement.setString(10, cliente.getTelefono());
-			statement.setString(11, cliente.getDni());
+			conexion = Conexion.getConexion().getSQLConexion();
+			mensajero = conexion.prepareStatement(ACTUALIZAR_CLIENTE);
+			mensajero.setString(1, cliente.getCuil());
+			mensajero.setString(2, cliente.getNombre());
+			mensajero.setString(3, cliente.getApellido());
+			mensajero.setString(4, cliente.getSexo());
+			mensajero.setString(5, cliente.getNacionalidad());
+			mensajero.setDate(6, java.sql.Date.valueOf(cliente.getFechaNacimiento()));
+			mensajero.setString(7, cliente.getDireccion());
+			mensajero.setInt(8, cliente.getLocalidad().getIdLocalidad());
+			mensajero.setString(9, cliente.getCorreoElectronico());
+			mensajero.setString(10, cliente.getTelefono());
+			mensajero.setString(11, cliente.getDni());
 			
-			if (statement.executeUpdate() > 0) {
-				conn.commit();
-				isSuccess = true;
+			if (mensajero.executeUpdate() > 0) {
+				conexion.commit();
+				exito = true;
 			} else {
-				conn.rollback();
+				conexion.rollback();
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 			try {
-				if (conn != null) conn.rollback();
+				if (conexion != null) conexion.rollback();
 			} catch (SQLException ex) {
 				ex.printStackTrace();
 			}
 		} finally {
 			try {
-				if (statement != null) statement.close();
+				if (mensajero != null) mensajero.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
-		return isSuccess;
+		return exito;
 	}
 
 	@Override
-	public boolean delete(String dni) {
-		Connection conn = null;
-		PreparedStatement statement = null;
-		boolean isSuccess = false;
+	public boolean bajaLogicaCliente(String dni) {
+		Connection conexion = null;
+		PreparedStatement mensajero = null;
+		boolean exito = false;
 		try {
-			conn = Conexion.getConexion().getSQLConexion();
-			statement = conn.prepareStatement(DELETE_LOGICO);
-			statement.setString(1, dni);
-			if (statement.executeUpdate() > 0) {
-				conn.commit();
-				isSuccess = true;
+			conexion = Conexion.getConexion().getSQLConexion();
+			mensajero = conexion.prepareStatement(BAJA_LOGICA);
+			mensajero.setString(1, dni);
+			if (mensajero.executeUpdate() > 0) {
+				conexion.commit();
+				exito = true;
 			} else {
-				conn.rollback();
+				conexion.rollback();
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 			try {
-				if (conn != null) conn.rollback();
+				if (conexion != null) conexion.rollback();
 			} catch (SQLException ex) {
 				ex.printStackTrace();
 			}
 		} finally {
 			try {
-				if (statement != null) statement.close();
+				if (mensajero != null) mensajero.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
-		return isSuccess;
+		return exito;
 	}
 
 	@Override
-	public Cliente getClientePorDni(String dni) {
-		Connection conn = null;
-		PreparedStatement statement = null;
-		ResultSet rs = null;
+	public Cliente obtenerClientePorDni(String dni) {
+		Connection conexion = null;
+		PreparedStatement mensajero = null;
+		ResultSet resultado = null;
 		Cliente cliente = null;
 		
 		
 		 System.out.println("DAO: Buscando cliente con DNI: " + dni); // <-- ESPÍA
 		try {
-			conn = Conexion.getConexion().getSQLConexion();
-			statement = conn.prepareStatement(GET_BY_DNI);
-			statement.setString(1, dni);
-			rs = statement.executeQuery();
-			if (rs.next()) {
-				cliente = instanciarClienteDesdeRs(rs);
+			conexion = Conexion.getConexion().getSQLConexion();
+			mensajero = conexion.prepareStatement(OBTENER_CLIENTE_POR_DNI);
+			mensajero.setString(1, dni);
+			resultado = mensajero.executeQuery();
+			if (resultado.next()) {
+				cliente = instanciarClienteDesdeRs(resultado);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			try {
-				if (rs != null) rs.close();
-				if (statement != null) statement.close();
+				if (resultado != null) resultado.close();
+				if (mensajero != null) mensajero.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -209,25 +209,25 @@ public class ClienteDaoImpl implements ClienteDao {
 	}
 
 	@Override
-	public Cliente getClientePorUsuario(int idUsuario) {
-		Connection conn = null;
-		PreparedStatement statement = null;
-		ResultSet rs = null;
+	public Cliente obtenerClientePorUsuario(int idUsuario) {
+		Connection conexion = null;
+		PreparedStatement mensajero = null;
+		ResultSet resultado = null;
 		Cliente cliente = null;
 		try {
-			conn = Conexion.getConexion().getSQLConexion();
-			statement = conn.prepareStatement(GET_BY_USUARIO_ID);
-			statement.setInt(1, idUsuario);
-			rs = statement.executeQuery();
-			if (rs.next()) {
-				cliente = instanciarClienteDesdeRs(rs);
+			conexion = Conexion.getConexion().getSQLConexion();
+			mensajero = conexion.prepareStatement(OBTENER_CLIENTE_POR_ID_USUARIO);
+			mensajero.setInt(1, idUsuario);
+			resultado = mensajero.executeQuery();
+			if (resultado.next()) {
+				cliente = instanciarClienteDesdeRs(resultado);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			try {
-				if (rs != null) rs.close();
-				if (statement != null) statement.close();
+				if (resultado != null) resultado.close();
+				if (mensajero != null) mensajero.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -235,56 +235,54 @@ public class ClienteDaoImpl implements ClienteDao {
 		return cliente;
 	}
 	
-	private Cliente instanciarClienteDesdeRs(ResultSet rs) throws SQLException {
+	private Cliente instanciarClienteDesdeRs(ResultSet resultado) throws SQLException {
 	    
 	    // 1. Creamos la Provincia
 	    Provincia provincia = new Provincia();
-	    provincia.setIdProvincia(rs.getInt("IdProvincia"));
-	    provincia.setDescripcion(rs.getString("ProvinciaDescripcion"));
+	    provincia.setIdProvincia(resultado.getInt("IdProvincia"));
+	    provincia.setDescripcion(resultado.getString("ProvinciaDescripcion"));
 	    
 	    // 2. Creamos la Localidad y le asignamos su Provincia
 	    Localidad localidad = new Localidad();
-	    localidad.setIdLocalidad(rs.getInt("IdLocalidad"));
-	    localidad.setDescripcion(rs.getString("LocalidadDescripcion"));
+	    localidad.setIdLocalidad(resultado.getInt("IdLocalidad"));
+	    localidad.setDescripcion(resultado.getString("LocalidadDescripcion"));
 	    localidad.setProvincia(provincia);
 	    
 	    // 3. Creamos el Cliente y rellenamos sus datos personales
 	    Cliente cliente = new Cliente();
-	    cliente.setIdCliente(rs.getInt("IdCliente"));
-	    cliente.setDni(rs.getString("Dni"));
-	    cliente.setCuil(rs.getString("CUIL"));
-	    cliente.setNombre(rs.getString("Nombre"));
-	    cliente.setApellido(rs.getString("Apellido"));
-	    cliente.setSexo(rs.getString("Sexo"));
-	    cliente.setNacionalidad(rs.getString("Nacionalidad"));
-	    cliente.setFechaNacimiento(rs.getDate("FechaNacimiento").toLocalDate());
-	    cliente.setDireccion(rs.getString("Direccion"));
-	    cliente.setCorreoElectronico(rs.getString("CorreoElectronico"));
-	    cliente.setTelefono(rs.getString("Telefono"));
-	    cliente.setEstado(rs.getBoolean("Estado"));
+	    cliente.setIdCliente(resultado.getInt("IdCliente"));
+	    cliente.setDni(resultado.getString("Dni"));
+	    cliente.setCuil(resultado.getString("CUIL"));
+	    cliente.setNombre(resultado.getString("Nombre"));
+	    cliente.setApellido(resultado.getString("Apellido"));
+	    cliente.setSexo(resultado.getString("Sexo"));
+	    cliente.setNacionalidad(resultado.getString("Nacionalidad"));
+	    cliente.setFechaNacimiento(resultado.getDate("FechaNacimiento").toLocalDate());
+	    cliente.setDireccion(resultado.getString("Direccion"));
+	    cliente.setCorreoElectronico(resultado.getString("CorreoElectronico"));
+	    cliente.setTelefono(resultado.getString("Telefono"));
+	    cliente.setEstado(resultado.getBoolean("Estado"));
 	    cliente.setLocalidad(localidad);
 	    
-	    // --- LÓGICA CORREGIDA PARA EL USUARIO ---
+	 
 	    
-	    Usuario user = null; 
+	    Usuario usuario = null; 
 	    // Primero, verificamos si la base de datos trajo un IdUsuario. 
 	    // Usamos getObject y luego verificamos si es nulo, es la forma más segura.
-	    if (rs.getObject("IdUsuario") != null) {
-	        user = new Usuario();
-	        user.setIdUsuario(rs.getInt("IdUsuario"));
-	        user.setNombreUsuario(rs.getString("NombreUsuario"));
+	    if (resultado.getObject("IdUsuario") != null) {
+	        usuario = new Usuario();
+	        usuario.setIdUsuario(resultado.getInt("IdUsuario"));
+	        usuario.setNombreUsuario(resultado.getString("NombreUsuario"));
 	        // Leemos el estado del usuario desde la columna con el alias que definimos
-	        user.setEstado(rs.getBoolean("UsuarioEstado")); 
+	        usuario.setEstado(resultado.getBoolean("UsuarioEstado")); 
 	    }
 
 	    // Finalmente, asignamos el usuario al cliente. 
 	    // El objeto 'user' será null si el cliente no tenía uno, lo cual es correcto.
-	    cliente.setUsuario(user);
+	    cliente.setUsuario(usuario);
 
 	    return cliente;
 	}
-	
-	
 	
 	
 	@Override
@@ -352,25 +350,25 @@ public class ClienteDaoImpl implements ClienteDao {
 
 
 
-	public ArrayList<Cliente> readAll() {
-		Connection conn = null;
-		PreparedStatement statement = null;
-		ResultSet rs = null;
+	public ArrayList<Cliente> leerTodosLosClientes() {
+		Connection conexion = null;
+		PreparedStatement mensajero = null;
+		ResultSet resultado = null;
 		ArrayList<Cliente> clientes = new ArrayList<>();
 		
 		try {
-			conn = Conexion.getConexion().getSQLConexion();
-			statement = conn.prepareStatement(READ_ALL);
-			rs = statement.executeQuery();
-			while (rs.next()) {
-				clientes.add(instanciarClienteDesdeRs(rs));
+			conexion = Conexion.getConexion().getSQLConexion();
+			mensajero = conexion.prepareStatement(LEER_TODOS);
+			resultado = mensajero.executeQuery();
+			while (resultado.next()) {
+				clientes.add(instanciarClienteDesdeRs(resultado));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			try {
-				if (rs != null) rs.close();
-				if (statement != null) statement.close();
+				if (resultado != null) resultado.close();
+				if (mensajero != null) mensajero.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -380,27 +378,27 @@ public class ClienteDaoImpl implements ClienteDao {
 	
 	
 	
-	public ArrayList<Cliente> leerTodosLosActivos() {
-		Connection conn = null;
-	    PreparedStatement statement = null;
-	    ResultSet rs = null;
+	public ArrayList<Cliente> leerTodosLosClientesActivos() {
+		Connection conexion = null;
+	    PreparedStatement mensajero = null;
+	    ResultSet resultado = null;
 	    ArrayList<Cliente> clientes = new ArrayList<>();
 	    try {
-	        conn = Conexion.getConexion().getSQLConexion();
-	        // Usamos la consulta con filtro de estado
-	        statement = conn.prepareStatement(LEER_TODOS_POR_ESTADO);
-	        // Le pasamos el valor '1' al primer '?' de la consulta
-	        statement.setBoolean(1, true); 
-	        rs = statement.executeQuery();
-	        while (rs.next()) {
-	            clientes.add(instanciarClienteDesdeRs(rs));
+	        conexion = Conexion.getConexion().getSQLConexion();
+	       
+	        mensajero = conexion.prepareStatement(LEER_TODOS_LOS_CLIENTE_POR_ESTADO);
+	      
+	        mensajero.setBoolean(1, true); 
+	        resultado = mensajero.executeQuery();
+	        while (resultado.next()) {
+	            clientes.add(instanciarClienteDesdeRs(resultado));
 	        }
 	    } catch (SQLException e) {
 	        e.printStackTrace();
 	    } finally {
 	    	try {
-				if (rs != null) rs.close();
-				if (statement != null) statement.close();
+				if (resultado != null) resultado.close();
+				if (mensajero != null) mensajero.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -409,27 +407,27 @@ public class ClienteDaoImpl implements ClienteDao {
 	}
 
 
-	public ArrayList<Cliente> leerTodosLosInactivos() {
-		 Connection conn = null;
-		    PreparedStatement statement = null;
-		    ResultSet rs = null;
+	public ArrayList<Cliente> leerTodosLosClientesInactivos() {
+		 Connection conexion = null;
+		    PreparedStatement mensajero = null;
+		    ResultSet resultado = null;
 		    ArrayList<Cliente> clientes = new ArrayList<>();
 		    try {
-		        conn = Conexion.getConexion().getSQLConexion();
+		        conexion = Conexion.getConexion().getSQLConexion();
 		        // Usamos la misma consulta con filtro de estado
-		        statement = conn.prepareStatement(LEER_TODOS_POR_ESTADO);
+		        mensajero = conexion.prepareStatement(LEER_TODOS_LOS_CLIENTE_POR_ESTADO);
 		        // Le pasamos el valor '0' al primer '?' de la consulta
-		        statement.setBoolean(1, false);
-		        rs = statement.executeQuery();
-		        while (rs.next()) {
-		            clientes.add(instanciarClienteDesdeRs(rs));
+		        mensajero.setBoolean(1, false);
+		        resultado = mensajero.executeQuery();
+		        while (resultado.next()) {
+		            clientes.add(instanciarClienteDesdeRs(resultado));
 		        }
 		    } catch (SQLException e) {
 		        e.printStackTrace();
 		    } finally {
 		    	try {
-					if (rs != null) rs.close();
-					if (statement != null) statement.close();
+					if (resultado != null) resultado.close();
+					if (mensajero != null) mensajero.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}

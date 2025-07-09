@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import dominio.Cliente;
 
 public interface ClienteNegocio {
-    public boolean insert(Cliente cliente);
-    public boolean delete(String dni);
+    public boolean insertarCliente(Cliente cliente);
+    public boolean bajaLogicaCliente(String dni);
    
-    public Cliente getClientePorDni(String dni);
-	public boolean update(Cliente cliente);
+    public Cliente obtenerClientePorDni(String dni);
+	public boolean actualizarCliente(Cliente cliente);
 	public Cliente obtenerClienteConCuentasPorUsuario(int idUsuario);
 	
-	public ArrayList<Cliente> readAll();
-    public ArrayList<Cliente> leerTodosLosActivos(); // Para ver solo activos (Estado = 1)
-    public ArrayList<Cliente> leerTodosLosInactivos();
+	public ArrayList<Cliente> leerTodosLosClientes();
+    public ArrayList<Cliente> leerTodosLosClientesActivos(); // Para ver solo activos (Estado = 1)
+    public ArrayList<Cliente> leerTodosLosClientesInactivos();
 	
 }

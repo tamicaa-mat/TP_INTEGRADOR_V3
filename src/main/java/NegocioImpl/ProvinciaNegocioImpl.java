@@ -15,7 +15,7 @@ public class ProvinciaNegocioImpl implements ProvinciaNegocio {
     }
 
     @Override
-    public ArrayList<Provincia> readAll() {
-        return provinciaDao.readAll();
+    public ArrayList<Provincia> leerTodasLasProvincias() {
+        return provinciaDao.leerTodasLasProvincias();
     }
 }

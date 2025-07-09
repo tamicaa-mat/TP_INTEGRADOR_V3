@@ -28,44 +28,44 @@ public class ClienteNegocioImpl implements ClienteNegocio {
     
   
     public ClienteNegocioImpl() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 
 
 
 	@Override
-    public boolean insert(Cliente cliente) {
-        return cdao.insert(cliente);
+    public boolean insertarCliente(Cliente cliente) {
+        return cdao.insertarCliente(cliente);
     }
 
     @Override
-    public boolean delete(String dni) {
+    public boolean bajaLogicaCliente(String dni) {
       
-    	Connection conn = null;
-        boolean isSuccess = false;
+    	Connection conexion = null;
+        boolean exito = false;
         
         try {
             
-            conn = Conexion.getConexion().getSQLConexion();
+            conexion = Conexion.getConexion().getSQLConexion();
            
-            conn.setAutoCommit(false); 
+            conexion.setAutoCommit(false); 
 
             
             ClienteDao clienteDao = new ClienteDaoImpl(); // Creamos una instancia del DAO
-            Cliente clienteAEliminar = clienteDao.getClientePorDni(dni);
+            Cliente clienteAEliminar = clienteDao.obtenerClientePorDni(dni);
 
             boolean clienteEliminado = false;
             boolean usuarioEliminado = false;
 
             if (clienteAEliminar != null) {
                 
-                clienteEliminado = clienteDao.delete(dni);
+                clienteEliminado = clienteDao.bajaLogicaCliente(dni);
 
                
                 if (clienteAEliminar.getUsuario() != null && clienteAEliminar.getUsuario().getIdUsuario() > 0) {
                     UsuarioDao usuarioDao = new UsuarioDaoImpl();
-                    usuarioEliminado = usuarioDao.delete(clienteAEliminar.getUsuario().getIdUsuario());
+                    usuarioEliminado = usuarioDao.bajaLogicaUsuario(clienteAEliminar.getUsuario().getIdUsuario());
                 } else {
                  
                     usuarioEliminado = true; 
@@ -74,19 +74,19 @@ public class ClienteNegocioImpl implements ClienteNegocio {
 
            
             if (clienteEliminado && usuarioEliminado) {
-                conn.commit();
-                isSuccess = true;
+                conexion.commit();
+                exito = true;
             } else {
               
-                conn.rollback();
+                conexion.rollback();
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
          
             try { 
-                if (conn != null) {
-                    conn.rollback();
+                if (conexion != null) {
+                    conexion.rollback();
                 }
             } catch (SQLException ex) {
                 ex.printStackTrace();
@@ -94,36 +94,36 @@ public class ClienteNegocioImpl implements ClienteNegocio {
         } finally {
            
             try { 
-                if (conn != null) {
-                    conn.setAutoCommit(true);
+                if (conexion != null) {
+                    conexion.setAutoCommit(true);
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
         
-        return isSuccess;
+        return exito;
     	
     	
     }
 
     @Override
-    public ArrayList<Cliente> readAll() {
-        return cdao.readAll();
+    public ArrayList<Cliente> leerTodosLosClientes() {
+        return cdao.leerTodosLosClientes();
     }
     
     
     @Override
-    public Cliente getClientePorDni(String dni) {
+    public Cliente obtenerClientePorDni(String dni) {
         // pasando la llamada al dao
-        return cdao.getClientePorDni(dni);
+        return cdao.obtenerClientePorDni(dni);
     }
     
     
     @Override
-    public boolean update(Cliente cliente) {
+    public boolean actualizarCliente(Cliente cliente) {
      
-        return cdao.update(cliente);
+        return cdao.actualizarCliente(cliente);
     }
     
     
@@ -136,15 +136,15 @@ public class ClienteNegocioImpl implements ClienteNegocio {
 
 	
 	@Override
-	public ArrayList<Cliente> leerTodosLosActivos(){
-		return cdao.leerTodosLosActivos();
+	public ArrayList<Cliente> leerTodosLosClientesActivos(){
+		return cdao.leerTodosLosClientesActivos();
 	}
 	
 	
 	
 	@Override
-	public ArrayList<Cliente> leerTodosLosInactivos(){
-		return cdao.leerTodosLosInactivos();
+	public ArrayList<Cliente> leerTodosLosClientesInactivos(){
+		return cdao.leerTodosLosClientesInactivos();
 	}
 	
 	

@@ -16,7 +16,7 @@ public class LocalidadNegocioImpl implements LocalidadNegocio {
     }
 
     @Override
-    public ArrayList<Localidad> readAll() {
-        return localidadDao.readAll();
+    public ArrayList<Localidad> leerTodasLasLocalidades() {
+        return localidadDao.leerTodasLasLocalidades();
     }
 }

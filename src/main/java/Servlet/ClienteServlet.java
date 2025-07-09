@@ -40,10 +40,10 @@ public class ClienteServlet extends HttpServlet {
       
         if (action != null && action.equals("mostrarFormulario")) {
             ProvinciaNegocio provNegocio = new ProvinciaNegocioImpl();
-            ArrayList<Provincia> listaProvincias = provNegocio.readAll();
+            ArrayList<Provincia> listaProvincias = provNegocio.leerTodasLasProvincias();
             
             LocalidadNegocio locNegocio = new LocalidadNegocioImpl();
-            ArrayList<Localidad> listaLocalidades = locNegocio.readAll();
+            ArrayList<Localidad> listaLocalidades = locNegocio.leerTodasLasLocalidades();
             
             request.setAttribute("listaProvincias", listaProvincias);
             request.setAttribute("listaLocalidades", listaLocalidades);
@@ -57,13 +57,13 @@ public class ClienteServlet extends HttpServlet {
             
        
             ClienteNegocio clienteNegocio = new ClienteNegocioImpl();
-            Cliente clienteAEditar = clienteNegocio.getClientePorDni(dni);
+            Cliente clienteAEditar = clienteNegocio.obtenerClientePorDni(dni);
             
           
             ProvinciaNegocio provNegocio = new ProvinciaNegocioImpl();
-            ArrayList<Provincia> listaProvincias = provNegocio.readAll();
+            ArrayList<Provincia> listaProvincias = provNegocio.leerTodasLasProvincias();
             LocalidadNegocio locNegocio = new LocalidadNegocioImpl();
-            ArrayList<Localidad> listaLocalidades = locNegocio.readAll();
+            ArrayList<Localidad> listaLocalidades = locNegocio.leerTodasLasLocalidades();
             
          
             request.setAttribute("clienteAEditar", clienteAEditar);
@@ -79,7 +79,7 @@ public class ClienteServlet extends HttpServlet {
             String dni = request.getParameter("dni");
             ClienteNegocio clienteNegocio = new ClienteNegocioImpl(new ClienteDaoImpl());
             if(dni != null) {
-                clienteNegocio.delete(dni);
+                clienteNegocio.actualizarCliente(null);
             }
             response.sendRedirect(request.getContextPath() + "/ClienteServlet");
         } 
@@ -90,13 +90,13 @@ public class ClienteServlet extends HttpServlet {
              
              // Decidimos qué método del negocio llamar según el filtro
              if (filtro != null && filtro.equals("inactivos")) {
-                 listaClientes = clienteNegocio.leerTodosLosInactivos();
+                 listaClientes = clienteNegocio.leerTodosLosClientesInactivos();
              }
              else if (filtro != null && filtro.equals("activos")) {
-                 listaClientes = clienteNegocio.leerTodosLosActivos();
+                 listaClientes = clienteNegocio.leerTodosLosClientesActivos();
              }
              else { // Por defecto, o si el filtro es "todos"
-                 listaClientes = clienteNegocio.readAll();
+                 listaClientes = clienteNegocio.leerTodosLosClientes();
              }
              
              request.setAttribute("listaClientes", listaClientes);
@@ -143,7 +143,7 @@ public class ClienteServlet extends HttpServlet {
             cliente.setLocalidad(loc);
             
 
-            boolean seAgrego = clienteNegocio.insert(cliente);
+            boolean seAgrego = clienteNegocio.insertarCliente(cliente);
 
             if (seAgrego) {
             	response.sendRedirect(request.getContextPath() + "/UsuarioServlet?action=mostrarFormularioAlta&dniCliente=" + dni);
@@ -184,7 +184,7 @@ public class ClienteServlet extends HttpServlet {
             cliente.setDireccion(direccion);
             cliente.setLocalidad(loc);
 
-            boolean seModifico = clienteNegocio.update(cliente);
+            boolean seModifico = clienteNegocio.actualizarCliente(cliente);
 
             if (seModifico) {
                 session.setAttribute("mensaje", "¡Cliente modificado correctamente!");

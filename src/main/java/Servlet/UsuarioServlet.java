@@ -66,7 +66,7 @@ public class UsuarioServlet extends HttpServlet {
             
       
             UsuarioNegocio usuarioNegocio = new UsuarioNegocioImpl();
-            boolean seCreo = usuarioNegocio.insert(usuario, dniCliente); // método en el negocio y  DAO
+            boolean seCreo = usuarioNegocio.insertarUsuario(usuario, dniCliente); // método en el negocio y  DAO
 
        
             HttpSession session = request.getSession();

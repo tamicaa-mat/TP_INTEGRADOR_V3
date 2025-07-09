@@ -8,14 +8,14 @@ public interface LocalidadDao {
 
 	
 
-	 boolean insert(Localidad loc);
+	 boolean insertarLocalidad(Localidad loc);
 
 	  
-	 boolean delete(int idLocalidad);
+	 boolean bajaLogicaLocalidad(int idLocalidad);
 
 
 	  
 
-	public ArrayList<Localidad> readAll();
+	public ArrayList<Localidad> leerTodasLasLocalidades();
 }
 

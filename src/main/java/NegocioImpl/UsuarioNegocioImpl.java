@@ -16,8 +16,8 @@ public class UsuarioNegocioImpl implements UsuarioNegocio {
     
     ////////////////////////////
     @Override
-    public Usuario getUsuario(String username, String password) {
-        return usuarioDao.getUsuario(username, password);
+    public Usuario obtenerUsuario(String username, String password) {
+        return usuarioDao.obtenerUsuario(username, password);
     }
     
     public boolean actualizarPassword(int idUsuario, String nuevaPassword) {
@@ -28,21 +28,17 @@ public class UsuarioNegocioImpl implements UsuarioNegocio {
  
 
     @Override
-    public boolean insert(Usuario usuario, String dniCliente) {
-        
-        // - se puede verificar que el nombre de usuario no este ya en uso
-        // - se puede verificar que la contraseña tenga un mínimo de caracteres por  ejemplo
-
-   
-        return usuarioDao.insert(usuario, dniCliente);
+    public boolean insertarUsuario(Usuario usuario, String dniCliente) {
+    
+        return usuarioDao.insertarUsuario(usuario, dniCliente);
     }
     
     
     
     @Override
-    public boolean delete(int idUsuario) {
+    public boolean bajaLogicaUsuario(int idUsuario) {
 
-        return usuarioDao.delete(idUsuario);
+        return usuarioDao.bajaLogicaUsuario(idUsuario);
     }
     
 }

@@ -7,6 +7,6 @@ import dominio.Provincia;
 
 public interface ProvinciaNegocio {
 
-	public ArrayList<Provincia> readAll();
+	public ArrayList<Provincia> leerTodasLasProvincias();
 	
 }

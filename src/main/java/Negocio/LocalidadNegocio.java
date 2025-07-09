@@ -7,7 +7,7 @@ import dominio.Localidad;
 
 public interface LocalidadNegocio {
 
-	public ArrayList<Localidad> readAll();
+	public ArrayList<Localidad> leerTodasLasLocalidades();
 	
 	
 }

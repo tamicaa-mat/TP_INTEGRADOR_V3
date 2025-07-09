@@ -6,27 +6,27 @@ import dominio.Cliente;
 public interface ClienteDao {
     
 
-     boolean insert(Cliente cliente);
+     boolean insertarCliente(Cliente cliente);
     
     
-     boolean delete(String dni);
+     boolean bajaLogicaCliente(String dni);
     
   
   
     
    
-    boolean update(Cliente cliente);
+    boolean actualizarCliente(Cliente cliente);
     
-     Cliente getClientePorDni(String dni);
+     Cliente obtenerClientePorDni(String dni);
      
-     Cliente getClientePorUsuario(int idUsuario);
+     Cliente obtenerClientePorUsuario(int idUsuario);
     
     /// probandooooo
      public Cliente getClienteConCuentasPorUsuario(int idUsuario);
      
      
-      ArrayList<Cliente> readAll();
-      ArrayList<Cliente> leerTodosLosActivos(); // Para ver solo activos (Estado = 1)
-      ArrayList<Cliente> leerTodosLosInactivos();
+      ArrayList<Cliente> leerTodosLosClientes();
+      ArrayList<Cliente> leerTodosLosClientesActivos(); // Para ver solo activos (Estado = 1)
+      ArrayList<Cliente> leerTodosLosClientesInactivos();
 
 }
