@@ -26,6 +26,10 @@ public class Cliente {
     
     public Cliente() {
         // Constructor vacío
+    	
+    	
+    	
+    	
     }
 
     public Cliente(int idCliente, String dni, String cuil, String nombre, String apellido, String sexo,
