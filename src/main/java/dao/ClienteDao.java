@@ -6,27 +6,24 @@ import dominio.Cliente;
 public interface ClienteDao {
     
 
-     boolean insertarCliente(Cliente cliente);
-    
-    
-     boolean bajaLogicaCliente(String dni);
-    
-  
-  
-    
+     public boolean insertarCliente(Cliente cliente);
    
-    boolean actualizarCliente(Cliente cliente);
+     public boolean bajaLogicaCliente(String dni);
+     public boolean altaLogicaCliente(String dni);
+
+   public  boolean actualizarCliente(Cliente cliente);
     
-     Cliente obtenerClientePorDni(String dni);
+   public  Cliente obtenerClientePorDni(String dni);
      
-     Cliente obtenerClientePorUsuario(int idUsuario);
+   public  Cliente obtenerClientePorUsuario(int idUsuario);
     
     /// probandooooo
      public Cliente getClienteConCuentasPorUsuario(int idUsuario);
      
-     
-      ArrayList<Cliente> leerTodosLosClientes();
-      ArrayList<Cliente> leerTodosLosClientesActivos(); // Para ver solo activos (Estado = 1)
-      ArrayList<Cliente> leerTodosLosClientesInactivos();
+     public Cliente obtenerClientePorDniSinFiltro(String dni); // Para buscar sin importar estado
+
+     public ArrayList<Cliente> leerTodosLosClientes();
+     public ArrayList<Cliente> leerTodosLosClientesActivos(); // Para ver solo activos (Estado = 1)
+     public ArrayList<Cliente> leerTodosLosClientesInactivos();
 
 }

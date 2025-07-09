@@ -30,13 +30,13 @@
 					    
 					    
 					    <div class="mb-3">
-					        <input type="password" class="form-control" id="contraseña" name="txtContraseña" placeholder="Contraseña" required>
+					        <input type="password" class="form-control" id="contrasena" name="txtContrasena" placeholder="Contrasena" required>
 					    </div>
 					    
 					    
 					    
 					    <div class="mb-3">
-					        <input type="password" class="form-control" id="confirmarContrasena" name="confirmarContrasena" placeholder="Confirmar Contraseña" required>
+					        <input type="password" class="form-control" id="confirmarContrasena" name="confirmarContrasena" placeholder="Confirmar Contrasena" required>
 					    </div>
 					    
 					    

@@ -79,23 +79,39 @@ public class ClienteServlet extends HttpServlet {
             String dni = request.getParameter("dni");
             ClienteNegocio clienteNegocio = new ClienteNegocioImpl(new ClienteDaoImpl());
             if(dni != null) {
-                clienteNegocio.actualizarCliente(null);
+                clienteNegocio.bajaLogicaCliente(dni);
             }
             response.sendRedirect(request.getContextPath() + "/ClienteServlet");
-        } 
+        }
+        
+        
+        
+        else if (action != null && action.equals("reactivar")) {
+        	 String dni = request.getParameter("dni");
+             if (dni != null) {
+            	 ClienteNegocio clienteNegocio = new ClienteNegocioImpl();
+                 clienteNegocio.altaLogicaCliente(dni); 
+                 request.getSession().setAttribute("mensaje", "Cliente reactivado con éxito.");
+             }
+            
+             response.sendRedirect(request.getContextPath() + "/ClienteServlet");
+        }
        
+        
+        
+        
         else {
         	 ArrayList<Cliente> listaClientes;
         	 ClienteNegocio clienteNegocio = new ClienteNegocioImpl();
              
-             // Decidimos qué método del negocio llamar según el filtro
+            
              if (filtro != null && filtro.equals("inactivos")) {
                  listaClientes = clienteNegocio.leerTodosLosClientesInactivos();
              }
              else if (filtro != null && filtro.equals("activos")) {
                  listaClientes = clienteNegocio.leerTodosLosClientesActivos();
              }
-             else { // Por defecto, o si el filtro es "todos"
+             else { 
                  listaClientes = clienteNegocio.leerTodosLosClientes();
              }
              
@@ -105,27 +121,30 @@ public class ClienteServlet extends HttpServlet {
         }
     }
     
+    
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
-        ClienteNegocio clienteNegocio = new ClienteNegocioImpl(new ClienteDaoImpl());
+        ClienteNegocio clienteNegocio = new ClienteNegocioImpl(); // Asumiendo que tienes un constructor vacío
         HttpSession session = request.getSession();
 
-     
+      
         if (action != null && action.equals("agregar")) {
-            String dni = request.getParameter("txtDni");
-            String cuil = request.getParameter("txtCuil");
-            String nombre = request.getParameter("txtNombre");
-            String apellido = request.getParameter("txtApellido");
-            String nacionalidad = request.getParameter("txtNacionalidad");
-            LocalDate fechaNacimiento = LocalDate.parse(request.getParameter("txtFechaNacimiento"));
-            String sexo = request.getParameter("ddlSexo");
-            String email = request.getParameter("txtEmail");
-            String telefono = request.getParameter("txtTelefono");
-            String direccion = request.getParameter("txtDireccion");
-            int idLocalidad = Integer.parseInt(request.getParameter("ddlLocalidad"));
+            
            
+            String dni = request.getParameter("txtDni");
+            String cuil = request.getParameter("txtCuil");
+            String nombre = request.getParameter("txtNombre");
+            String apellido = request.getParameter("txtApellido");
+            String nacionalidad = request.getParameter("txtNacionalidad");
+            LocalDate fechaNacimiento = LocalDate.parse(request.getParameter("txtFechaNacimiento"));
+            String sexo = request.getParameter("ddlSexo");
+            String email = request.getParameter("txtEmail");
+            String telefono = request.getParameter("txtTelefono");
+            String direccion = request.getParameter("txtDireccion");
+            int idLocalidad = Integer.parseInt(request.getParameter("ddlLocalidad"));
 
+          
             Localidad loc = new Localidad();
             loc.setIdLocalidad(idLocalidad);
 
@@ -142,20 +161,21 @@ public class ClienteServlet extends HttpServlet {
             cliente.setDireccion(direccion);
             cliente.setLocalidad(loc);
             
+            
+            boolean seAgrego = clienteNegocio.insertarCliente(cliente); 
 
-            boolean seAgrego = clienteNegocio.insertarCliente(cliente);
-
+            
             if (seAgrego) {
-            	response.sendRedirect(request.getContextPath() + "/UsuarioServlet?action=mostrarFormularioAlta&dniCliente=" + dni);
+                response.sendRedirect(request.getContextPath() + "/UsuarioServlet?action=mostrarFormularioAlta&dniCliente=" + dni);
             } else {
-            	
-                 session.setAttribute("mensaje", "Error: No se pudo agregar al cliente (posiblemente DNI o CUIL ya existen).");
-                 response.sendRedirect(request.getContextPath() + "/ClienteServlet");
+                session.setAttribute("mensaje", "Error: No se pudo agregar al cliente (posiblemente DNI o CUIL ya existen).");
+                response.sendRedirect(request.getContextPath() + "/ClienteServlet");
             }
-        //    response.sendRedirect(request.getContextPath() + "/ClienteServlet");
-
-        
-        } else if (action != null && action.equals("modificar")) {
+        } 
+       
+        else if (action != null && action.equals("modificar")) {
+            
+          
             String dni = request.getParameter("txtDni");
             String cuil = request.getParameter("txtCuil");
             String nombre = request.getParameter("txtNombre");
@@ -168,6 +188,7 @@ public class ClienteServlet extends HttpServlet {
             String direccion = request.getParameter("txtDireccion");
             int idLocalidad = Integer.parseInt(request.getParameter("ddlLocalidad"));
             
+            
             Localidad loc = new Localidad();
             loc.setIdLocalidad(idLocalidad);
 
@@ -184,8 +205,10 @@ public class ClienteServlet extends HttpServlet {
             cliente.setDireccion(direccion);
             cliente.setLocalidad(loc);
 
-            boolean seModifico = clienteNegocio.actualizarCliente(cliente);
+           
+            boolean seModifico = clienteNegocio.actualizarCliente(cliente); 
 
+           
             if (seModifico) {
                 session.setAttribute("mensaje", "¡Cliente modificado correctamente!");
             } else {
@@ -194,4 +217,7 @@ public class ClienteServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/ClienteServlet");
         }
     }
+    
+    
+    
 }

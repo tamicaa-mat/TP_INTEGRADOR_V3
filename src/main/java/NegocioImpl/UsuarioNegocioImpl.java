@@ -3,6 +3,9 @@ package NegocioImpl;
 import dao.UsuarioDao;
 import daoImpl.UsuarioDaoImpl;
 import dominio.Usuario;
+
+import java.util.ArrayList;
+
 import Negocio.UsuarioNegocio;
 
 public class UsuarioNegocioImpl implements UsuarioNegocio {
@@ -25,6 +28,12 @@ public class UsuarioNegocioImpl implements UsuarioNegocio {
         return usuarioDao.actualizarPassword(idUsuario, nuevaPassword);
     }
     
+    
+    
+    public ArrayList<Usuario> leerTodosLosUsuarios(){
+    	 return usuarioDao.leerTodosLosUsuarios();
+    }
+    
  
 
     @Override
@@ -34,6 +43,16 @@ public class UsuarioNegocioImpl implements UsuarioNegocio {
     }
     
     
+    
+    
+    @Override
+    public boolean altaLogicaUsuario(int idUsuario) {
+      
+        if (usuarioDao != null) {
+            return usuarioDao.altaLogicaUsuario(idUsuario);
+        }
+        return false;
+    }
     
     @Override
     public boolean bajaLogicaUsuario(int idUsuario) {

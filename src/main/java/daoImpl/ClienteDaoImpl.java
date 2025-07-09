@@ -19,29 +19,55 @@ import dominio.Usuario;
 
 public class ClienteDaoImpl implements ClienteDao {
 
-	private static final String INSERTAR_CLIENTE_SOLO = "insert into cliente(DNI, CUIL, Nombre, Apellido, Sexo, Nacionalidad, FechaNacimiento, Direccion, idLocalidad, CorreoElectronico, Telefono, Estado) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)";
+private static final String INSERTAR_CLIENTE_SOLO = "insert into cliente(DNI, CUIL, Nombre, Apellido, Sexo, Nacionalidad, FechaNacimiento, Direccion, idLocalidad, CorreoElectronico, Telefono, Estado) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)";
+	
+	// consulta base, la usaremos para las demás. Usa LEFT JOIN para más seguridad.
 	private static final String LEER_TODOS = "select c.*, u.NombreUsuario, u.Estado as UsuarioEstado, l.Descripcion as LocalidadDescripcion, p.IdProvincia, p.Descripcion as ProvinciaDescripcion from cliente c left join usuario u on c.IdUsuario = u.IdUsuario left join localidad l on c.IdLocalidad = l.IdLocalidad left join provincia p on l.IdProvincia = p.IdProvincia";
+	
+	
+	private static final String ALTA_LOGICA = "update cliente set Estado = 1 where DNI = ?";
 	private static final String BAJA_LOGICA = "update cliente set Estado = 0 where DNI = ?";
 	private static final String ACTUALIZAR_CLIENTE = "update cliente set CUIL = ?, Nombre = ?, Apellido = ?, Sexo = ?, Nacionalidad = ?, FechaNacimiento = ?, Direccion = ?, idLocalidad = ?, CorreoElectronico = ?, Telefono = ? where DNI = ?";
-	private static final String OBTENER_CLIENTE_POR_DNI = "select c.*, u.NombreUsuario, l.Descripcion as LocalidadDescripcion, p.IdProvincia, p.Descripcion as ProvinciaDescripcion " +
-            "from cliente c " +
-            "inner join usuario u on c.IdUsuario = u.IdUsuario " +
-            "inner join localidad l on c.IdLocalidad = l.IdLocalidad " +
-            "inner join provincia p on l.IdProvincia = p.IdProvincia " + // <-- ESTE JOIN FALTABA
-            "where c.DNI = ? and c.Estado = 1";
+	private static final String OBTENER_CLIENTE_POR_DNI = LEER_TODOS + " where c.DNI = ?";
+	private static final String OBTENER_CLIENTE_POR_ID_USUARIO = LEER_TODOS + " where c.IdUsuario = ?";
+	private static final String LEER_TODOS_LOS_CLIENTE_POR_ESTADO = LEER_TODOS + " where c.Estado = ?";
+	private static final String OBTENER_POR_DNI_SIN_FILTRO = LEER_TODOS + " where c.DNI = ?";
 
 	
-	private static final String OBTENER_CLIENTE_POR_ID_USUARIO = "select c.*, u.NombreUsuario, l.Descripcion as LocalidadDescripcion, p.IdProvincia, p.Descripcion as ProvinciaDescripcion " +
-            "from cliente c " +
-            "inner join usuario u on c.IdUsuario = u.IdUsuario " +
-            "inner join localidad l on c.IdLocalidad = l.IdLocalidad " +
-            "inner join provincia p on l.IdProvincia = p.IdProvincia " +
-            "where c.IdUsuario = ? and c.Estado = 1";
 	
-	
-	private static final String LEER_TODOS_LOS_CLIENTE_POR_ESTADO = "select c.*, u.NombreUsuario, l.Descripcion as LocalidadDescripcion from cliente c left join usuario u ... left join localidad l ... where c.Estado = ?";
-	
-	
+	@Override
+	public Cliente obtenerClientePorDniSinFiltro(String dni) {
+		Connection conexion = null;
+	    PreparedStatement mensajero = null;
+	    ResultSet resultado = null;
+	    Cliente cliente = null;
+
+	    try {
+	        conexion = Conexion.getConexion().getSQLConexion();
+	        mensajero = conexion.prepareStatement(OBTENER_POR_DNI_SIN_FILTRO);
+	        mensajero.setString(1, dni);
+	        resultado = mensajero.executeQuery();
+
+	        if (resultado.next()) {
+	            // Reutilizamos el método de ayuda que ya tienes
+	            cliente = instanciarClienteDesdeRs(resultado); 
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    } finally {
+	        try {
+	            if (resultado != null) {
+	                resultado.close();
+	            }
+	            if (mensajero != null) {
+	                mensajero.close();
+	            }
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	    }
+	    return cliente;
+	}
 	
 	@Override
 	public boolean insertarCliente(Cliente cliente) {
@@ -146,6 +172,44 @@ public class ClienteDaoImpl implements ClienteDao {
 		return exito;
 	}
 
+	
+	@Override
+	public boolean altaLogicaCliente(String dni) {
+		Connection conexion = null;
+	    PreparedStatement mensajero = null;
+	    boolean exito = false;
+	    try {
+	        conexion = Conexion.getConexion().getSQLConexion();
+	        // Usamos la nueva constante para reactivar
+	        mensajero = conexion.prepareStatement(ALTA_LOGICA);
+	        mensajero.setString(1, dni);
+	        
+	        if (mensajero.executeUpdate() > 0) {
+	            conexion.commit();
+	            exito = true;
+	        } else {
+	            conexion.rollback();
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        try {
+	            if (conexion != null) conexion.rollback();
+	        } catch (SQLException ex) {
+	            ex.printStackTrace();
+	        }
+	    } finally {
+	        try {
+	            if (mensajero != null) mensajero.close();
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	    }
+	    return exito;
+		
+		
+		
+	}
+	
 	@Override
 	public boolean bajaLogicaCliente(String dni) {
 		Connection conexion = null;

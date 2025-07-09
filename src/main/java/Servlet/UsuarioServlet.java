@@ -1,6 +1,7 @@
 package Servlet;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -27,17 +28,37 @@ public class UsuarioServlet extends HttpServlet {
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		String action = request.getParameter("action");
 		
-		 if (action != null && action.equals("mostrarFormularioAlta")) {
+
+	    // Para evitar errores, si la acción es nula, la tratamos como un string vacío.
+	    String action = request.getParameter("action") != null ? request.getParameter("action") : "";
+	    
+	    switch (action) {
+	        case "mostrarFormularioAlta": {
+	           
 	            String dniCliente = request.getParameter("dniCliente");
-	            
-	         
 	            request.setAttribute("dniCliente", dniCliente);
 	            
 	            RequestDispatcher rd = request.getRequestDispatcher("/AdministradorABMLusuarios.jsp");
 	            rd.forward(request, response);
+	            break;
 	        }
+	        
+	        //  más casos en el futuro, como "desactivarUsuario", etc.
+	        
+	        default: {
+	            // ACCIÓN NUEVA Y POR DEFECTO: Listar todos los usuarios.
+	            UsuarioNegocio usuarioNegocio = new UsuarioNegocioImpl();
+	            ArrayList<Usuario> listaUsuarios = usuarioNegocio.leerTodosLosUsuarios();
+	            
+	            request.setAttribute("listaUsuarios", listaUsuarios);
+	            
+	            // Reenviamos a una NUEVA página JSP que mostrará la lista.
+	            RequestDispatcher rd = request.getRequestDispatcher("/AdministradorListaUsuarios.jsp");
+	            rd.forward(request, response);
+	            break;
+	        }
+	    }
 		
 	}
 
@@ -57,7 +78,7 @@ public class UsuarioServlet extends HttpServlet {
             
             String dniCliente = request.getParameter("dniCliente");
             String nombreUsuario = request.getParameter("txtUsuario");
-            String pass = request.getParameter("txtContraseña");
+            String pass = request.getParameter("txtContrasena");
             
           
             Usuario usuario = new Usuario();

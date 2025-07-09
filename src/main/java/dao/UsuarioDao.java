@@ -1,5 +1,7 @@
 package dao;
 
+import java.util.ArrayList;
+
 import dominio.Usuario;
 
 public interface UsuarioDao {
@@ -8,9 +10,10 @@ public interface UsuarioDao {
 	    
 	    
 	    public  boolean bajaLogicaUsuario(int IdUsuario); // dará de baja logica
+	    public boolean altaLogicaUsuario (int IdUsuario); // cambia el estado a 1
 	    
 	  
-	    // ArrayList<Usuario> readAll();
+	     public ArrayList<Usuario> leerTodosLosUsuarios();
 	  
 	   
 	   // boolean update(Usuario usuario);

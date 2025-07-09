@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import com.mysql.jdbc.Statement;
 
@@ -18,8 +19,9 @@ public class UsuarioDaoImpl implements UsuarioDao {
     
     private static final String ACTUALIZAR_CLIENTE_CON_USUARIO = "UPDATE cliente SET IdUsuario = ? WHERE DNI = ?";
     
-    
+    private static final String ALTA_LOGICA_USUARIO = "UPDATE usuario SET Estado = 1 WHERE IdUsuario = ?";
     private static final String BAJA_LOGICA_USUARIO = "UPDATE usuario SET Estado = 0 WHERE IdUsuario = ?";
+    private static final String LEER_TODOS_LOS_USUARIOS = "SELECT u.IdUsuario, u.NombreUsuario, u.Estado, u.IdTipoUsuario, tu.Descripcion as TipoDescripcion FROM usuario u INNER JOIN tipousuario tu ON u.IdTipoUsuario = tu.IdTipoUsuario";
 
     
     public Usuario obtenerUsuario(String username, String password) {
@@ -63,7 +65,42 @@ public class UsuarioDaoImpl implements UsuarioDao {
     }
     
     
-    
+    public ArrayList<Usuario> leerTodosLosUsuarios(){
+    	Connection conexion = null;
+        PreparedStatement mensajero = null;
+        ResultSet resultado = null;
+        ArrayList<Usuario> usuarios = new ArrayList<>();
+        
+        try {
+            conexion = Conexion.getConexion().getSQLConexion();
+            mensajero = conexion.prepareStatement(LEER_TODOS_LOS_USUARIOS);
+            resultado = mensajero.executeQuery();
+            
+            while (resultado.next()) {
+                Usuario usuario = new Usuario();
+                usuario.setIdUsuario(resultado.getInt("IdUsuario"));
+                usuario.setNombreUsuario(resultado.getString("NombreUsuario"));
+                
+                TipoUsuario tipo = new TipoUsuario();
+                tipo.setIdTipoUsuario(resultado.getInt("IdTipoUsuario"));
+                tipo.setDescripcion(resultado.getString("TipoDescripcion"));
+                usuario.setTipoUsuario(tipo);
+                
+                usuario.setEstado(resultado.getBoolean("Estado"));
+                usuarios.add(usuario);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (resultado != null) resultado.close();
+                if (mensajero != null) mensajero.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return usuarios;
+    }
     
     @Override
     public boolean actualizarPassword(int idUsuario, String nuevaPassword) {
@@ -160,6 +197,32 @@ public class UsuarioDaoImpl implements UsuarioDao {
         return exito;
     }
    
+    
+    @Override
+    public boolean altaLogicaUsuario(int IdUsuario) {
+    	Connection conexion = null;
+        PreparedStatement mensajero = null;
+        boolean exito = false;
+        try {
+            conexion = Conexion.getConexion().getSQLConexion();
+            mensajero = conexion.prepareStatement(ALTA_LOGICA_USUARIO);
+            mensajero.setInt(1, IdUsuario);
+            if (mensajero.executeUpdate() > 0) {
+                conexion.commit();
+                exito = true;
+            } else {
+                conexion.rollback();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            try { if (conexion != null) conexion.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+        } finally {
+            try { if (mensajero != null) mensajero.close(); } catch (SQLException e) { e.printStackTrace(); }
+        }
+        return exito;
+    }
+    
+    
     
     @Override
     public boolean bajaLogicaUsuario(int idUsuario) {
