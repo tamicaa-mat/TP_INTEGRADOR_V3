@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import dao.PrestamoDao;
@@ -32,7 +33,9 @@ public class PrestamoDaoImpl implements PrestamoDao{
     		+ "JOIN Cuenta cu ON p.IdCuentaAsociada = cu.IdCuenta;";
     private static final String UPDATE_ESTADO = "UPDATE Prestamo SET Estado = ? WHERE IdPrestamo = ?" ;
 
-    
+    private static final String SUMAR_PRESTAMOS_FECHA = "SELECT SUM(ImportePedido) AS Total FROM Prestamo WHERE FechaAlta BETWEEN ? AND ?";
+    private static final String CONTAR_PRESTAMOS_FECHA = "SELECT COUNT(*) AS Cantidad FROM Prestamo WHERE FechaAlta BETWEEN ? AND ?";
+
     
     
     public boolean insert(Prestamo prestamo) {
@@ -337,45 +340,73 @@ public class PrestamoDaoImpl implements PrestamoDao{
 		        }
 		    }
 	    }
+	
+	
+	@Override
+	public double obtenerSumaImporteEntreFechas(Date desde, Date hasta) {
+	    double total = 0;
+	    Connection conn = null;
+	    PreparedStatement stmt = null;
+	    ResultSet rs = null;
 
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	    try {
+	        conn = Conexion.getConexion().getSQLConexion();
+	        stmt = conn.prepareStatement(SUMAR_PRESTAMOS_FECHA);
+	        stmt.setDate(1, new java.sql.Date(desde.getTime()));
+	        stmt.setDate(2, new java.sql.Date(hasta.getTime()));
+
+	        rs = stmt.executeQuery();
+
+	        if (rs.next()) {
+	            total = rs.getDouble("Total");
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    } finally {
+	        try {
+	            if (rs != null) rs.close();
+	            if (stmt != null) stmt.close();
+	            if (conn != null) conn.close();
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	    }
+	    return total;
+	}
+
+
+	@Override
+	public int contarPrestamosEntreFechas(Date desde, Date hasta) {
+	    int cantidad = 0;
+	    Connection conn = null;
+	    PreparedStatement stmt = null;
+	    ResultSet rs = null;
+
+	    try {
+	        conn = Conexion.getConexion().getSQLConexion();
+	        stmt = conn.prepareStatement(CONTAR_PRESTAMOS_FECHA);
+	        stmt.setDate(1, new java.sql.Date(desde.getTime()));
+	        stmt.setDate(2, new java.sql.Date(hasta.getTime()));
+
+	        rs = stmt.executeQuery();
+
+	        if (rs.next()) {
+	            cantidad = rs.getInt("Cantidad");
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    } finally {
+	        try {
+	            if (rs != null) rs.close();
+	            if (stmt != null) stmt.close();
+	            if (conn != null) conn.close();
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	    }
+	    return cantidad;
+	}
+
 }
 
     

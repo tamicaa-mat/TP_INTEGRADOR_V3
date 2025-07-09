@@ -1,7 +1,7 @@
 package daoImpl;
 
 import java.sql.Connection;
-import java.sql.Date;
+import java.util.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -28,6 +28,9 @@ public class CuentaDaoImpl implements CuentaDao {
 
     private static final String GET_CUENTA_POR_CBU =
         "SELECT * FROM Cuenta WHERE Cbu = ? AND Estado = 1";
+    
+    private static final String CONTAR_CUENTAS_FECHA = "SELECT COUNT(*) AS Total FROM Cuenta WHERE FechaCreacion BETWEEN ? AND ?";
+    private static final String SUMAR_SALDOS_CUENTAS_FECHA = "SELECT SUM(Saldo) AS Total FROM Cuenta WHERE FechaCreacion BETWEEN ? AND ?";
 
  
     public boolean insert(Cuenta cuenta) {
@@ -170,7 +173,7 @@ public class CuentaDaoImpl implements CuentaDao {
 
                 Date fechaSQL = rs.getDate("FechaCreacion");
                 if (fechaSQL != null) {
-                    cuenta.setFechaCreacion(fechaSQL.toLocalDate());
+                    cuenta.setFechaCreacion(((java.sql.Date) fechaSQL).toLocalDate());
                 }
 
                 cuentas.add(cuenta);
@@ -279,7 +282,71 @@ public class CuentaDaoImpl implements CuentaDao {
         return cuentas;
     }
 
-    
+    @Override
+    public int contarCuentasCreadasEntreFechas(Date desde, Date hasta) {
+        int cantidad = 0;
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = Conexion.getConexion().getSQLConexion();
+            stmt = conn.prepareStatement(CONTAR_CUENTAS_FECHA);
+            stmt.setDate(1, new java.sql.Date(desde.getTime()));
+            stmt.setDate(2, new java.sql.Date(hasta.getTime()));
+
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                cantidad = rs.getInt("Total");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return cantidad;
+    }
+
+
+    @Override
+    public double obtenerSaldoTotalCuentasCreadasEntreFechas(Date desde, Date hasta) {
+        double total = 0;
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = Conexion.getConexion().getSQLConexion();
+            stmt = conn.prepareStatement(SUMAR_SALDOS_CUENTAS_FECHA);
+            stmt.setDate(1, new java.sql.Date(desde.getTime()));
+            stmt.setDate(2, new java.sql.Date(hasta.getTime()));
+
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                total = rs.getDouble("Total");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return total;
+    }
+
     
 }
  

@@ -1,6 +1,7 @@
 package dao;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import dominio.Prestamo;
@@ -19,6 +20,7 @@ public interface PrestamoDao {
 	List<Prestamo> obtenerTodosLosPrestamos();
     boolean actualizarEstado(int idPrestamo, int nuevoEstado);
    
-    
+    double obtenerSumaImporteEntreFechas(Date desde, Date hasta);
+    int contarPrestamosEntreFechas(Date desde, Date hasta);
     
 }

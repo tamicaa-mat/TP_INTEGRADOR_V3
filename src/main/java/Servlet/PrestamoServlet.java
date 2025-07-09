@@ -1,6 +1,9 @@
 package Servlet;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -27,12 +30,41 @@ public class PrestamoServlet extends HttpServlet {
 
     private PrestamoNegocio prestamoNegocio = new PrestamoNegocioImpl(new PrestamoDaoImpl());
 
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		List<Prestamo> prestamos = prestamoNegocio.listarPrestamos();
-		System.out.println("Cantidad de prÃ©stamos traÃ­dos: " + prestamos.size()); 
-		request.setAttribute("prestamos", prestamos);
-		request.getRequestDispatcher("AdministradorListaPrestamos.jsp").forward(request, response);
-	}
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String action = request.getParameter("action");
+
+        if (action != null && action.equals("reportePrestamos")) {
+            String desdeStr = request.getParameter("fechaInicioPrestamo");
+            String hastaStr = request.getParameter("fechaFinPrestamo");
+
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                Date desde = sdf.parse(desdeStr);
+                Date hasta = sdf.parse(hastaStr);
+
+                double totalPrestamos = prestamoNegocio.obtenerSumaImporteEntreFechas(desde, hasta);
+                int cantidadPrestamos = prestamoNegocio.contarPrestamosEntreFechas(desde, hasta);
+
+                request.setAttribute("totalPrestamos", totalPrestamos);
+                request.setAttribute("cantidadPrestamos", cantidadPrestamos);
+                request.setAttribute("fechaInicioPrestamo", desdeStr);
+                request.setAttribute("fechaFinPrestamo", hastaStr);
+
+                request.getRequestDispatcher("AdministradorReportes.jsp").forward(request, response);
+                return;
+                
+            } catch (ParseException e) {
+                request.setAttribute("error", "Formato de fecha inválido. Use el formato YYYY-MM-DD");
+                request.getRequestDispatcher("AdministradorReportes.jsp").forward(request, response);
+                return;
+            }
+        }		
+        
+        List<Prestamo> prestamos = prestamoNegocio.listarPrestamos();
+        System.out.println("Cantidad de préstamos traídos: " + prestamos.size()); 
+        request.setAttribute("prestamos", prestamos);
+        request.getRequestDispatcher("AdministradorListaPrestamos.jsp").forward(request, response);
+    }
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
