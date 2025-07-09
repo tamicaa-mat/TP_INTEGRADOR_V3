@@ -3,6 +3,9 @@ package NegocioImpl;
 import dao.UsuarioDao;
 import daoImpl.UsuarioDaoImpl;
 import dominio.Usuario;
+import excepciones.ClaveIncorrectaException;
+import excepciones.UsuarioInactivoException;
+import excepciones.UsuarioInexistenteException;
 
 import java.util.ArrayList;
 
@@ -58,6 +61,21 @@ public class UsuarioNegocioImpl implements UsuarioNegocio {
     public boolean bajaLogicaUsuario(int idUsuario) {
 
         return usuarioDao.bajaLogicaUsuario(idUsuario);
+    }
+    
+    @Override
+    public Usuario login(String username, String password) throws UsuarioInexistenteException, ClaveIncorrectaException, UsuarioInactivoException {
+        Usuario usuario = usuarioDao.obtenerUsuarioPorUsername(username);
+        if (usuario == null) {
+            throw new UsuarioInexistenteException("El usuario no existe.");
+        }
+        if (!usuario.getPassword().equals(password)) {
+            throw new ClaveIncorrectaException("La contraseña es incorrecta.");
+        }
+        if (!usuario.isEstado()) {
+            throw new UsuarioInactivoException("Tu cuenta se encuentra inactiva.");
+        }
+        return usuario;
     }
     
 }

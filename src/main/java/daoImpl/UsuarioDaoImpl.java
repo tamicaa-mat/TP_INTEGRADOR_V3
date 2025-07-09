@@ -248,5 +248,47 @@ public class UsuarioDaoImpl implements UsuarioDao {
         return isSuccess;
     }
     
+    @Override
+    public Usuario obtenerUsuarioPorUsername(String username) {
+        Connection conexion = null;
+        PreparedStatement mensajero = null;
+        ResultSet resultado = null;
+        Usuario usuario = null;
+
+        try {
+            conexion = Conexion.getConexion().getSQLConexion();
+            String sql = "SELECT u.IdUsuario, u.NombreUsuario, u.Password, u.Estado, u.IdTipoUsuario, tu.Descripcion as TipoDescripcion " +
+                         "FROM Usuario u INNER JOIN TipoUsuario tu ON u.IdTipoUsuario = tu.IdTipoUsuario " +
+                         "WHERE u.NombreUsuario = ?";
+
+            mensajero = conexion.prepareStatement(sql);
+            mensajero.setString(1, username);
+            resultado = mensajero.executeQuery();
+
+            if (resultado.next()) {
+                usuario = new Usuario();
+                usuario.setIdUsuario(resultado.getInt("IdUsuario"));
+                usuario.setNombreUsuario(resultado.getString("NombreUsuario"));
+                usuario.setPassword(resultado.getString("Password"));
+                usuario.setEstado(resultado.getBoolean("Estado"));
+
+                TipoUsuario tipo = new TipoUsuario();
+                tipo.setIdTipoUsuario(resultado.getInt("IdTipoUsuario"));
+                tipo.setDescripcion(resultado.getString("TipoDescripcion"));
+                usuario.setTipoUsuario(tipo);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (resultado != null) resultado.close();
+                if (mensajero != null) mensajero.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return usuario;
+    }    
     
 }
