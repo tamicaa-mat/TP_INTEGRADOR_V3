@@ -298,16 +298,43 @@ public class PrestamoDaoImpl implements PrestamoDao{
 
 	@Override
 	public boolean actualizarEstado(int idPrestamo, int nuevoEstado) {
-		 try (Connection cn = Conexion.getConexion().getSQLConexion();
-		        PreparedStatement stmt = cn.prepareStatement(UPDATE_ESTADO)){
+		   Connection conn = null;
+		    PreparedStatement stmt = null;
+		    try {
+		        conn = Conexion.getConexion().getSQLConexion();
+		        conn.setAutoCommit(false); // comparamos manualmente sin el autocomit no funciona por que??
+
+		        stmt = conn.prepareStatement(UPDATE_ESTADO);
 		        stmt.setInt(1, nuevoEstado);
 		        stmt.setInt(2, idPrestamo);
 		        int filas = stmt.executeUpdate();
 		        System.out.println("updateEstado: filas afectadas = " + filas);
-		        return filas > 0;
+
+		        if (filas > 0) {
+		            conn.commit(); 
+		            return true;
+		        } else {
+		            conn.rollback(); 
+		            return false;
+		        }
 		    } catch (SQLException e) {
+		        try {
+		            if (conn != null) conn.rollback(); 
+		        } catch (SQLException ex) {
+		            ex.printStackTrace();
+		        }
 		        e.printStackTrace();
 		        return false;
+		    } finally {
+		        try {
+		            if (stmt != null) stmt.close();
+		            if (conn != null) {
+		                conn.setAutoCommit(true); 
+		                conn.close();
+		            }
+		        } catch (SQLException e) {
+		            e.printStackTrace();
+		        }
 		    }
 	    }
 
