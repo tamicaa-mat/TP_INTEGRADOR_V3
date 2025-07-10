@@ -1,6 +1,7 @@
 package dominio;
 
 import java.time.LocalDate; // Importar para FechaCreacion
+import java.time.format.DateTimeFormatter;
 
 public class Cuenta {
 
@@ -63,6 +64,12 @@ public class Cuenta {
 			return tipoCuentaObjeto;
 		}
 
+		public String getFechaCreacionFormateada() {
+		    return fechaCreacion != null ? fechaCreacion.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "";
+		}
+		
+		
+		
 		public void setTipoCuentaObjeto(TipoCuenta tipoCuentaObjeto) {
 			this.tipoCuentaObjeto = tipoCuentaObjeto;
 		}

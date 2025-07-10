@@ -13,6 +13,7 @@ public interface CuentaDao {
     boolean delete(int idCuenta);
     int cuentasActivasPorCliente(String dniCliente); 
     ArrayList<Cuenta> getCuentasPorIdCliente(int idCliente,Cliente cliente);
+    ArrayList<Cuenta> getCuentasPorIdCliente2OTRA(int idCliente,Cliente cliente);
 	ArrayList<Cuenta> getCuentasPorCliente(String dniCliente, Cliente cliente);
 	Cuenta getCuentaPorCbu(String cbu, Cliente cliente);
 	

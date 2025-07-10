@@ -23,5 +23,13 @@ public interface CuentaNegocio {
 	
 	int contarCuentasCreadasEntreFechas(Date desde, Date hasta);
     double obtenerSaldoTotalCuentasCreadasEntreFechas(Date desde, Date hasta);
+    
+    
+    public String generarNumeroCuenta(String dniCliente);
 
+	public String generarNumeroCbu(String numeroCuenta);
+
+	public boolean darDeBajaLogicaCuentas(int idCuenta);
+	
+	
 }

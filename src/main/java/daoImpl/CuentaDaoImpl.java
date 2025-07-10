@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import dao.CuentaDao;
 import dominio.Cliente;
 import dominio.Cuenta;
+import dominio.TipoCuenta;
 
 public class CuentaDaoImpl implements CuentaDao {
 
@@ -17,8 +18,8 @@ public class CuentaDaoImpl implements CuentaDao {
     private static final String INSERT_CUENTA =
         "INSERT INTO Cuenta (IdCliente, FechaCreacion, IdTipoCuenta, NumeroCuenta, Cbu, Saldo, Estado) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-    private static final String DELETE_CUENTA =
-        "UPDATE Cuenta SET Estado = 0 WHERE idCuenta = ?";
+    ///private static final String DELETE_CUENTA =
+        //"UPDATE Cuenta SET Estado = 0 WHERE idCuenta = ?";
 
     private static final String COUNT_CUENTAS_POR_DNI =
         "SELECT COUNT(*) AS total FROM Cuenta c JOIN Cliente cl ON c.IdCliente = cl.IdCliente WHERE cl.DNI = ? AND c.Estado = 1";
@@ -79,41 +80,36 @@ public class CuentaDaoImpl implements CuentaDao {
 
     @Override
     public boolean delete(int idCuenta) {
-        Connection conn = null;
-        PreparedStatement stmt = null;
-        boolean isSuccess = false;
+    	 Connection conn = null;
+    	    PreparedStatement stmt = null;
 
-        try {
-            conn = Conexion.getConexion().getSQLConexion();
-            conn.setAutoCommit(false);
+    	    try {
+    	        conn = Conexion.getConexion().getSQLConexion();
+    	        String sql = "UPDATE Cuenta SET Estado = 0 WHERE IdCuenta = ?";
+    	        stmt = conn.prepareStatement(sql);
+    	        stmt.setInt(1, idCuenta);
 
-            stmt = conn.prepareStatement(DELETE_CUENTA);
-            stmt.setInt(1, idCuenta);
+    	        int filas = stmt.executeUpdate();
 
-            if (stmt.executeUpdate() > 0) {
-                conn.commit();
-                isSuccess = true;
-            } else {
-                conn.rollback();
-            }
+    	        if (filas > 0) {
+    	            conn.commit();
+    	            return true;
+    	        } else {
+    	            conn.rollback();
+    	        }
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            try {
-                if (conn != null) conn.rollback();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-        } finally {
-            try {
-                if (stmt != null) stmt.close();
-                if (conn != null) conn.setAutoCommit(true);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
+    	    } catch (Exception e) {
+    	        e.printStackTrace();
+    	    } finally {
+    	        try {
+    	            if (stmt != null) stmt.close();
+    	            if (conn != null) conn.close();
+    	        } catch (SQLException e) {
+    	            e.printStackTrace();
+    	        }
+    	    }
 
-        return isSuccess;
+    	    return false;
     }
 
     @Override
@@ -254,7 +250,8 @@ public class CuentaDaoImpl implements CuentaDao {
                 Cuenta cuenta = new Cuenta();
                 cuenta.setIdCuenta(rs.getInt("IdCuenta"));
                 cuenta.setIdCliente(rs.getInt("IdCliente"));
-                cuenta.setFechaCreacion(rs.getDate("FechaCreacion").toLocalDate());
+              //  cuenta.setFechaCreacion(rs.getDate("FechaCreacion"));
+               cuenta.setFechaCreacion(rs.getDate("FechaCreacion").toLocalDate());
                 cuenta.setTipoCuenta(rs.getInt("IdTipoCuenta"));
                 cuenta.setNumeroCuenta(rs.getString("NumeroCuenta"));
                 cuenta.setCbu(rs.getString("Cbu"));
@@ -282,6 +279,64 @@ public class CuentaDaoImpl implements CuentaDao {
         return cuentas;
     }
 
+    
+    
+    public ArrayList<Cuenta> getCuentasPorIdCliente2OTRA(int idCliente, Cliente cliente) {
+        ArrayList<Cuenta> cuentas = new ArrayList<>();
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = Conexion.getConexion().getSQLConexion();
+
+            String query = "SELECT c.*, tc.Descripcion AS TipoDescripcion " +
+                           "FROM Cuenta c " +
+                           "JOIN TipoCuenta tc ON c.IdTipoCuenta = tc.IdTipoCuenta " +
+                           "WHERE c.IdCliente = ? AND c.Estado = 1";
+
+            stmt = conn.prepareStatement(query);
+            stmt.setInt(1, idCliente);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Cuenta cuenta = new Cuenta();
+                cuenta.setIdCuenta(rs.getInt("IdCuenta"));
+                cuenta.setIdCliente(rs.getInt("IdCliente"));
+                cuenta.setFechaCreacion(rs.getDate("FechaCreacion").toLocalDate());
+                cuenta.setNumeroCuenta(rs.getString("NumeroCuenta"));
+                cuenta.setCbu(rs.getString("Cbu"));
+                cuenta.setSaldo(rs.getDouble("Saldo"));
+                cuenta.setEstado(rs.getBoolean("Estado"));
+                cuenta.setCliente(cliente);
+
+                // ✅ Cargar el tipo de cuenta completo
+                TipoCuenta tipo = new TipoCuenta();
+                tipo.setIdTipoCuenta(rs.getInt("IdTipoCuenta"));
+                tipo.setDescripcion(rs.getString("TipoDescripcion"));
+                cuenta.setTipoCuentaObjeto(tipo);
+
+                cuentas.add(cuenta);
+            }
+
+            System.out.println("Total cuentas encontradas: " + cuentas.size());
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return cuentas;
+    }
+    
+    
     @Override
     public int contarCuentasCreadasEntreFechas(Date desde, Date hasta) {
         int cantidad = 0;

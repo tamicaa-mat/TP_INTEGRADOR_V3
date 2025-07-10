@@ -85,7 +85,7 @@ public class CuentaNegocioImpl implements CuentaNegocio {
 		
 		
 		public List<Cuenta> obtenerCuentasPorIdCliente(int idCliente, Cliente cliente) {
-		    List<Cuenta> cuentas = cuentaDao.getCuentasPorIdCliente(idCliente, cliente);
+		    List<Cuenta> cuentas = cuentaDao.getCuentasPorIdCliente2OTRA(idCliente, cliente);
 		    
 		    if (cuentas == null || cuentas.isEmpty()) {
 		        System.out.println("No se encontraron cuentas para el cliente ID: " + idCliente);
@@ -107,5 +107,40 @@ public class CuentaNegocioImpl implements CuentaNegocio {
 	        return cuentaDao.obtenerSaldoTotalCuentasCreadasEntreFechas(desde, hasta);
 	    }
 
+
+		@Override
+		public String generarNumeroCuenta(String dniCliente) {
+			
+		    String dniStr = String.valueOf(dniCliente);
+
+		  
+		    int aleatorio = (int)(Math.random() * 1_000_000); // entre 000000 y 999999
+		    String aleatorioStr = String.format("%06d", aleatorio);
+
+		    // Concatena: DNI + aleatorio = cuenta única tipo "12345678XXXXXX" para string
+		    return dniStr + aleatorioStr;
+		}
+
+		
+		public String generarNumeroCbu(String numeroCuenta) {
+			
+		    String cbuStr = String.valueOf(numeroCuenta);
+
+		  
+		    int aleatorio = (int)(Math.random() * 1_000_000); // entre 000000 y 999999
+		    String aleatorioStr = String.format("%06d", aleatorio);
+
+		    // Concatena: DNI + aleatorio = cuenta única tipo "12345678XXXXXX" para string
+		    return cbuStr + aleatorioStr;
+		}
+
+
+	
+		public boolean darDeBajaLogicaCuentas(int idCuenta) {
+			return cuentaDao.delete(idCuenta);
+			
+		}
+
+		
 
 }
