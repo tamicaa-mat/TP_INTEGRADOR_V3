@@ -27,6 +27,10 @@ public interface PrestamoNegocio {
     
     boolean solicitarPrestamo(Prestamo prestamo);
 
+    
+   Prestamo obtenerPrestamoPorId(int idPrestamo);
+    
+    
     double obtenerSumaImporteEntreFechas(Date desde, Date hasta);
     int contarPrestamosEntreFechas(Date desde, Date hasta);
 

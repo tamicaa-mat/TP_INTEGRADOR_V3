@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.math.BigDecimal; 
 
 public class Movimiento {
+	
     private int idMovimiento;
     private LocalDateTime fechaHora;
     private String Referencia;
@@ -56,8 +57,8 @@ public class Movimiento {
 		return Importe;
 	}
 
-	public void setImporte(BigDecimal importe) {
-		Importe = importe;
+	public void setImporte(BigDecimal d) {
+		Importe = d;
 	}
 
 	public TipoMovimiento getTipoMovimiento() {

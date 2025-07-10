@@ -125,7 +125,7 @@ public class ClienteServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
-        ClienteNegocio clienteNegocio = new ClienteNegocioImpl(); // Asumiendo que tienes un constructor vacío
+        ClienteNegocio clienteNegocio = new ClienteNegocioImpl(); 
         HttpSession session = request.getSession();
 
       

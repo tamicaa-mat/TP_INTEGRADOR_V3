@@ -103,6 +103,16 @@ public class PrestamoNegocioImpl implements PrestamoNegocio	{
 		}
 
 		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		@Override
 		public double obtenerSumaImporteEntreFechas(Date desde, Date hasta) {
 		    return prestamoDao.obtenerSumaImporteEntreFechas(desde, hasta);
@@ -111,6 +121,16 @@ public class PrestamoNegocioImpl implements PrestamoNegocio	{
 		@Override
 		public int contarPrestamosEntreFechas(Date desde, Date hasta) {
 		    return prestamoDao.contarPrestamosEntreFechas(desde, hasta);
+		}
+
+
+
+
+		@Override
+		public Prestamo obtenerPrestamoPorId(int idPrestamo) {
+			
+		    return prestamoDao.getPrestamoPorId(idPrestamo);
+			
 		}
 	    
 }

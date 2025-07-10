@@ -8,7 +8,7 @@ public interface MovimientoNegocio {
 
 	List<Movimiento> listarMovimientos(int idCuenta, int idTipo);
 
-	
+	boolean crearMovimiento(Movimiento movimiento);
 	
 	
 }

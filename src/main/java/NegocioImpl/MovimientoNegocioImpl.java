@@ -26,6 +26,13 @@ public class MovimientoNegocioImpl implements MovimientoNegocio{
 	    public List<Movimiento> listarMovimientos(int idCuenta, int idTipo) {
 	        return movimientoDao.listarMovimientos(idCuenta, idTipo);
 	    }
+
+
+		@Override
+		public boolean crearMovimiento(Movimiento movimiento) {
+			return movimientoDao.insertMovimiento(movimiento);
+		
+		}
 	
 	
 }

@@ -187,10 +187,11 @@ public class PrestamoDaoImpl implements PrestamoDao{
 
                 Cuenta cuenta = new Cuenta();
                 cuenta.setIdCuenta(rs.getInt("IdCuentaAsociada"));
-
+                prestamo.setCuentaAsociada(cuenta);
+             
                 prestamo.setIdPrestamo(rs.getInt("IdPrestamo"));
                 prestamo.setCliente(cliente);
-                prestamo.setCuentaAsociada(cuenta);
+         
                 prestamo.setFechaAlta(rs.getDate("FechaAlta"));
                 prestamo.setImportePedido(rs.getDouble("ImportePedido"));
                 prestamo.setPlazoMeses(rs.getInt("PlazoMeses"));

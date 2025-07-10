@@ -1,5 +1,6 @@
 package dominio;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 
 
@@ -123,6 +124,11 @@ public class Prestamo {
 				+ ", fechaAlta=" + fechaAlta + ", importePedido=" + importePedido + ", plazoMeses=" + plazoMeses
 				+ ", importePorMes=" + importePorMes + ", interes=" + interes + ", CantidadCuotas=" + CantidadCuotas
 				+ ", Estado=" + Estado + "]";
+	}
+
+	public int getIdCuenta() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 
