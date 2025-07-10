@@ -402,6 +402,38 @@ public class CuentaDaoImpl implements CuentaDao {
         return total;
     }
 
+	@Override
+	public int getIdCuentaPorNumeroCuenta(String numeroCuenta) {
+		 Connection conn = null;
+		    PreparedStatement stmt = null;
+		    ResultSet rs = null;
+		    int idCuenta = -1;
+
+		    try {
+		        conn = Conexion.getConexion().getSQLConexion();
+		        String sql = "SELECT IdCuenta FROM Cuenta WHERE NumeroCuenta = ?";
+		        stmt = conn.prepareStatement(sql);
+		        stmt.setString(1, numeroCuenta);
+		        rs = stmt.executeQuery();
+
+		        if (rs.next()) {
+		            idCuenta = rs.getInt("IdCuenta");
+		        }
+		    } catch (Exception e) {
+		        e.printStackTrace();
+		    } finally {
+		        try {
+		            if (rs != null) rs.close();
+		            if (stmt != null) stmt.close();
+		            if (conn != null) conn.close();
+		        } catch (SQLException e) {
+		            e.printStackTrace();
+		        }
+		    }
+
+		    return idCuenta;
+	}
+
     
 }
  

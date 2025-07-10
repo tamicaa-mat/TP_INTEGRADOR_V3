@@ -21,18 +21,20 @@
                 <div class="card-body">
                     <h4 class="card-title mb-4 text-center">Solicitar Préstamo</h4>
 
-                
-                 <form action="SolicitarPrestamoServlet" method="get">
+  <form action="SolicitarPrestamoServlet" method="get">
     <div class="mb-3">
         <label class="form-label small text-muted">Cuenta</label>
         <select class="form-select" name="cuentaSeleccionada" required>
             <option value="" disabled selected>Seleccione una cuenta</option>
             <c:forEach var="c" items="${cuentas}">
-                <option value="${c.idCuenta}">${c.numeroCuenta}</option>
+              <c:if test="${c.estado}">
+    <option value="${c.idCuenta}">${c.numeroCuenta}</option>
+</c:if>
             </c:forEach>
         </select>
     </div>
-
+    
+    
                         <div class="mb-3">
                             <input type="number" class="form-control" id="importe" name="importe" placeholder="Importe solicitado" min="1000" required>
                         </div>
@@ -42,7 +44,10 @@
                         </div>
 
                         <button type="submit" class="btn btn-secondary w-50 d-block mx-auto">Enviar solicitud</button>
-                    </form>
+    
+    
+    
+</form>
 
                 </div>
             </div>

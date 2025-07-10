@@ -19,5 +19,6 @@ public interface CuentaDao {
 	
 	int contarCuentasCreadasEntreFechas(Date desde, Date hasta);
 	double obtenerSaldoTotalCuentasCreadasEntreFechas(Date desde, Date hasta);
+	int getIdCuentaPorNumeroCuenta(String numeroCuenta);
 	
 }

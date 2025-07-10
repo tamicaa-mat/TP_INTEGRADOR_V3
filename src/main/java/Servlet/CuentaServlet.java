@@ -1,9 +1,11 @@
 package Servlet;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -18,10 +20,14 @@ import javax.servlet.http.HttpSession;
 import Negocio.CuentaNegocio;
 import NegocioImpl.ClienteNegocioImpl;
 import NegocioImpl.CuentaNegocioImpl;
+import NegocioImpl.MovimientoNegocioImpl;
 import daoImpl.ClienteDaoImpl;
 import daoImpl.CuentaDaoImpl;
+import daoImpl.MovimientoDaoImpl;
 import dominio.Cliente;
 import dominio.Cuenta;
+import dominio.Movimiento;
+import dominio.TipoMovimiento;
 
 @WebServlet("/CuentaServlet")
 public class CuentaServlet extends HttpServlet {
@@ -75,7 +81,7 @@ public class CuentaServlet extends HttpServlet {
     	        CuentaNegocioImpl cuentaNegocio = new CuentaNegocioImpl(new CuentaDaoImpl());
     	        ClienteNegocioImpl clienteNegocio = new ClienteNegocioImpl(new ClienteDaoImpl());
 
-    	        // ✅ Buscamos el cliente por DNI (no desde sesión)
+    	        //   el cliente por DNI (no desde sesión)
     	        Cliente cliente = clienteNegocio.obtenerClientePorDni(dniCliente);
 
     	        if (cliente == null) {
@@ -84,7 +90,7 @@ public class CuentaServlet extends HttpServlet {
     	            return;
     	        }
 
-    	        // ✅ Obtenemos las cuentas del cliente
+    	        //  cuentas del cliente
     	        ArrayList<Cuenta> listaCuentas = (ArrayList<Cuenta>) cuentaNegocio.obtenerCuentasPorIdCliente(cliente.getIdCliente(), cliente);
 
     	        request.setAttribute("listaCuentas", listaCuentas);
@@ -148,7 +154,7 @@ public class CuentaServlet extends HttpServlet {
             String dniCliente = request.getParameter("dniCliente");
             int idTipoCuenta = Integer.parseInt(request.getParameter("idTipoCuenta"));
 
-            // ✅ Buscar al cliente por DNI ya que sos admin
+            // Buscar al cliente por DNI ya que soy admin
             Cliente cliente = clienteNegocio.obtenerClientePorDni(dniCliente);
 
             if (cliente == null) {
@@ -157,7 +163,7 @@ public class CuentaServlet extends HttpServlet {
                 return;
             }
 
-            // ✅ Generar número de cuenta
+          
             String numeroCuenta = cuentaNegocio.generarNumeroCuenta(cliente.getDni());
             String cbu = cuentaNegocio.generarNumeroCbu(numeroCuenta);
             
@@ -175,15 +181,39 @@ public class CuentaServlet extends HttpServlet {
             boolean seAgrego = cuentaNegocio.agregarCuenta(nuevaCuenta, cliente);
             if (!seAgrego) {
                 request.setAttribute("errorLimiteCuentas", "⚠️ El cliente ya tiene 3 cuentas activas.");
+                ArrayList<Cuenta> listaCuentas = (ArrayList<Cuenta>) cuentaNegocio.obtenerCuentasPorIdCliente(cliente.getIdCliente(), cliente);
+                request.setAttribute("listaCuentas", listaCuentas);
+                request.setAttribute("dniCliente", dniCliente);
+                request.getRequestDispatcher("/AdministradorListaCuentas.jsp").forward(request, response);
+                return;
             } else {
                 request.setAttribute("mensajeExitoCuenta", "✅ Cuenta creada con éxito. Número: " + numeroCuenta + " | Saldo inicial: $10,000.00");
-            
-            ArrayList<Cuenta> listaCuentas = cuentaNegocio.getCuentasPorCliente(dniCliente, cliente);
-            request.setAttribute("listaCuentas", listaCuentas);
-            request.setAttribute("dniCliente", dniCliente);
+                // INSERTAR MOVIMIENTO (tipo 1 ALTA CUENTA)
+                Movimiento movimientoInicial = new Movimiento();
+                movimientoInicial.setFechaHora(LocalDateTime.now());
+                movimientoInicial.setReferencia("Apertura de cuenta");
+                movimientoInicial.setImporte(BigDecimal.valueOf(10000.0)); 
+                movimientoInicial.setIdCuenta(nuevaCuenta.getIdCuenta());
 
-            RequestDispatcher rd = request.getRequestDispatcher("/AdministradorListaCuentas.jsp");
-            rd.forward(request, response);
+    
+                TipoMovimiento tipo = new TipoMovimiento();
+                tipo.setIdTipoMovimiento(1); 
+                movimientoInicial.setTipoMovimiento(tipo);
+
+                //  obtener el ID de la nueva cuenta insertada
+                int idCuentaNueva = cuentaNegocio.obtenerIdCuentaPorNumero(numeroCuenta); 
+                movimientoInicial.setIdCuenta(idCuentaNueva);
+
+                MovimientoNegocioImpl movimientoNegocio = new MovimientoNegocioImpl(new MovimientoDaoImpl());
+                movimientoNegocio.crearMovimiento(movimientoInicial);
+
+                ArrayList<Cuenta> listaCuentas = (ArrayList<Cuenta>) cuentaNegocio.obtenerCuentasPorIdCliente(cliente.getIdCliente(), cliente);
+                request.setAttribute("listaCuentas", listaCuentas);
+                request.setAttribute("dniCliente", dniCliente);
+
+                RequestDispatcher rd = request.getRequestDispatcher("/AdministradorListaCuentas.jsp");
+                rd.forward(request, response);
+           
         }
        
     }

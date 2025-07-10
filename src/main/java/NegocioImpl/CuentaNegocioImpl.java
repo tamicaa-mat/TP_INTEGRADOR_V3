@@ -50,7 +50,7 @@ public class CuentaNegocioImpl implements CuentaNegocio {
     	        return cuentas;
     	    }
     	    
-        return new ArrayList<>();
+       return new ArrayList<>();
         
       
         
@@ -141,6 +141,13 @@ public class CuentaNegocioImpl implements CuentaNegocio {
 			
 		}
 
+
+		@Override
+		public int obtenerIdCuentaPorNumero(String numeroCuenta) {
+			return cuentaDao.getIdCuentaPorNumeroCuenta(numeroCuenta);
 		
 
+}
+		
+		
 }

@@ -31,5 +31,5 @@ public interface CuentaNegocio {
 
 	public boolean darDeBajaLogicaCuentas(int idCuenta);
 	
-	
+	public int obtenerIdCuentaPorNumero(String numeroCuenta);
 }
