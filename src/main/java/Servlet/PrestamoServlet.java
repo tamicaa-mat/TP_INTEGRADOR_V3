@@ -88,36 +88,36 @@ public class PrestamoServlet extends HttpServlet {
 	        int idPrestamo = Integer.parseInt(id);
 	        int nuevoEstado = accion.equals("aprobar") ? 1 : 2;
 
-	        // Actualiza estado del préstamo
+	      
 	        prestamoNegocio.actualizarEstadoPrestamo(idPrestamo, nuevoEstado);
-/////aca agregar movimiento a la bd del prestamo id movimiento=2
+               /////aca agregar movimiento a la bd del prestamo id movimiento=2
 	        if (nuevoEstado == 1) {
 	        	
 	        	Prestamo prestamo = prestamoNegocio.obtenerPrestamoPorId(idPrestamo);
 
 	            if (prestamo == null) {
-	                System.err.println("⚠️ ERROR: No se encontró el préstamo con ID " + idPrestamo);
+	                System.err.println(" ERROR: No se encontró el préstamo con ID " + idPrestamo);
 	             
 	                return;
 	            }
-	            System.out.println("✅ Préstamo obtenido. ID Cuenta: " + prestamo.getIdCuenta() + ", Monto: " + prestamo.getImportePedido());
+	            System.out.println(" Préstamo obtenido. ID Cuenta: " + prestamo.getIdCuenta() + ", Monto: " + prestamo.getImportePedido());
 	        
-	        	 // Solo generar movimiento si el préstamo fue aprobado
+	        	 // generar movimiento si el préstamo fue aprobado
 
 	            Movimiento movimiento = new Movimiento();
 	            movimiento.setFechaHora(LocalDateTime.now());
 	            movimiento.setReferencia("ALTA PRESTAMO ID: " + idPrestamo);
 	            movimiento.setImporte(BigDecimal.valueOf(prestamo.getImportePedido()));
 
-	            // CORRECTO: Crear y asignar tipo de movimiento
+	            // Crear y asignar tipo de movimiento
 	            TipoMovimiento tipo = new TipoMovimiento();
-	            tipo.setIdTipoMovimiento(2); // Suponiendo que 2 = Alta préstamo
+	            tipo.setIdTipoMovimiento(2); // 2 = Alta préstamo
 	            movimiento.setTipoMovimiento(tipo);
 
 	            movimiento.setIdCuenta(prestamo.getCuentaAsociada().getIdCuenta());
 	            
 	            
-	            System.out.println("➡️ Datos del movimiento a insertar:");
+	            System.out.println(" Datos del movimiento a insertar:");
 	            System.out.println("FechaHora: " + movimiento.getFechaHora());
 	            System.out.println("Referencia: " + movimiento.getReferencia());
 	            System.out.println("Importe: " + movimiento.getImporte());

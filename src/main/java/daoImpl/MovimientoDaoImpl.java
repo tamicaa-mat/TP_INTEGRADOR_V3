@@ -22,8 +22,6 @@ public class MovimientoDaoImpl implements MovimientoDao{
 		        "FROM movimiento m " +
 		        "JOIN tipoMovimiento tm ON m.IdTipoMovimiento = tm.IdTipoMovimiento " +
 		        "WHERE 1=1 ";
-	 private static final String INSERTAR_MOVIMIENTO = "INSERT INTO Movimiento (FechaHora, Referencia, Importe, IdTipoMovimiento, IdCuenta) " +
-             "VALUES (?, ?, ?, ?, ?)";
 	
 
 			    public List<Movimiento> listarMovimientos(int idCuenta, int idTipo) {
@@ -76,7 +74,7 @@ public class MovimientoDaoImpl implements MovimientoDao{
 			        try {
 			            conn = Conexion.getConexion().getSQLConexion();
 			            System.out.println("Base de datos actual: " + conn.getCatalog());
-			            conn.setAutoCommit(false); // manejo manual de transacción
+			            conn.setAutoCommit(false); // manejo manual de transacción no se por que no funciona sin esto
 
 			            String sql = "INSERT INTO Movimiento (FechaHora, Referencia, Importe, IdTipoMovimiento, IdCuenta) "
 			                       + "VALUES (?, ?, ?, ?, ?)";
@@ -97,11 +95,11 @@ public class MovimientoDaoImpl implements MovimientoDao{
 			            stmt.setInt(5, movimiento.getIdCuenta());
 
 			            int rows = stmt.executeUpdate();
-			            System.out.println("🎯 Filas insertadas en Movimiento: " + rows);
+			            System.out.println("Filas insertadas en Movimiento: " + rows);
 
 			            // FORZAR commit siempre para depuración
 			            conn.commit();
-			            System.out.println("✅ COMMIT realizado (forzado, sin rollback)");
+			            System.out.println("COMMIT realizado (forzado, sin rollback)");
 
 			            return rows > 0;
 
@@ -109,7 +107,7 @@ public class MovimientoDaoImpl implements MovimientoDao{
 			            e.printStackTrace();
 			            try {
 			                if (conn != null) {
-			                    System.out.println("⚠️ Ocurrió excepción, forzando commit para depuración");
+			                    System.out.println("Ocurrió excepción, forzando commit para depuración");
 			                    conn.commit();
 			                }
 			            } catch (SQLException ex) {
