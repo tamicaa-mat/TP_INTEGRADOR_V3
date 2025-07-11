@@ -168,8 +168,23 @@ public class ClienteServlet extends HttpServlet {
             if (seAgrego) {
                 response.sendRedirect(request.getContextPath() + "/UsuarioServlet?action=mostrarFormularioAlta&dniCliente=" + dni);
             } else {
-                session.setAttribute("mensaje", "Error: No se pudo agregar al cliente (posiblemente DNI o CUIL ya existen).");
-                response.sendRedirect(request.getContextPath() + "/ClienteServlet");
+            	 
+                
+               
+                request.setAttribute("mensajeError", "El DNI ingresado ya existe. Por favor, verifique los datos.");
+
+                // cargamos las listas de nuevo para que el Usuario haga una nueva carga si quiere
+                ProvinciaNegocio provNegocio = new ProvinciaNegocioImpl();
+                ArrayList<Provincia> listaProvincias = provNegocio.leerTodasLasProvincias();
+                LocalidadNegocio locNegocio = new LocalidadNegocioImpl();
+                ArrayList<Localidad> listaLocalidades = locNegocio.leerTodasLasLocalidades();
+                request.setAttribute("listaProvincias", listaProvincias);
+                request.setAttribute("listaLocalidades", listaLocalidades);
+                
+                // Hacemos forward de vuelta al formulario para mostrar el error y mantener los datos.
+                RequestDispatcher rd = request.getRequestDispatcher("/clientesFormulario.jsp");
+                rd.forward(request, response);
+            	
             }
         } 
        

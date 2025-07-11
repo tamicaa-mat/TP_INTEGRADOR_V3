@@ -39,7 +39,15 @@ public class ClienteNegocioImpl implements ClienteNegocio {
 
 	@Override
     public boolean insertarCliente(Cliente cliente) {
-        return cdao.insertarCliente(cliente);
+		
+		
+		// se evalua el dni ingresado,si ya existe , en ese caso retornamos falso y no insertamos nada.
+	    if (cdao.obtenerClientePorDni(cliente.getDni()) != null) {
+	        System.out.println("Se intentó insertar un cliente con un DNI que ya existe.");
+	        return false; 
+	    }
+	    
+	    return cdao.insertarCliente(cliente);
     }
 	
 	

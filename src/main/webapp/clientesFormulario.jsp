@@ -32,17 +32,31 @@
                     <h4 class="card-title text-center mb-4"><%= tituloFormulario %></h4>
                     
                     <form action="ClienteServlet" method="post">
+                    
+                    <%
+				        String mensajeError = (String) request.getAttribute("mensajeError");
+				        if (mensajeError != null) {
+				    %>
+				        <div class="alert alert-danger" role="alert">
+				            <%= mensajeError %>
+				        </div>
+				    <%
+				        }
+				    %>
+                    
+                    
+                    
                         
                         <%-- 2. LÓGICA PARA LA ACCIÓN (AGREGAR O MODIFICAR) --%>
                         <% if (clienteAEditar != null) { %>
                             <input type="hidden" name="action" value="modificar"/>
-                            <%-- Guardamos el DNI original en un campo oculto --%>
+                          
                             <input type="hidden" name="txtDni" value="<%= clienteAEditar.getDni() %>"/>
                         <% } else { %>
                             <input type="hidden" name="action" value="agregar"/>
                         <% } %>
 
-                        <%-- 3. LÓGICA PARA MOSTRAR LOS CAMPOS --%>
+                        
                         <div class="mb-3">
                              <% if (clienteAEditar != null) { %>
                                 <input type="text" class="form-control" value="DNI: <%= clienteAEditar.getDni() %>" disabled>
@@ -51,7 +65,7 @@
                             <% } %>
                         </div>
                         
-                        <%-- El patrón se repite: si estamos editando, se muestra el valor del cliente. Si no, se muestra vacío. --%>
+                       
                         <div class="mb-3"><input type="text" class="form-control" name="txtCuil" placeholder="CUIL" value="<%= (clienteAEditar != null) ? clienteAEditar.getCuil() : "" %>" required></div>
                         <div class="mb-3"><input type="text" class="form-control" name="txtNombre" placeholder="Nombre" value="<%= (clienteAEditar != null) ? clienteAEditar.getNombre() : "" %>" required></div>
                         <div class="mb-3"><input type="text" class="form-control" name="txtApellido" placeholder="Apellido" value="<%= (clienteAEditar != null) ? clienteAEditar.getApellido() : "" %>" required></div>
