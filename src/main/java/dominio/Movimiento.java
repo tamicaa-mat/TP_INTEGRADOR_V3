@@ -1,7 +1,9 @@
 package dominio;
 
-import java.time.LocalDateTime; 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.math.BigDecimal; 
+
 
 public class Movimiento {
 	
@@ -10,7 +12,7 @@ public class Movimiento {
     private String Referencia;
     private BigDecimal Importe;
     private TipoMovimiento tipoMovimiento; 
-    private int idCuenta; 
+    private Cuenta Cuenta; 
   
 
     public Movimiento() {
@@ -19,14 +21,23 @@ public class Movimiento {
 
     public Movimiento(int idMovimiento, LocalDateTime fechaHora, String concepto,
                       BigDecimal importe, TipoMovimiento tipoMovimiento,
-                      int idCuentaMov) {
+                      Cuenta Cuenta) {
         this.idMovimiento = idMovimiento;
         this.fechaHora = fechaHora;
         this.Referencia = concepto;
         this.Importe = importe;
         this.tipoMovimiento = tipoMovimiento;
-        this.idCuenta = idCuentaMov;
+        this.Cuenta= Cuenta;
        
+    }
+    
+    
+    public String getFechaHoraFormateada() {
+        if (this.fechaHora == null) {
+            return "";
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        return this.fechaHora.format(formatter);
     }
 
 	public int getIdMovimiento() {
@@ -69,18 +80,18 @@ public class Movimiento {
 		this.tipoMovimiento = tipoMovimiento;
 	}
 
-	public int getIdCuenta() {
-		return idCuenta;
-	}
+	   public Cuenta getCuenta() {
+	        return Cuenta;
+	    }
 
-	public void setIdCuenta(int idCuenta) {
-		this.idCuenta = idCuenta;
-	}
+	    public void setCuenta(Cuenta cuenta) {
+	        this.Cuenta = cuenta;
+	    }
 
 	@Override
 	public String toString() {
 		return "Movimiento [idMovimiento=" + idMovimiento + ", fechaHora=" + fechaHora + ", Referencia=" + Referencia
-				+ ", Importe=" + Importe + ", tipoMovimiento=" + tipoMovimiento + ", idCuenta=" + idCuenta + "]";
+				+ ", Importe=" + Importe + ", tipoMovimiento=" + tipoMovimiento + ", idCuenta=" + Cuenta + "]";
 	}
 
     

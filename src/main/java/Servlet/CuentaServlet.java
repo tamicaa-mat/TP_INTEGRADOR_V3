@@ -17,6 +17,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+
+
+import Negocio.ClienteNegocio;
+
+
+import Negocio.MovimientoNegocio;
 import Negocio.CuentaNegocio;
 import NegocioImpl.ClienteNegocioImpl;
 import NegocioImpl.CuentaNegocioImpl;
@@ -27,6 +33,7 @@ import daoImpl.MovimientoDaoImpl;
 import dominio.Cliente;
 import dominio.Cuenta;
 import dominio.Movimiento;
+import dominio.TipoCuenta;
 import dominio.TipoMovimiento;
 
 @WebServlet("/CuentaServlet")
@@ -145,16 +152,17 @@ public class CuentaServlet extends HttpServlet {
 
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	String action = request.getParameter("action");
+        String action = request.getParameter("action");
 
-        CuentaNegocioImpl cuentaNegocio = new CuentaNegocioImpl(new CuentaDaoImpl());
-        ClienteNegocioImpl clienteNegocio = new ClienteNegocioImpl(new ClienteDaoImpl());
+        // Es una buena práctica declarar las interfaces, no las implementaciones
+        CuentaNegocio cuentaNegocio = new CuentaNegocioImpl(new CuentaDaoImpl());
+        ClienteNegocio clienteNegocio = new ClienteNegocioImpl(new ClienteDaoImpl());
 
-        if (action != null && action.equals("agregar")) {
+        if ("agregar".equals(action)) {
             String dniCliente = request.getParameter("dniCliente");
             int idTipoCuenta = Integer.parseInt(request.getParameter("idTipoCuenta"));
 
-            // Buscar al cliente por DNI ya que soy admin
+            // 1. Buscamos el objeto Cliente completo
             Cliente cliente = clienteNegocio.obtenerClientePorDni(dniCliente);
 
             if (cliente == null) {
@@ -163,63 +171,72 @@ public class CuentaServlet extends HttpServlet {
                 return;
             }
 
-          
+            // 2. Creamos la nueva cuenta
             String numeroCuenta = cuentaNegocio.generarNumeroCuenta(cliente.getDni());
             String cbu = cuentaNegocio.generarNumeroCbu(numeroCuenta);
             
             Cuenta nuevaCuenta = new Cuenta();
-            nuevaCuenta.setIdCliente(cliente.getIdCliente());
+            
+            // --- CORRECCIONES APLICADAS AQUÍ ---
+            // Asignamos el objeto Cliente completo, no solo el ID.
+            nuevaCuenta.setCliente(cliente); 
+            
+            // Creamos un objeto TipoCuenta y se lo asignamos.
+            TipoCuenta tipoCuenta = new TipoCuenta();
+            tipoCuenta.setIdTipoCuenta(idTipoCuenta);
+            nuevaCuenta.setTipoCuentaObjeto(tipoCuenta);
+            // --- FIN CORRECCIONES ---
+            
             nuevaCuenta.setNumeroCuenta(numeroCuenta);
             nuevaCuenta.setCbu(cbu);
-            
-            
             nuevaCuenta.setFechaCreacion(LocalDate.now());
-            nuevaCuenta.setTipoCuenta(idTipoCuenta);
-            nuevaCuenta.setSaldo(10000.0);
+            nuevaCuenta.setSaldo(new BigDecimal("10000.0"));
             nuevaCuenta.setEstado(true);
 
+            // 3. Intentamos agregar la cuenta en la base de datos
             boolean seAgrego = cuentaNegocio.agregarCuenta(nuevaCuenta, cliente);
+            
             if (!seAgrego) {
+                // Manejo de error si el cliente ya tiene 3 cuentas
                 request.setAttribute("errorLimiteCuentas", "⚠️ El cliente ya tiene 3 cuentas activas.");
-                ArrayList<Cuenta> listaCuentas = (ArrayList<Cuenta>) cuentaNegocio.obtenerCuentasPorIdCliente(cliente.getIdCliente(), cliente);
-                request.setAttribute("listaCuentas", listaCuentas);
-                request.setAttribute("dniCliente", dniCliente);
-                request.getRequestDispatcher("/AdministradorListaCuentas.jsp").forward(request, response);
-                return;
             } else {
-                request.setAttribute("mensajeExitoCuenta", "✅ Cuenta creada con éxito. Número: " + numeroCuenta + " | Saldo inicial: $10,000.00");
-                // INSERTAR MOVIMIENTO (tipo 1 ALTA CUENTA)
+                // 4. Si la cuenta se agregó, creamos el movimiento inicial
+                request.setAttribute("mensajeExitoCuenta", "✅ Cuenta creada con éxito. Número: " + numeroCuenta);
+
+                // Obtenemos el ID de la cuenta que acabamos de insertar
+                int idCuentaNueva = cuentaNegocio.obtenerIdCuentaPorNumero(numeroCuenta); 
+                
+                // Creamos el objeto Cuenta que irá dentro del Movimiento
+                Cuenta cuentaDelMovimiento = new Cuenta();
+                cuentaDelMovimiento.setIdCuenta(idCuentaNueva);
+
+                // Creamos el objeto TipoMovimiento
+                TipoMovimiento tipoMovimientoAlta = new TipoMovimiento();
+                tipoMovimientoAlta.setIdTipoMovimiento(1); // ID 1 = Alta de Cuenta
+
+                // Creamos el objeto Movimiento y le asignamos los objetos completos
                 Movimiento movimientoInicial = new Movimiento();
                 movimientoInicial.setFechaHora(LocalDateTime.now());
                 movimientoInicial.setReferencia("Apertura de cuenta");
-                movimientoInicial.setImporte(BigDecimal.valueOf(10000.0)); 
-                movimientoInicial.setIdCuenta(nuevaCuenta.getIdCuenta());
+                movimientoInicial.setImporte(new BigDecimal("10000.0")); 
+                movimientoInicial.setCuenta(cuentaDelMovimiento); // <-- Se asigna el objeto
+                movimientoInicial.setTipoMovimiento(tipoMovimientoAlta); // <-- Se asigna el objeto
 
-    
-                TipoMovimiento tipo = new TipoMovimiento();
-                tipo.setIdTipoMovimiento(1); 
-                movimientoInicial.setTipoMovimiento(tipo);
+                // Guardamos el movimiento
+                MovimientoNegocio movimientoNegocio = new MovimientoNegocioImpl(new MovimientoDaoImpl());
+                movimientoNegocio.crearMovimiento(movimientoInicial); // Suponiendo que este método existe
+            }
 
-                //  obtener el ID de la nueva cuenta insertada
-                int idCuentaNueva = cuentaNegocio.obtenerIdCuentaPorNumero(numeroCuenta); 
-                movimientoInicial.setIdCuenta(idCuentaNueva);
+            // 5. Volvemos a cargar la lista de cuentas y reenviamos al JSP
+            ArrayList<Cuenta> listaCuentas = (ArrayList<Cuenta>) cuentaNegocio.obtenerCuentasPorIdCliente(cliente.getIdCliente(), cliente);
+            request.setAttribute("listaCuentas", listaCuentas);
+            request.setAttribute("dniCliente", dniCliente);
 
-                MovimientoNegocioImpl movimientoNegocio = new MovimientoNegocioImpl(new MovimientoDaoImpl());
-                movimientoNegocio.crearMovimiento(movimientoInicial);
-
-                ArrayList<Cuenta> listaCuentas = (ArrayList<Cuenta>) cuentaNegocio.obtenerCuentasPorIdCliente(cliente.getIdCliente(), cliente);
-                request.setAttribute("listaCuentas", listaCuentas);
-                request.setAttribute("dniCliente", dniCliente);
-
-                RequestDispatcher rd = request.getRequestDispatcher("/AdministradorListaCuentas.jsp");
-                rd.forward(request, response);
-           
+            RequestDispatcher rd = request.getRequestDispatcher("/AdministradorListaCuentas.jsp");
+            rd.forward(request, response);
         }
-       
     }
-    
-        
-    }
+
     
     
 }

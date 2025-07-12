@@ -1,5 +1,7 @@
 package dominio;
 
+import java.math.BigDecimal;
+
 import java.time.LocalDate; // Importar para FechaCreacion
 import java.time.format.DateTimeFormatter;
 
@@ -9,11 +11,11 @@ public class Cuenta {
 	    Cliente cliente;
 	    int IdCliente;
 	    private LocalDate fechaCreacion;
-	    private int tipoCuenta; 
-	    private TipoCuenta tipoCuentaObjeto;
+	     
+	    private TipoCuenta tipoCuenta; // ÚNICO atributo para el tipo de cuenta
 	    private String numeroCuenta;
 	    private String cbu;
-	    private double saldo; // Usar BigDecimal para dinero por precisión
+	    private BigDecimal saldo; // Usar BigDecimal para dinero por precisión
 	    private boolean estado; // Coincide con 'Estado' en tu DDL actual
 
 	    public Cuenta() {
@@ -52,16 +54,16 @@ public class Cuenta {
 			this.fechaCreacion = fechaCreacion;
 		}
 
-		public int getTipoCuenta() {
+		public TipoCuenta getTipoCuenta() {
 			return tipoCuenta;
 		}
 
-		public void setTipoCuenta(int tipoCuenta) {
+		public void setTipoCuenta(TipoCuenta tipoCuenta) {
 			this.tipoCuenta = tipoCuenta;
 		}
 
 		public TipoCuenta getTipoCuentaObjeto() {
-			return tipoCuentaObjeto;
+			return tipoCuenta;
 		}
 
 		public String getFechaCreacionFormateada() {
@@ -70,8 +72,8 @@ public class Cuenta {
 		
 		
 		
-		public void setTipoCuentaObjeto(TipoCuenta tipoCuentaObjeto) {
-			this.tipoCuentaObjeto = tipoCuentaObjeto;
+		public void setTipoCuentaObjeto(TipoCuenta tipoCuenta) {
+			this.tipoCuenta = tipoCuenta;
 		}
 
 		public String getNumeroCuenta() {
@@ -90,12 +92,12 @@ public class Cuenta {
 			this.cbu = cbu;
 		}
 
-		public double getSaldo() {
+		public BigDecimal getSaldo() {
 			return saldo;
 		}
 
-		public void setSaldo(double saldo) {
-			this.saldo = saldo;
+		public void setSaldo(BigDecimal d) {
+			this.saldo = d;
 		}
 
 		public boolean isEstado() {
@@ -110,7 +112,7 @@ public class Cuenta {
 		public String toString() {
 			return "Cuenta [idCuenta=" + idCuenta + ", cliente=" + cliente + ", IdCliente=" + IdCliente
 					+ ", fechaCreacion=" + fechaCreacion + ", tipoCuenta=" + tipoCuenta + ", tipoCuentaObjeto="
-					+ tipoCuentaObjeto + ", numeroCuenta=" + numeroCuenta + ", cbu=" + cbu + ", saldo=" + saldo
+					+ tipoCuenta + ", numeroCuenta=" + numeroCuenta + ", cbu=" + cbu + ", saldo=" + saldo
 					+ ", estado=" + estado + "]";
 		}
 

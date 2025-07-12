@@ -114,7 +114,7 @@ public class PrestamoServlet extends HttpServlet {
 	            tipo.setIdTipoMovimiento(2); // 2 = Alta préstamo
 	            movimiento.setTipoMovimiento(tipo);
 
-	            movimiento.setIdCuenta(prestamo.getCuentaAsociada().getIdCuenta());
+	            movimiento.setCuenta(prestamo.getCuentaAsociada());
 	            
 	            
 	            System.out.println(" Datos del movimiento a insertar:");
@@ -122,7 +122,7 @@ public class PrestamoServlet extends HttpServlet {
 	            System.out.println("Referencia: " + movimiento.getReferencia());
 	            System.out.println("Importe: " + movimiento.getImporte());
 	            System.out.println("IdTipoMovimiento: " + movimiento.getTipoMovimiento().getIdTipoMovimiento());
-	            System.out.println("IdCuenta: " + movimiento.getIdCuenta());
+	            System.out.println("IdCuenta: " + movimiento.getCuenta().getIdCuenta());
 
 	            
 	            System.out.println("Intentando insertar movimiento...");

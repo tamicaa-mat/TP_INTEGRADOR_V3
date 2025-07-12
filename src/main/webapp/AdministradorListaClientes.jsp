@@ -24,7 +24,7 @@
             </div>
            
 
-            <a href="ClienteServlet?action=mostrarFormulario" class="btn btn-primary btn-sm">Agregar Nuevo Cliente</a>
+            <a href="ClienteServlet?Action=mostrarFormulario" class="btn btn-primary btn-sm">Agregar Nuevo Cliente</a>
         </div>
         
         

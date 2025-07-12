@@ -9,6 +9,9 @@ import dominio.Cuenta;
 
 public interface CuentaNegocio {
 
+	
+	
+	public List<Cuenta> obtenerCuentasPorCliente(int idCliente);
 
     public Cuenta getCuentaPorCbu(String cbu,Cliente cliente);
     

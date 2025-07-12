@@ -25,7 +25,20 @@ public class CuentaNegocioImpl implements CuentaNegocio {
 
 //    ///////////////////////////////////////////////
     
-    public Cuenta getCuentaPorCbu(String cbu, Cliente cliente) {
+    public CuentaNegocioImpl() {
+		// TODO Auto-generated constructor stub
+	}
+    
+    
+    
+    public List<Cuenta> obtenerCuentasPorCliente(int idCliente) {
+        // La lógica de negocio aquí es simple: solo llama al DAO.
+        // En casos más complejos, aquí podrías agregar validaciones o reglas de negocio.
+        return cuentaDao.obtenerCuentasPorCliente(idCliente);
+    }
+
+
+	public Cuenta getCuentaPorCbu(String cbu, Cliente cliente) {
         return cuentaDao.getCuentaPorCbu(cbu,cliente);
     }
 

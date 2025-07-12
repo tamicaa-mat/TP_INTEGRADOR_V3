@@ -20,6 +20,16 @@ public class MovimientoNegocioImpl implements MovimientoNegocio{
 	    
 	  ////////////////////////////  
 	    
+	    public MovimientoNegocioImpl() {
+	        this.movimientoDao = new MovimientoDaoImpl();
+	    }
+	    
+	    
+	    public List<Movimiento> obtenerMovimientosPorCliente(int idCliente) {
+	        // La lógica de negocio aquí es simple: solo llama al DAO.
+	        return movimientoDao.obtenerMovimientosPorCliente(idCliente);
+	    }
+	    
 	    
 	    
 	    @Override

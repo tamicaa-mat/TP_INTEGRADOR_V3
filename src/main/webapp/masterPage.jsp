@@ -56,7 +56,7 @@
                  
                  <a href="${pageContext.request.contextPath}/MovimientoServlet" class="btn btn-secondary btn-sm">Movimientos</a>
                     
-	            <a href="CLIENTEtransferencias.jsp" class="btn btn-secondary btn-sm">Transferencias</a>
+	            <a href="${pageContext.request.contextPath}/TransferenciaServlet" class="btn btn-secondary btn-sm">Transferencias</a>
 	          <a href="${pageContext.request.contextPath}/SolicitarPrestamoServlet" class="btn btn-secondary btn-sm">Solicitar Préstamo</a>
 	          
 	      

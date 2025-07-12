@@ -10,5 +10,6 @@ public interface MovimientoNegocio {
 
 	boolean crearMovimiento(Movimiento movimiento);
 	
-	
+    public List<Movimiento> obtenerMovimientosPorCliente(int idCliente);
+
 }
