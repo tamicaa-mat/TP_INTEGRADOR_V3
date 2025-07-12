@@ -15,7 +15,22 @@
 <body>
     <header class="navbar navbar-dark bg-secondary">
         <div class="container-fluid d-flex justify-content-between align-items-center">
-            <span class="navbar-brand mb-0 h1">SISTEMA BANCARIO UTN</span>
+            
+           
+            <c:set var="homeUrl" value="${pageContext.request.contextPath}/login.jsp" />
+            
+           
+            <c:if test="${sessionScope.usuarioLogueado.getTipoUsuario().getDescripcion() == 'Administrador'}">
+                <c:set var="homeUrl" value="${pageContext.request.contextPath}/adminBienvenida.jsp" />
+            </c:if>
+
+           
+            <c:if test="${sessionScope.usuarioLogueado.getTipoUsuario().getDescripcion() == 'Cliente'}">
+                <c:set var="homeUrl" value="${pageContext.request.contextPath}/clienteBienvenida.jsp" />
+            </c:if>
+
+            
+            <a href="${homeUrl}" class="navbar-brand mb-0 h1">SISTEMA BANCARIO UTN</a>
             
             <c:if test="${not empty sessionScope.usuarioLogueado}">
                 <span class="text-white mx-3">

@@ -13,7 +13,7 @@ public class TransferenciaDaoImpl implements TransferenciaDao {
     private static final String ACTUALIZAR_SALDO = "UPDATE Cuenta SET Saldo = ? WHERE IdCuenta = ?";
     private static final String INSERTAR_MOVIMIENTO = "INSERT INTO Movimiento (FechaHora, Referencia, Importe, IdTipoMovimiento, IdCuenta) VALUES (NOW(), ?, ?, ?, ?)";
     private static final String INSERTAR_TRANSFERENCIA = "INSERT INTO Transferencia (IdCuentaOrigen, IdCuentaDestino) VALUES (?, ?)";
-    private static final int ID_TIPO_MOVIMIENTO_TRANSFERENCIA = 4; // Asumiendo que 4 es 'Transferencia' en tu tabla TipoMovimiento
+    private static final int ID_TIPO_MOVIMIENTO_TRANSFERENCIA = 4; 
 
     
     

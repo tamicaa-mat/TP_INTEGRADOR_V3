@@ -43,9 +43,21 @@ public class LoginServlet extends HttpServlet {
                 ClienteDao clienteDao = new ClienteDaoImpl();
                 Cliente cliente = clienteDao.obtenerClientePorUsuario(usuario.getIdUsuario());
                 session.setAttribute("clienteLogueado", cliente);
+                
+                RequestDispatcher rd = request.getRequestDispatcher("/clienteBienvenida.jsp");
+                rd.forward(request, response);
+                
+            }
+            else if(usuario.getTipoUsuario().getDescripcion().equalsIgnoreCase("Administrador")) {
+            	
+            	 RequestDispatcher rd = request.getRequestDispatcher("/adminBienvenida.jsp");
+                 rd.forward(request, response);
+            }
+            else {
+            	response.sendRedirect("masterPage.jsp");
             }
 
-            response.sendRedirect("masterPage.jsp");
+          
 
         } catch (UsuarioInexistenteException | UsuarioInactivoException | ClaveIncorrectaException e) {
             request.setAttribute("errorLogin", e.getMessage());

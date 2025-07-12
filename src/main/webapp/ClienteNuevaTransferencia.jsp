@@ -36,6 +36,9 @@
 
                     <div class="mb-3">
                         <label for="idCuentaOrigen" class="form-label">Seleccione su cuenta de origen:</label>
+                        
+                        
+                        
                         <select class="form-select" id="idCuentaOrigen" name="idCuentaOrigen" required>
                             <option value="">-- Seleccionar cuenta --</option>
                             <% 
@@ -51,6 +54,9 @@
                                 }
                             %>
                         </select>
+                        
+                        
+                        
                     </div>
 
                     <div class="mb-3">

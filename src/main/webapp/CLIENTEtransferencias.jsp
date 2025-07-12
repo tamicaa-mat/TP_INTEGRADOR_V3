@@ -26,7 +26,7 @@
         <div class="transferencias-container">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1 class="h3 mb-0">Historial de Movimientos</h1>
-                <%-- Este botón ahora llama al servlet con el parámetro 'action' correcto --%>
+               
                 <a href="TransferenciaServlet?action=mostrarFormulario" class="btn btn-primary">Realizar Transferencia</a>
             </div>
             <div class="table-responsive">
@@ -41,18 +41,18 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <%-- Verificamos si la lista que mandó el servlet está vacía --%>
+                      
                         <c:if test="${empty historialTransferencias}">
                             <tr>
                                 <td colspan="5" class="text-center text-muted py-4">No hay movimientos para mostrar.</td>
                             </tr>
                         </c:if>
                         
-                        <%-- Iteramos sobre la lista de movimientos y creamos una fila por cada uno --%>
+                       
                         <c:forEach var="mov" items="${historialTransferencias}">
                             <tr>
                                 <td class="fecha-hora">
-                                    <%-- Formateamos la fecha y hora para que se vea bien --%>
+                                   
             							${mov.fechaHoraFormateada}  <%-- JSTL llama automáticamente a getFechaHoraFormateada() --%>
 
                                 </td>
@@ -64,7 +64,7 @@
                                     <div class="cbu-numero">${mov.getCuenta().getNumeroCuenta()}</div>
                                 </td>
                                 <td>
-                                    <%-- Usamos una clase CSS distinta para ingresos (positivo) y egresos (negativo) --%>
+                                    
                                     <span class="${mov.getImporte() < 0 ? 'monto-negativo' : 'monto-positivo'}">
                                         <fmt:formatNumber value="${mov.getImporte()}" type="currency" currencySymbol="$ " />
                                     </span>
@@ -75,6 +75,9 @@
                 </table>
             </div>
             <%-- Aquí podrías agregar la lógica de paginación si la implementas --%>
+            
+            
+            
         </div>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
