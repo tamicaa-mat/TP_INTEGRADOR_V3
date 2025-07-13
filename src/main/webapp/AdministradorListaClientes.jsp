@@ -75,13 +75,13 @@
             
             
             <c:if test="${empty cliente.getUsuario() || empty cliente.getUsuario().getNombreUsuario()}">
-                 <a href="UsuarioServlet?Action=mostrarFormularioAlta&dniCliente=${cliente.getDni()}" >Crear Acceso</a>
+                 <a href="UsuarioServlet?action=mostrarFormularioAlta&dniCliente=${cliente.getDni()}" >Crear Acceso</a>
             </c:if>
         </c:when>
         
         
         <c:otherwise>
-            <a href="ClienteServlet?Action=reactivar&dni=${cliente.getDni()}" >Reactivar</a>
+            <a href="ClienteServlet?action=reactivar&dni=${cliente.getDni()}" >Reactivar</a>
         </c:otherwise>
     </c:choose>
 </td>

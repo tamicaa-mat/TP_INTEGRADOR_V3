@@ -13,7 +13,13 @@ import Negocio.UsuarioNegocio;
 
 public class UsuarioNegocioImpl implements UsuarioNegocio {
    
-	private UsuarioDao usuarioDao;
+	private UsuarioDao usuarioDao =  new UsuarioDaoImpl();
+	
+	
+	
+	
+	
+	
 
     public UsuarioNegocioImpl() {
         this.usuarioDao = new UsuarioDaoImpl();
@@ -70,12 +76,27 @@ public class UsuarioNegocioImpl implements UsuarioNegocio {
             throw new UsuarioInexistenteException("El usuario no existe.");
         }
         if (!usuario.getPassword().equals(password)) {
-            throw new ClaveIncorrectaException("La contrase�a es incorrecta.");
+            throw new ClaveIncorrectaException("La contrase�a es incorrecta.");
         }
         if (!usuario.isEstado()) {
             throw new UsuarioInactivoException("Tu cuenta se encuentra inactiva.");
         }
         return usuario;
+    }
+    
+    
+    @Override
+    public boolean cambiarEstadoUsuario(int idUsuario, boolean nuevoEstado) {
+        return usuarioDao.cambiarEstado(idUsuario, nuevoEstado);
+    }
+    
+    
+    @Override
+    public boolean resetearPasswordUsuario(int idUsuario) {
+        // Lógica de negocio: generar una nueva contraseña simple.
+        // En una aplicación real, esto sería más complejo y seguro.
+        String nuevaPassword = "nuevoPass123";
+        return usuarioDao.resetearPassword(idUsuario, nuevaPassword);
     }
     
 }

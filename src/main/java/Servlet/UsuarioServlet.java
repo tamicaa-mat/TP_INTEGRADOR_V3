@@ -31,7 +31,13 @@ public class UsuarioServlet extends HttpServlet {
 		
 
 	    // Para evitar errores, si la acción es nula, la tratamos como un string vacío.
-	    String action = request.getParameter("Action") != null ? request.getParameter("action") : "";
+		 String action = request.getParameter("action");
+	        if (action == null) {
+	            action = "";
+	        }
+	        
+		     UsuarioNegocio usuarioNegocio = new UsuarioNegocioImpl();
+
 	    
 	    switch (action) {
 	        case "mostrarFormularioAlta": {
@@ -46,17 +52,41 @@ public class UsuarioServlet extends HttpServlet {
 	        
 	        //  más casos en el futuro, como "desactivarUsuario", etc.
 	        
+	        case "cambiarEstado": {
+                int idUsuario = Integer.parseInt(request.getParameter("id"));
+                boolean estadoActual = Boolean.parseBoolean(request.getParameter("estado"));
+                
+                // Invertimos el estado
+                usuarioNegocio.cambiarEstadoUsuario(idUsuario, !estadoActual);
+                
+                // Volvemos a la lista de usuarios
+                response.sendRedirect("UsuarioServlet");
+                break;
+            }
+	        
+	        
+	        case "resetearPassword": {
+                int idUsuario = Integer.parseInt(request.getParameter("id"));
+                usuarioNegocio.resetearPasswordUsuario(idUsuario);
+                
+                // Guardamos un mensaje de éxito en la sesión para mostrarlo
+                HttpSession session = request.getSession();
+                session.setAttribute("mensajeUsuario", "¡Contraseña reseteada a 'nuevoPass123'!");
+                
+                response.sendRedirect("UsuarioServlet");
+                break;
+            }
+	        
+	        
 	        default: {
-	            // ACCIÓN NUEVA Y POR DEFECTO: Listar todos los usuarios.
-	            UsuarioNegocio usuarioNegocio = new UsuarioNegocioImpl();
-	            ArrayList<Usuario> listaUsuarios = usuarioNegocio.leerTodosLosUsuarios();
-	            
-	            request.setAttribute("listaUsuarios", listaUsuarios);
-	            
-	            // Reenviamos a una NUEVA página JSP que mostrará la lista.
-	            RequestDispatcher rd = request.getRequestDispatcher("/AdministradorListaUsuarios.jsp");
-	            rd.forward(request, response);
-	            break;
+	        	
+	                ArrayList<Usuario> listaUsuarios = usuarioNegocio.leerTodosLosUsuarios();
+	                
+	                request.setAttribute("listaUsuarios", listaUsuarios);
+	                
+	                RequestDispatcher rd = request.getRequestDispatcher("/AdministradorListaUsuarios.jsp");
+	                rd.forward(request, response);
+	                break;
 	        }
 	    }
 		
@@ -69,7 +99,7 @@ public class UsuarioServlet extends HttpServlet {
 	
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String action = request.getParameter("Action");
+		String action = request.getParameter("action");
 		
 		
 		

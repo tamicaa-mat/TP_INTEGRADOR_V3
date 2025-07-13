@@ -16,4 +16,8 @@ public interface UsuarioNegocio {
     public ArrayList<Usuario> leerTodosLosUsuarios();
     Usuario login(String username, String password) throws UsuarioInexistenteException, ClaveIncorrectaException, UsuarioInactivoException;
 
+    
+    
+    public boolean resetearPasswordUsuario(int idUsuario);
+    public boolean cambiarEstadoUsuario(int idUsuario, boolean nuevoEstado);
 }

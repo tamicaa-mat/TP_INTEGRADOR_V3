@@ -175,7 +175,8 @@ public class ClienteServlet extends HttpServlet {
             
             if (seAgrego) {
                 response.sendRedirect(request.getContextPath() + "/UsuarioServlet?action=mostrarFormularioAlta&dniCliente=" + dni);
-            } else {
+            } 
+            else {
             	 
                 
                

@@ -24,6 +24,85 @@ public class UsuarioDaoImpl implements UsuarioDao {
     private static final String LEER_TODOS_LOS_USUARIOS = "SELECT u.IdUsuario, u.NombreUsuario, u.Estado, u.IdTipoUsuario, tu.Descripcion as TipoDescripcion FROM usuario u INNER JOIN tipousuario tu ON u.IdTipoUsuario = tu.IdTipoUsuario";
 
     
+    
+    private static final String CAMBIAR_ESTADO = "UPDATE Usuario SET Estado = ? WHERE IdUsuario = ?";
+    private static final String RESETEAR_PASS = "UPDATE Usuario SET Password = ? WHERE IdUsuario = ?";
+    
+    
+    public boolean cambiarEstado(int idUsuario, boolean nuevoEstado) {
+    	 boolean exito = false;
+         
+         // Usamos try-with-resources para que la conexión y el PreparedStatement se cierren solos.
+         try (Connection conn = Conexion.getConexion().getSQLConexion();
+              PreparedStatement stmt = conn.prepareStatement(CAMBIAR_ESTADO)) {
+             
+             
+             conn.setAutoCommit(false);
+             
+           
+             stmt.setBoolean(1, nuevoEstado);
+             stmt.setInt(2, idUsuario);
+             
+           
+             int filasAfectadas = stmt.executeUpdate();
+             
+            
+             if (filasAfectadas > 0) {
+                 conn.commit();
+                 exito = true;
+                 System.out.println("Estado del usuario cambiado con éxito. COMMIT realizado.");
+             } else {
+               
+                 conn.rollback();
+                 System.out.println("No se actualizó ninguna fila. ROLLBACK realizado.");
+             }
+
+         } catch (SQLException e) {
+            
+             e.printStackTrace();
+         }
+         
+         return exito;
+    }
+    
+    public boolean resetearPassword(int idUsuario, String nuevaPassword) {
+    		boolean exito = false;
+        
+        
+        try (Connection conn = Conexion.getConexion().getSQLConexion();
+             PreparedStatement stmt = conn.prepareStatement(RESETEAR_PASS)) {
+            
+        
+            conn.setAutoCommit(false);
+            
+            
+            stmt.setString(1, nuevaPassword);
+            stmt.setInt(2, idUsuario);
+            
+            
+            int filasAfectadas = stmt.executeUpdate();
+            
+         
+            if (filasAfectadas > 0) {
+                conn.commit();  // se confirman los cambios afectados
+                exito = true;
+                System.out.println("Contraseña reseteada con éxito. COMMIT realizado.");
+            } else {
+                // Si no se actualizó nada, revertimos.
+                conn.rollback();
+                System.out.println("No se actualizó ninguna fila. ROLLBACK realizado.");
+            }
+
+        } catch (SQLException e) {
+            // si hay error la transacción se descarta
+            e.printStackTrace();
+        }
+        
+        return exito;
+    }
+    
+    
+    
     public Usuario obtenerUsuario(String username, String password) {
         Connection conexion = null;
         PreparedStatement mensajero = null;

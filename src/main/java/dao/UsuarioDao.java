@@ -22,5 +22,10 @@ public interface UsuarioDao {
        boolean actualizarPassword(int idUsuario, String nuevaPassword);
        public boolean insertarUsuario(Usuario usuario, String dniCliente);
        Usuario obtenerUsuarioPorUsername(String username);
+       
+       
+       boolean cambiarEstado(int idUsuario, boolean nuevoEstado);
+       boolean resetearPassword(int idUsuario, String nuevaPassword);
+
     
 }
