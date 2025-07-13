@@ -243,7 +243,7 @@ public class CuentaDaoImpl implements CuentaDao {
             conn.setAutoCommit(false);
 
             stmt = conn.prepareStatement(INSERT_CUENTA);
-            stmt.setInt(1, cuenta.getIdCliente());
+            stmt.setInt(1, cuenta.getCliente().getIdCliente());
             stmt.setDate(2, java.sql.Date.valueOf(cuenta.getFechaCreacion()));
             stmt.setInt(3, cuenta.getTipoCuenta().getIdTipoCuenta());
             stmt.setString(4, cuenta.getNumeroCuenta());
