@@ -69,19 +69,19 @@
     <c:choose>
         
         <c:when test="${cliente.isEstado()}">
-            <a href="ClienteServlet?action=editar&dni=${cliente.getDni()}" >Editar</a>
-            <a href="ClienteServlet?action=eliminar&dni=${cliente.getDni()}" onclick="return confirm('¿Está seguro?');">Eliminar</a>
+            <a href="ClienteServlet?Action=editar&dni=${cliente.getDni()}" >Editar</a>
+            <a href="ClienteServlet?Action=eliminar&dni=${cliente.getDni()}" onclick="return confirm('¿Está seguro?');">Eliminar</a>
             <a href="CuentaServlet?action=listar&dni=${cliente.getDni()}" >Cuentas</a>
             
             
             <c:if test="${empty cliente.getUsuario() || empty cliente.getUsuario().getNombreUsuario()}">
-                 <a href="UsuarioServlet?action=mostrarFormularioAlta&dniCliente=${cliente.getDni()}" >Crear Acceso</a>
+                 <a href="UsuarioServlet?Action=mostrarFormularioAlta&dniCliente=${cliente.getDni()}" >Crear Acceso</a>
             </c:if>
         </c:when>
         
         
         <c:otherwise>
-            <a href="ClienteServlet?action=reactivar&dni=${cliente.getDni()}" >Reactivar</a>
+            <a href="ClienteServlet?Action=reactivar&dni=${cliente.getDni()}" >Reactivar</a>
         </c:otherwise>
     </c:choose>
 </td>

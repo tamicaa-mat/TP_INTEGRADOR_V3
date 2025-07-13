@@ -34,7 +34,7 @@ public class ClienteServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         
-        String action = request.getParameter("action");
+        String action = request.getParameter("Action");
         String filtro = request.getParameter("filtro");
         
       
@@ -136,30 +136,38 @@ public class ClienteServlet extends HttpServlet {
             String cuil = request.getParameter("txtCuil");
             String nombre = request.getParameter("txtNombre");
             String apellido = request.getParameter("txtApellido");
-            String nacionalidad = request.getParameter("txtNacionalidad");
-            LocalDate fechaNacimiento = LocalDate.parse(request.getParameter("txtFechaNacimiento"));
             String sexo = request.getParameter("ddlSexo");
+            LocalDate fechaNacimiento = LocalDate.parse(request.getParameter("txtFechaNacimiento"));
+            String direccion = request.getParameter("txtDireccion");
+            String nacionalidad = request.getParameter("txtNacionalidad");
             String email = request.getParameter("txtEmail");
             String telefono = request.getParameter("txtTelefono");
-            String direccion = request.getParameter("txtDireccion");
+            
+            
             int idLocalidad = Integer.parseInt(request.getParameter("ddlLocalidad"));
-
+            int idProvincia = Integer.parseInt(request.getParameter("ddlProvincia"));
+            
+            Provincia prov = new Provincia();
+            prov.setIdProvincia(idProvincia);
+            
+           
           
             Localidad loc = new Localidad();
             loc.setIdLocalidad(idLocalidad);
+            loc.setProvincia(prov); // la provincia va adentro de la localidad
 
             Cliente cliente = new Cliente();
             cliente.setDni(dni);
             cliente.setCuil(cuil);
             cliente.setNombre(nombre);
             cliente.setApellido(apellido);
-            cliente.setNacionalidad(nacionalidad);
-            cliente.setFechaNacimiento(fechaNacimiento);
             cliente.setSexo(sexo);
+            cliente.setFechaNacimiento(fechaNacimiento);
+            cliente.setDireccion(direccion);
+            cliente.setLocalidad(loc); // la localidad completa  adentro del cliente
+            cliente.setNacionalidad(nacionalidad);
             cliente.setCorreoElectronico(email);
             cliente.setTelefono(telefono);
-            cliente.setDireccion(direccion);
-            cliente.setLocalidad(loc);
             
             
             boolean seAgrego = clienteNegocio.insertarCliente(cliente); 
@@ -202,11 +210,18 @@ public class ClienteServlet extends HttpServlet {
             String telefono = request.getParameter("txtTelefono");
             String direccion = request.getParameter("txtDireccion");
             int idLocalidad = Integer.parseInt(request.getParameter("ddlLocalidad"));
-            
+            int idProvincia = Integer.parseInt(request.getParameter("ddlProvincia"));
+
+            Provincia prov = new Provincia();
+            prov.setIdProvincia(idProvincia);
             
             Localidad loc = new Localidad();
             loc.setIdLocalidad(idLocalidad);
-
+            loc.setProvincia(prov);
+            
+            
+            
+            
             Cliente cliente = new Cliente();
             cliente.setDni(dni);
             cliente.setCuil(cuil);

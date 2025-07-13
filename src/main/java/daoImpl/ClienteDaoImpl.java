@@ -71,15 +71,19 @@ private static final String INSERTAR_CLIENTE_SOLO = "insert into cliente(DNI, CU
 	
 	@Override
 	public boolean insertarCliente(Cliente cliente) {
-		Connection conexion = null;
-		PreparedStatement mensajero = null;
+		
+		
 		boolean exito = false;
 		
 		
-		try {
-			conexion = Conexion.getConexion().getSQLConexion();
-			mensajero = conexion.prepareStatement(INSERTAR_CLIENTE_SOLO);
-			mensajero.setString(1, cliente.getDni());
+		try (Connection conexion = Conexion.getConexion().getSQLConexion();
+        PreparedStatement mensajero = conexion.prepareStatement(INSERTAR_CLIENTE_SOLO)){
+			
+	        conexion.setAutoCommit(false);
+
+			
+			
+	        mensajero.setString(1, cliente.getDni());
 	        mensajero.setString(2, cliente.getCuil());
 	        mensajero.setString(3, cliente.getNombre());
 	        mensajero.setString(4, cliente.getApellido());
@@ -90,39 +94,25 @@ private static final String INSERTAR_CLIENTE_SOLO = "insert into cliente(DNI, CU
 	        mensajero.setInt(9, cliente.getLocalidad().getIdLocalidad());
 	        mensajero.setString(10, cliente.getCorreoElectronico());
 	        mensajero.setString(11, cliente.getTelefono());
-
-
-			if (mensajero.executeUpdate() > 0) {
-				conexion.commit();
-				exito = true;
-				
-			}
-			else {
-				conexion.rollback();
-			}
-			
-
-		} 
+	        
+	        
+	        int filasAfectadas = mensajero.executeUpdate();
+	        
+	        if(filasAfectadas >0) {
+	        	conexion.commit();
+	        	exito = true;
+	        	System.out.println("Cliente insertado con éxito.  commit");
+	        }
+	        else {
+	        	conexion.rollback();
+	        	System.out.println("no se insertó el cliente.  Rollbak");
+	        }
+	        
+		}
 		catch (SQLException e) {
-			e.printStackTrace();
-			try { 
-				if (conexion != null) conexion.rollback(); 
-				} 
-			
-			catch (SQLException ex) { 
-				ex.printStackTrace(); 
-			}
-	    } finally {
-	        try
-	        { 
-	        	if (mensajero != null) mensajero.close();
-	        	} 
-	        catch (SQLException e)
-	        {
-	        	e.printStackTrace(); 
-	        	}
-	    }
-	    return exito;
+			  e.printStackTrace();
+		}
+		return exito;
 			
 			
 	}
@@ -131,12 +121,12 @@ private static final String INSERTAR_CLIENTE_SOLO = "insert into cliente(DNI, CU
 	
 	@Override
 	public boolean actualizarCliente(Cliente cliente) {
-		Connection conexion = null;
-		PreparedStatement mensajero = null;
+		
 		boolean exito = false;
-		try {
-			conexion = Conexion.getConexion().getSQLConexion();
-			mensajero = conexion.prepareStatement(ACTUALIZAR_CLIENTE);
+		try (Connection conexion = Conexion.getConexion().getSQLConexion();
+        PreparedStatement mensajero = conexion.prepareStatement(ACTUALIZAR_CLIENTE)){
+	        conexion.setAutoCommit(false);
+
 			mensajero.setString(1, cliente.getCuil());
 			mensajero.setString(2, cliente.getNombre());
 			mensajero.setString(3, cliente.getApellido());
@@ -149,26 +139,23 @@ private static final String INSERTAR_CLIENTE_SOLO = "insert into cliente(DNI, CU
 			mensajero.setString(10, cliente.getTelefono());
 			mensajero.setString(11, cliente.getDni());
 			
-			if (mensajero.executeUpdate() > 0) {
+			int filasAfectadas = mensajero.executeUpdate();
+			
+			if(filasAfectadas > 0 ) {
 				conexion.commit();
-				exito = true;
-			} else {
+				exito= true;
+				System.out.println("cliente actualizado con exito, commit");
+			}
+			else {
 				conexion.rollback();
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-			try {
-				if (conexion != null) conexion.rollback();
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-		} finally {
-			try {
-				if (mensajero != null) mensajero.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
+				System.out.println("no se actualizaron los datos del cliente, rollback");
 			}
 		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+			
+		
 		return exito;
 	}
 
@@ -337,7 +324,7 @@ private static final String INSERTAR_CLIENTE_SOLO = "insert into cliente(DNI, CU
 	        usuario = new Usuario();
 	        usuario.setIdUsuario(resultado.getInt("IdUsuario"));
 	        usuario.setNombreUsuario(resultado.getString("NombreUsuario"));
-	        // Leemos el estado del usuario desde la columna con el alias que definimos
+	        // Leemos el estado del usuario desde la columna con el alias que de))finimos
 	        usuario.setEstado(resultado.getBoolean("UsuarioEstado")); 
 	    }
 

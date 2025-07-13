@@ -114,6 +114,7 @@
                             </select>
                         </div>
                         
+                        <div class="mb-3"><input type="text" class="form-control" name="txtNacionalidad" placeholder="Nacionalidad" value="<%= (clienteAEditar != null) ? clienteAEditar.getNacionalidad() : "" %>" required></div>
                         <div class="mb-3"><input type="email" class="form-control" name="txtEmail" placeholder="Correo Electrónico" value="<%= (clienteAEditar != null) ? clienteAEditar.getCorreoElectronico() : "" %>" required></div>
                         <div class="mb-3"><input type="text" class="form-control" name="txtTelefono" placeholder="Teléfono" value="<%= (clienteAEditar != null) ? clienteAEditar.getTelefono() : "" %>" required></div>
                         

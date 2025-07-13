@@ -31,7 +31,7 @@ public class UsuarioServlet extends HttpServlet {
 		
 
 	    // Para evitar errores, si la acción es nula, la tratamos como un string vacío.
-	    String action = request.getParameter("action") != null ? request.getParameter("action") : "";
+	    String action = request.getParameter("Action") != null ? request.getParameter("action") : "";
 	    
 	    switch (action) {
 	        case "mostrarFormularioAlta": {
@@ -69,7 +69,7 @@ public class UsuarioServlet extends HttpServlet {
 	
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String action = request.getParameter("action");
+		String action = request.getParameter("Action");
 		
 		
 		
