@@ -54,16 +54,17 @@ public class CuentaNegocioImpl implements CuentaNegocio {
     }
 
  
-    public ArrayList<Cuenta> getCuentasPorCliente(String dniCliente, Cliente cliente) {
+    public ArrayList<Cuenta> getCuentasPorCliente(Cliente cliente) {
     
-    	  ArrayList<Cuenta> cuentas = cuentaDao.getCuentasPorCliente(dniCliente,cliente);
+    	  ArrayList<Cuenta> cuentas = cuentaDao.getCuentasPorCliente(cliente);
 
+    	   if (cuentas == null || cuentas.isEmpty()) {
+		        System.out.println("No se encontraron cuentas para el cliente ID: " + cliente.getIdCliente());
+		    } else {
+		        System.out.println("Cuentas encontradas: " + cuentas.size());
+		    }
 
-    	    if (cuentas != null) {
-    	        return cuentas;
-    	    }
-    	    
-       return new ArrayList<>();
+		    return cuentas;
         
       
         
@@ -161,6 +162,7 @@ public class CuentaNegocioImpl implements CuentaNegocio {
 		
 
 }
-		
+
+
 		
 }

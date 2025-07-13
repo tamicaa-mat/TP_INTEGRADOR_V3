@@ -30,6 +30,7 @@ public interface PrestamoNegocio {
     
    Prestamo obtenerPrestamoPorId(int idPrestamo);
     
+    public List<Prestamo> obtenerPrestamosActivosPorCuenta(int idCuenta);
     
     double obtenerSumaImporteEntreFechas(Date desde, Date hasta);
     int contarPrestamosEntreFechas(Date desde, Date hasta);

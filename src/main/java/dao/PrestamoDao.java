@@ -14,7 +14,9 @@ public interface PrestamoDao {
    // boolean update(Prestamo prestamo);
     ArrayList<Prestamo> readAll();
     List<Prestamo> obtenerPrestamosPorCliente(int idCliente);
-    Prestamo getPrestamoPorId(int idPrestamo);
+    
+    // para obtener los prestamos de una cuenta
+    List<Prestamo> getPrestamoPorIdCuenta(int idCuenta);
 	boolean actualizarImportePedido(int idPrestamo, double nuevoImporte);
 	
 	List<Prestamo> obtenerTodosLosPrestamos();
@@ -22,5 +24,8 @@ public interface PrestamoDao {
    
     double obtenerSumaImporteEntreFechas(Date desde, Date hasta);
     int contarPrestamosEntreFechas(Date desde, Date hasta);
+    
+    //para pagar
+	Prestamo getPrestamoPorIdPrestamo(int idPrestamo);
     
 }

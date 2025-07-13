@@ -27,7 +27,7 @@ public class CuentaDaoImpl implements CuentaDao {
         "SELECT COUNT(*) AS total FROM Cuenta c JOIN Cliente cl ON c.IdCliente = cl.IdCliente WHERE cl.DNI = ? AND c.Estado = 1";
 
     private static final String GET_CUENTAS_POR_CLIENTE =
-        "SELECT * FROM Cuenta WHERE IdCliente = ? ";
+        "SELECT * FROM Cuenta WHERE IdCliente = ? AND Estado = 1";
 
     private static final String GET_CUENTA_POR_CBU =
         "SELECT * FROM Cuenta WHERE Cbu = ? AND Estado = 1";
@@ -342,18 +342,20 @@ public class CuentaDaoImpl implements CuentaDao {
         return count;
     }
 
-    public ArrayList<Cuenta> getCuentasPorCliente(String dniCliente, Cliente cliente) {
+    public ArrayList<Cuenta> getCuentasPorCliente(Cliente cliente) {
     	
     	
         ArrayList<Cuenta> cuentas = new ArrayList<>();
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
+        
+       int idCliente = cliente.getIdCliente();
 
         try {
             conn = Conexion.getConexion().getSQLConexion();
             stmt = conn.prepareStatement(GET_CUENTAS_POR_CLIENTE);
-            stmt.setString(1, dniCliente);
+            stmt.setInt(1, idCliente);
             rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -363,9 +365,9 @@ public class CuentaDaoImpl implements CuentaDao {
 
                 
                 
-                cuenta.setIdCliente(cliente.getIdCliente()); // lo tomás del objeto cliente recibido
+                cuenta.setIdCliente(cliente.getIdCliente()); 
                 cuenta.setNumeroCuenta(rs.getString("NumeroCuenta"));
-                cuenta.setCbu(rs.getString("CBU"));
+                cuenta.setCbu(rs.getString("Cbu"));
                 cuenta.setSaldo(rs.getBigDecimal("Saldo"));
                 cuenta.setEstado(rs.getBoolean("Estado"));
                 
@@ -386,12 +388,12 @@ public class CuentaDaoImpl implements CuentaDao {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace(); // Log más detallado si querés: Logger o System.err
+            e.printStackTrace(); 
         } finally {
             try {
                 if (rs != null) rs.close();
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close(); // cerrá también la conexión si no usás pool
+                if (conn != null) conn.close(); 
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -459,7 +461,7 @@ public class CuentaDaoImpl implements CuentaDao {
 
         try {
             conn = Conexion.getConexion().getSQLConexion();
-            String query = "SELECT * FROM Cuenta WHERE IdCliente = ?";
+            String query = "SELECT * FROM Cuenta WHERE IdCliente = ? AND Estado = 1";
             stmt = conn.prepareStatement(query);
             stmt.setInt(1, idCliente);
             rs = stmt.executeQuery();

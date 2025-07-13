@@ -21,7 +21,7 @@ public interface CuentaDao {
     int cuentasActivasPorCliente(String dniCliente); 
     ArrayList<Cuenta> getCuentasPorIdCliente(int idCliente,Cliente cliente);
     ArrayList<Cuenta> getCuentasPorIdCliente2OTRA(int idCliente,Cliente cliente);
-	ArrayList<Cuenta> getCuentasPorCliente(String dniCliente, Cliente cliente);
+	ArrayList<Cuenta> getCuentasPorCliente(Cliente cliente);
 	Cuenta getCuentaPorCbu(String cbu, Cliente cliente);
 	
 	int contarCuentasCreadasEntreFechas(Date desde, Date hasta);

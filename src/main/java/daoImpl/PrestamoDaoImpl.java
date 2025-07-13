@@ -21,7 +21,8 @@ public class PrestamoDaoImpl implements PrestamoDao{
     //private static final String UPDATE = "UPDATE Prestamo SET Estado = ? WHERE IdPrestamo = ?";
     private static final String SELECT_ALL = "SELECT * FROM Prestamo";
     private static final String SELECT_BY_CLIENTE = "SELECT * FROM Prestamo WHERE IdCliente = ?";
-    private static final String GETPRESTAMO = "SELECT * FROM Prestamo WHERE IdPrestamo = ?";
+    //private static final String GETPRESTAMO = "SELECT * FROM Prestamo WHERE IdPrestamo = ?";
+    private static final String GETPRESTAMOPORCUENTA = "SELECT * FROM Prestamo WHERE IdCuenta = ?";
     private static final String ACTUALIZARIMPORTE = "UPDATE Prestamo SET ImportePedido = ? WHERE IdPrestamo = ?";
     private static final String OBTENER_PRESTAMOS = "SELECT  \r\n"
     		+ "  p.*, \r\n"
@@ -167,20 +168,23 @@ public class PrestamoDaoImpl implements PrestamoDao{
 	
     
     @Override
-    public Prestamo getPrestamoPorId(int idPrestamo) {
-        Prestamo prestamo = null;
+    public List<Prestamo> getPrestamoPorIdCuenta(int idCuenta) {
+    	 List<Prestamo> lista = new ArrayList<>();
+    	
+    	Prestamo prestamo = null;
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
         try {
             conn = Conexion.getConexion().getSQLConexion();
-            stmt = conn.prepareStatement(GETPRESTAMO);
-            stmt.setInt(1, idPrestamo);
+            stmt = conn.prepareStatement(GETPRESTAMOPORCUENTA);
+            stmt.setInt(1, idCuenta);
             rs = stmt.executeQuery();
 
             if (rs.next()) {
                 prestamo = new Prestamo();
+                prestamo.setIdPrestamo(rs.getInt("IdPrestamo"));
                
                 Cliente cliente = new Cliente();
                 cliente.setIdCliente(rs.getInt("IdCliente"));
@@ -189,7 +193,6 @@ public class PrestamoDaoImpl implements PrestamoDao{
                 cuenta.setIdCuenta(rs.getInt("IdCuentaAsociada"));
                 prestamo.setCuentaAsociada(cuenta);
              
-                prestamo.setIdPrestamo(rs.getInt("IdPrestamo"));
                 prestamo.setCliente(cliente);
          
                 prestamo.setFechaAlta(rs.getDate("FechaAlta"));
@@ -199,23 +202,20 @@ public class PrestamoDaoImpl implements PrestamoDao{
                 prestamo.setInteres(rs.getDouble("Interes"));
                 prestamo.setCantidadCuotas(rs.getInt("CantidadCuotas"));
                 prestamo.setEstado(rs.getInt("Estado")); 
+                
+                lista.add(prestamo);
             }
 
-        } catch (SQLException e) {
+
+            conn.close();
+
+        } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            try {
-                if (rs != null) rs.close();
-                if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
         }
 
-        return prestamo;
-    }
-
+        return lista;
+}
+   
     
     @Override
     public boolean actualizarImportePedido(int idPrestamo, double nuevoImporte) {
@@ -406,6 +406,14 @@ public class PrestamoDaoImpl implements PrestamoDao{
 	        }
 	    }
 	    return cantidad;
+	}
+
+
+
+	@Override
+	public Prestamo getPrestamoPorIdPrestamo(int idPrestamo) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

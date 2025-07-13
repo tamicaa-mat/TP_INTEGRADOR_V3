@@ -39,7 +39,7 @@ public class PrestamoNegocioImpl implements PrestamoNegocio	{
 	    }
 
 	    public boolean pagarPrestamo(int idPrestamo, double montoPago) {
-	    	   Prestamo prestamo = prestamoDao.getPrestamoPorId(idPrestamo); 
+	    	   Prestamo prestamo = prestamoDao.getPrestamoPorIdPrestamo(idPrestamo); 
 	    	    if (prestamo != null && montoPago > 0) {
 	    	        double nuevoSaldo = prestamo.getImportePedido() - montoPago;
 
@@ -126,10 +126,10 @@ public class PrestamoNegocioImpl implements PrestamoNegocio	{
 
 
 
-		@Override
-		public Prestamo obtenerPrestamoPorId(int idPrestamo) {
+
+		public List<Prestamo> obtenerPrestamosActivosPorCuenta(int idCuenta) {
 			
-		    return prestamoDao.getPrestamoPorId(idPrestamo);
+		    return  prestamoDao.getPrestamoPorIdCuenta(idCuenta);
 			
 		}
 	    
