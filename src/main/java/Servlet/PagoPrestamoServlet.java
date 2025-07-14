@@ -11,10 +11,14 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import Negocio.CuentaNegocio;
+import Negocio.PrestamoNegocio;
 import NegocioImpl.CuentaNegocioImpl;
+import NegocioImpl.PrestamoNegocioImpl;
 import daoImpl.CuentaDaoImpl;
+import daoImpl.PrestamoDaoImpl;
 import dominio.Cliente;
 import dominio.Cuenta;
+import dominio.Prestamo;
 
 /**
  * Servlet implementation class PagoPrestamoServlet
@@ -34,39 +38,82 @@ public class PagoPrestamoServlet extends HttpServlet {
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		 System.out.println("Servlet ejecutado pago prestamo");
 
-	        HttpSession session = request.getSession();
-	      
-	        Cliente clienteLogueado = (Cliente) session.getAttribute("clienteLogueado");
+	        
+	        
+	        
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        System.out.println("Servlet ejecutado: PagoPrestamoServlet");
 
-	        if (clienteLogueado == null) {
-	            response.sendRedirect("login.jsp?mensaje=Debe iniciar sesion");
-	            return;
-	        }
+        HttpSession session = request.getSession();
+
+        // Validar sesión del cliente
+        Cliente clienteLogueado = (Cliente) session.getAttribute("clienteLogueado");
+        if (clienteLogueado == null) {
+            response.sendRedirect("login.jsp?mensaje=Debe iniciar sesión");
+            return;
+        }
+
+        // Obtener cuentas del cliente
+        CuentaNegocio cuentaNegocio = new CuentaNegocioImpl(new CuentaDaoImpl());
+        List<Cuenta> cuentas = cuentaNegocio.getCuentasPorCliente(clienteLogueado);
+        request.setAttribute("cuentas", cuentas);
+
+        // Si hay una cuenta seleccionada, traer préstamos y saldo
+        String idCuentaStr = request.getParameter("idCuenta");
+        if (idCuentaStr != null && !idCuentaStr.isEmpty()) {
+            try {
+                int idCuenta = Integer.parseInt(idCuentaStr);
+
+                // Obtener préstamos activos de la cuenta
+                PrestamoNegocio prestamoNeg = new PrestamoNegocioImpl(new PrestamoDaoImpl());
+                List<Prestamo> prestamos = prestamoNeg.obtenerPrestamosActivosPorCuenta(idCuenta);
+                request.setAttribute("prestamos", prestamos);
+                System.out.println("Cantidad de préstamos encontrados para la cuenta " + idCuenta + ": " + prestamos.size());
+                // Mostrar resumen del primer préstamo si existe
+                if (!prestamos.isEmpty()) {
+                    Prestamo p = prestamos.get(0);
+                    System.out.println("Mostrando préstamo ID: " + p.getIdPrestamo());
+                    System.out.println("Importe pedido: " + p.getImportePedido());
+                    System.out.println("Plazo en meses: " + p.getPlazoMeses());
+                    System.out.println("Importe por mes: " + p.getImportePorMes());
+                    
+                    
+       
+                    request.setAttribute("importePrestamo", p.getImportePedido());
+                    request.setAttribute("cuotas", p.getPlazoMeses());
+                    request.setAttribute("cuotaMensual", p.getImportePorMes());
+                }
+                
+                else {
+                    System.out.println("No se encontraron préstamos activos para esta cuenta.");
+                }
+
+                // Obtener saldo de la cuenta seleccionada
+                Cuenta cuentaSeleccionada = cuentaNegocio.buscarCuentaPorId(idCuenta);
+                if (cuentaSeleccionada != null) {
+                    System.out.println("Cuenta encontrada. Saldo: " + cuentaSeleccionada.getSaldo());
+                    request.setAttribute("saldoCuenta", cuentaSeleccionada.getSaldo());
+                } else {
+                    System.out.println("No se encontró la cuenta con ID: " + idCuenta);
+                }
+
+            } catch (NumberFormatException e) {
+                System.out.println("Error al parsear idCuenta: " + e.getMessage());
+            }
+        } else {
+            System.out.println("No se recibió parámetro idCuenta en el request.");
+        }
+
+        request.getRequestDispatcher("CLIENTEpagoPrestamos.jsp").forward(request, response);
+                
+                
+       
+    }
+    
 	        
-	        CuentaNegocio cuentaNegocio = new CuentaNegocioImpl(new CuentaDaoImpl());
-	      
-	        List<Cuenta> cuentas = cuentaNegocio.getCuentasPorCliente(clienteLogueado);
-	        request.setAttribute("cuentas", cuentas);
-	        request.getRequestDispatcher("CLIENTEpagoPrestamo.jsp").forward(request, response);
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	}
+	   
+	 
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)

@@ -22,7 +22,7 @@ public class PrestamoDaoImpl implements PrestamoDao{
     private static final String SELECT_ALL = "SELECT * FROM Prestamo";
     private static final String SELECT_BY_CLIENTE = "SELECT * FROM Prestamo WHERE IdCliente = ?";
     //private static final String GETPRESTAMO = "SELECT * FROM Prestamo WHERE IdPrestamo = ?";
-    private static final String GETPRESTAMOPORCUENTA = "SELECT * FROM Prestamo WHERE IdCuenta = ?";
+    private static final String GETPRESTAMOPORCUENTA = "SELECT * FROM Prestamo WHERE IdCuentaAsociada = ? AND Estado = 1";
     private static final String ACTUALIZARIMPORTE = "UPDATE Prestamo SET ImportePedido = ? WHERE IdPrestamo = ?";
     private static final String OBTENER_PRESTAMOS = "SELECT  \r\n"
     		+ "  p.*, \r\n"
@@ -167,11 +167,9 @@ public class PrestamoDaoImpl implements PrestamoDao{
     }
 	
     
-    @Override
+
     public List<Prestamo> getPrestamoPorIdCuenta(int idCuenta) {
-    	 List<Prestamo> lista = new ArrayList<>();
-    	
-    	Prestamo prestamo = null;
+        List<Prestamo> lista = new ArrayList<>();
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -182,19 +180,18 @@ public class PrestamoDaoImpl implements PrestamoDao{
             stmt.setInt(1, idCuenta);
             rs = stmt.executeQuery();
 
-            if (rs.next()) {
-                prestamo = new Prestamo();
+            while (rs.next()) {
+                Prestamo prestamo = new Prestamo();
                 prestamo.setIdPrestamo(rs.getInt("IdPrestamo"));
-               
+
                 Cliente cliente = new Cliente();
                 cliente.setIdCliente(rs.getInt("IdCliente"));
+                prestamo.setCliente(cliente);
 
                 Cuenta cuenta = new Cuenta();
                 cuenta.setIdCuenta(rs.getInt("IdCuentaAsociada"));
                 prestamo.setCuentaAsociada(cuenta);
-             
-                prestamo.setCliente(cliente);
-         
+
                 prestamo.setFechaAlta(rs.getDate("FechaAlta"));
                 prestamo.setImportePedido(rs.getDouble("ImportePedido"));
                 prestamo.setPlazoMeses(rs.getInt("PlazoMeses"));
@@ -202,20 +199,25 @@ public class PrestamoDaoImpl implements PrestamoDao{
                 prestamo.setInteres(rs.getDouble("Interes"));
                 prestamo.setCantidadCuotas(rs.getInt("CantidadCuotas"));
                 prestamo.setEstado(rs.getInt("Estado")); 
-                
+
                 lista.add(prestamo);
             }
 
-
-            conn.close();
-
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
 
         return lista;
-}
-   
+    }
+
     
     @Override
     public boolean actualizarImportePedido(int idPrestamo, double nuevoImporte) {
@@ -408,14 +410,51 @@ public class PrestamoDaoImpl implements PrestamoDao{
 	    return cantidad;
 	}
 
-
-
-	@Override
+///////////// la necesito???
 	public Prestamo getPrestamoPorIdPrestamo(int idPrestamo) {
-		// TODO Auto-generated method stub
-		return null;
+	    Prestamo prestamo = null;
+	    Connection cn = null;
+	    PreparedStatement ps = null;
+	    ResultSet rs = null;
+
+	    try {
+	        cn = (Connection) Conexion.getConexion();
+	        String sql = "SELECT * FROM Prestamo WHERE IdPrestamo = ?";
+	        ps = cn.prepareStatement(sql);
+	        ps.setInt(1, idPrestamo);
+	        rs = ps.executeQuery();
+
+	        if (rs.next()) {
+	            prestamo = new Prestamo();
+	            prestamo.setIdPrestamo(rs.getInt("IdPrestamo"));
+	            prestamo.setImportePedido(rs.getDouble("Importe"));
+	            prestamo.setImportePorMes(rs.getDouble("ImportePorMes"));
+	            prestamo.setPlazoMeses(rs.getInt("Plazo"));
+	            prestamo.setInteres(rs.getDouble("Interes"));
+	            prestamo.setFechaAlta(rs.getDate("FechaAlta"));
+	           
+	            prestamo.setEstado(rs.getInt("Estado"));
+	         //   prestamo.setCuentaAsociada(rs.getInt("IdCuenta"));
+	         
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        try {
+	            if (rs != null) rs.close();
+	            if (ps != null) ps.close();
+	            if (cn != null) cn.close();
+	        } catch (Exception ex) {
+	            ex.printStackTrace();
+	        }
+	    }
+
+	    return prestamo;
 	}
 
+	
+	
 }
 
     

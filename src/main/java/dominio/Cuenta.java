@@ -11,7 +11,6 @@ public class Cuenta {
 	    Cliente cliente;
 	    int IdCliente;
 	    private LocalDate fechaCreacion;
-	     
 	    private TipoCuenta tipoCuenta; // ÚNICO atributo para el tipo de cuenta
 	    private String numeroCuenta;
 	    private String cbu;

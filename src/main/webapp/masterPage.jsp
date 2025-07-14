@@ -76,7 +76,9 @@
 	          
 	      
 	            
-	            <a href="CLIENTEpagoPrestamos.jsp" class="btn btn-secondary btn-sm">Pago Préstamos</a>
+	            <a href="${pageContext.request.contextPath}/PagoPrestamoServlet" class="btn btn-secondary btn-sm">Pago Préstamos</a>
+	            
+	            
 	            <a href="ClienteInfoPersonal.jsp" class="btn btn-secondary btn-sm">Mi Información</a>
                 </div>
             </c:if>

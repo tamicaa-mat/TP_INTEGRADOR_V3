@@ -20,6 +20,7 @@ public interface CuentaDao {
     boolean delete(int idCuenta);
     int cuentasActivasPorCliente(String dniCliente); 
     ArrayList<Cuenta> getCuentasPorIdCliente(int idCliente,Cliente cliente);
+    
     ArrayList<Cuenta> getCuentasPorIdCliente2OTRA(int idCliente,Cliente cliente);
 	ArrayList<Cuenta> getCuentasPorCliente(Cliente cliente);
 	Cuenta getCuentaPorCbu(String cbu, Cliente cliente);
@@ -30,5 +31,9 @@ public interface CuentaDao {
 	
 	
 	int getIdCuentaPorNumeroCuenta(String numeroCuenta);
+
+	public Cuenta buscarCuentaPorIdDao(int idCuenta);
+	
+	
 	
 }

@@ -25,6 +25,7 @@ public interface CuentaNegocio {
 	public ArrayList<Cuenta> getCuentasPorCliente(Cliente cliente);
 	
 	int contarCuentasCreadasEntreFechas(Date desde, Date hasta);
+	
     double obtenerSaldoTotalCuentasCreadasEntreFechas(Date desde, Date hasta);
     
     
@@ -35,4 +36,6 @@ public interface CuentaNegocio {
 	public boolean darDeBajaLogicaCuentas(int idCuenta);
 	
 	public int obtenerIdCuentaPorNumero(String numeroCuenta);
+
+	public Cuenta buscarCuentaPorId(int idCuenta);
 }

@@ -342,6 +342,7 @@ public class CuentaDaoImpl implements CuentaDao {
         return count;
     }
 
+    /// aqui Pag prest
     public ArrayList<Cuenta> getCuentasPorCliente(Cliente cliente) {
     	
     	
@@ -362,15 +363,11 @@ public class CuentaDaoImpl implements CuentaDao {
                 Cuenta cuenta = new Cuenta();
                 cuenta.setIdCuenta(rs.getInt("IdCuenta"));
                 cuenta.setCliente(cliente); 
-
-                
-                
                 cuenta.setIdCliente(cliente.getIdCliente()); 
                 cuenta.setNumeroCuenta(rs.getString("NumeroCuenta"));
                 cuenta.setCbu(rs.getString("Cbu"));
                 cuenta.setSaldo(rs.getBigDecimal("Saldo"));
                 cuenta.setEstado(rs.getBoolean("Estado"));
-                
                 
                 TipoCuenta tipo = new TipoCuenta();
                 tipo.setIdTipoCuenta(rs.getInt("IdTipoCuenta"));
@@ -645,8 +642,60 @@ public class CuentaDaoImpl implements CuentaDao {
 		    return idCuenta;
 	}
 
+
+
+
+	@Override
+	public Cuenta buscarCuentaPorIdDao(int idCuenta) {
+		
+		Cuenta cuenta = null;
+	    Connection cn = null;
+	    PreparedStatement ps = null;
+	    ResultSet rs = null;
+
+	    try {
+	        cn = (Connection) Conexion.getConexion();
+	        String sql = "SELECT * FROM Cuenta WHERE IdCuenta = ?";
+	        ps = cn.prepareStatement(sql);
+	        ps.setInt(1, idCuenta);
+	        rs = ps.executeQuery();
+
+	        if (rs.next()) {
+	            cuenta = new Cuenta();
+	            cuenta.setIdCuenta(rs.getInt("IdCuenta"));
+	            cuenta.setIdCliente(rs.getInt("IdCliente")); 
+	            cuenta.setFechaCreacion(rs.getDate("FechaCreacion").toLocalDate());
+	            TipoCuenta tipo = new TipoCuenta();
+	            tipo.setIdTipoCuenta(rs.getInt("IdTipoCuenta"));
+	            cuenta.setNumeroCuenta(rs.getString("NumeroCuenta"));
+	            cuenta.setCbu(rs.getString("CBU"));
+	            cuenta.setSaldo(rs.getBigDecimal("Saldo"));
+                cuenta.setEstado(rs.getBoolean("Estado"));
+	       
+	            
+	            // Si tenés relación con cliente
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        try {
+	            if (rs != null) rs.close();
+	            if (ps != null) ps.close();
+	            if (cn != null) cn.close();
+	        } catch (Exception ex) {
+	            ex.printStackTrace();
+	        }
+	    }
+
+	    return cuenta;
+		
+		
+		
+		
+	}
+
     
-	
 	
 	
 }

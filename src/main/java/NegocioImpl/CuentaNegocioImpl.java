@@ -32,8 +32,7 @@ public class CuentaNegocioImpl implements CuentaNegocio {
     
     
     public List<Cuenta> obtenerCuentasPorCliente(int idCliente) {
-        // La lógica de negocio aquí es simple: solo llama al DAO.
-        // En casos más complejos, aquí podrías agregar validaciones o reglas de negocio.
+     
         return cuentaDao.obtenerCuentasPorCliente(idCliente);
     }
 
@@ -162,6 +161,12 @@ public class CuentaNegocioImpl implements CuentaNegocio {
 		
 
 }
+
+
+		@Override
+		public Cuenta buscarCuentaPorId(int idCuenta) {
+			 return cuentaDao.buscarCuentaPorIdDao(idCuenta);
+		}
 
 
 		
