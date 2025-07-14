@@ -1,5 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -21,43 +23,55 @@
                 <select class="form-select mb-3" name="idCuenta" required onchange="this.form.submit()">
                     <option value="" disabled selected>Seleccione una cuenta</option>
                     <c:forEach var="cuenta" items="${cuentas}">
-                        <option value="${cuenta.idCuenta}" 
-                            ${cuenta.idCuenta == param.idCuenta ? "selected" : ""}>
+                        <option value="${cuenta.idCuenta}"
+                                ${cuenta.idCuenta == param.idCuenta ? "selected" : ""}>
                             ${cuenta.numeroCuenta}
                         </option>
                     </c:forEach>
                 </select>
-                <!-- Este form se autocompleta con el onchange. Si querés usar botón, sacá el onchange -->
             </form>
 
-          <!-- Formulario para pagar cuota -->
-<c:if test="${not empty prestamos}">
-    <form action="PagarCuotaServlet" method="get">
-        <input type="hidden" name="idCuenta" value="${param.idCuenta}" />
-        <label class="form-label">Seleccione préstamo</label>
-        <select class="form-select mb-3" name="idPrestamo" required>
-            <option value="" disabled selected>Seleccione un préstamo</option>
-            <c:forEach var="p" items="${prestamos}">
-                <option value="${p.idPrestamo}">
-                    Préstamo #${p.idPrestamo}
-                </option>
-            </c:forEach>
-        </select>
+            <!-- Formulario para seleccionar préstamo -->
+            <c:if test="${not empty prestamos}">
+                <form action="PagoPrestamoServlet" method="get">
+                    <input type="hidden" name="idCuenta" value="${param.idCuenta}" />
+                    <label class="form-label">Seleccione préstamo</label>
+                    <select class="form-select mb-3" name="idPrestamo" required onchange="this.form.submit()">
+                        <option value="" disabled selected>Seleccione un préstamo</option>
+                        <c:forEach var="p" items="${prestamos}">
+                            <option value="${p.idPrestamo}"
+                                    ${p.idPrestamo == param.idPrestamo ? "selected" : ""}>
+                                Préstamo #${p.idPrestamo}
+                            </option>
+                        </c:forEach>
+                    </select>
+                </form>
+            </c:if>
 
-        <label class="form-label">Monto a pagar</label>
-        <input type="number" step="0.01" class="form-control mb-3" name="montoPago" required />
-
-        <div class="text-center mt-4">
-            <button type="submit" class="btn btn-success">Pagar cuota</button>
-        </div>
-    </form>
-</c:if>
-          
-            
-            
+            <!-- Mostrar datos y formulario de pago -->
+            <c:if test="${not empty param.idPrestamo}">
+                <form action="PagarCuotaServlet" method="get">
+                    <input type="hidden" name="idCuenta" value="${param.idCuenta}" />
+                    <input type="hidden" name="idPrestamo" value="${param.idPrestamo}" />
+                    <c:forEach var="p" items="${prestamos}">
+                        <c:if test="${p.idPrestamo == param.idPrestamo}">
+                            <div class="mb-3">
+                                <p><strong>Importe pedido:</strong> $${p.importePedido}</p>
+                                <p><strong>Importe por mes (cuota):</strong> $${p.importePorMes}</p>
+                                <p><strong>Interés:</strong> ${p.interes}%</p>
+                                <p><strong>Plazo:</strong> ${p.plazoMeses} meses</p>
+                                <p><strong>Cantidad de cuotas:</strong> ${p.cantidadCuotas}</p>
+                                <input type="hidden" name="montoPago" value="${p.importePorMes}" />
+                            </div>
+                        </c:if>
+                    </c:forEach>
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-success">Pagar cuota</button>
+                    </div>
+                </form>
+            </c:if>
         </div>
     </div>
 </main>
-
 </body>
 </html>
