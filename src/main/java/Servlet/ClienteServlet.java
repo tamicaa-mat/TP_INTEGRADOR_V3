@@ -96,6 +96,18 @@ public class ClienteServlet extends HttpServlet {
             
              response.sendRedirect(request.getContextPath() + "/ClienteServlet");
         }
+        
+        else if(action != null && action.equals("verDirectorio")) {
+        	 // La lógica es simple: obtenemos todos los clientes
+        	ClienteNegocio clienteNegocio = new ClienteNegocioImpl();
+            ArrayList<Cliente> listaClientes = clienteNegocio.leerTodosLosClientes();
+            request.setAttribute("listaClientes", listaClientes);
+            
+            // Pero lo enviamos al NUEVO JSP de directorio
+            RequestDispatcher rd = request.getRequestDispatcher("/AdministradorDirectorioClientes.jsp");
+            rd.forward(request, response);
+            
+        }
        
         
         

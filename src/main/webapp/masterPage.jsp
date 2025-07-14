@@ -46,7 +46,7 @@
     </header>
 
     <nav class="navbar bg-light border-bottom shadow-sm">
-        <div class="container d-flex flex-column align-items-center py-3">
+        <div class="container d-flex flex-column align-items-c	enter py-3">
 
             <c:if test="${sessionScope.usuarioLogueado.getTipoUsuario().getDescripcion() == 'Administrador'}">
                 <div class="mb-3 w-100 d-flex justify-content-center flex-wrap gap-2">
@@ -59,7 +59,7 @@
 	         <a href="${pageContext.request.contextPath}/PrestamoServlet" class="btn btn-secondary btn-sm">Autorizar Préstamos</a>
 	         
 	            <a href="AdministradorReportes.jsp" class="btn btn-secondary btn-sm">Reportes Admin</a>
-	            <a href="${pageContext.request.contextPath}/ClienteServlet" class="btn btn-secondary btn-sm">Listado Clientes</a>
+	            <a href="${pageContext.request.contextPath}/ClienteServlet?Action=verDirectorio" class="btn btn-secondary btn-sm">Directorio de Clientes</a>	
                 </div>
             </c:if>
 

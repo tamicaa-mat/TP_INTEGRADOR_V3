@@ -479,7 +479,7 @@ private static final String INSERTAR_CLIENTE_SOLO = "insert into cliente(DNI, CU
 		    	try {
 					if (resultado != null) resultado.close();
 					if (mensajero != null) mensajero.close();
-				} catch (SQLException e) {
+				} catch (SQLException e) {	
 					e.printStackTrace();
 				}
 		    }
