@@ -168,6 +168,9 @@ public class CuentaNegocioImpl implements CuentaNegocio {
 			 return cuentaDao.buscarCuentaPorIdDao(idCuenta);
 		}
 
-
+		@Override
+		public boolean actualizarSaldo(int idCuenta, double nuevoSaldo) {
+		    return cuentaDao.actualizarSaldo(idCuenta, nuevoSaldo);
+		}
 		
 }

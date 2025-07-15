@@ -225,5 +225,4 @@ public class ClienteNegocioImpl implements ClienteNegocio {
 		return cdao.leerTodosLosClientesInactivos();
 	}
 	
-	
 }

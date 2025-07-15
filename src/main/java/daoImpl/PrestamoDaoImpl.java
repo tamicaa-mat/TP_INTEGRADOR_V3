@@ -66,11 +66,11 @@ public class PrestamoDaoImpl implements PrestamoDao{
 
                 if (filas > 0) {
                     conn.commit();
-                    System.out.println("Transacción commit OK");
+                    System.out.println("TransacciÃ³n commit OK");
                     return true;
                 } else {
                     conn.rollback();
-                    System.err.println("No se insertó ninguna fila, se hizo rollback");
+                    System.err.println("No se insertÃ³ ninguna fila, se hizo rollback");
                     return false;
                 }
             } catch (SQLException e) {
@@ -83,7 +83,7 @@ public class PrestamoDaoImpl implements PrestamoDao{
                 conn.setAutoCommit(true);
             }
         } catch (SQLException e) {
-            System.err.println("Error grave en la conexión");
+            System.err.println("Error grave en la conexiÃ³n");
             e.printStackTrace();
             return false;
         }
@@ -94,20 +94,24 @@ public class PrestamoDaoImpl implements PrestamoDao{
     @Override
     public ArrayList<Prestamo> readAll() {
         ArrayList<Prestamo> lista = new ArrayList<>();
-        Connection conn = null;
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
 
-        try {
-            conn = Conexion.getConexion().getSQLConexion();
-            stmt = conn.prepareStatement(SELECT_ALL);
-            rs = stmt.executeQuery();
+        try (Connection conn = Conexion.getConexion().getSQLConexion();
+             PreparedStatement stmt = conn.prepareStatement(OBTENER_PRESTAMOS);
+             ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 Prestamo p = new Prestamo();
                 p.setIdPrestamo(rs.getInt("IdPrestamo"));
-                // p.setCliente(...); 
-                // p.setCuenta(...);
+
+                Cliente cliente = new Cliente();
+                cliente.setNombre(rs.getString("NombreCliente"));
+                cliente.setApellido(rs.getString("ApellidoCliente"));
+                p.setCliente(cliente);
+
+                Cuenta cuenta = new Cuenta();
+                cuenta.setNumeroCuenta(rs.getString("NumeroCuenta"));
+                p.setCuentaAsociada(cuenta);
+
                 p.setFechaAlta(rs.getDate("FechaAlta"));
                 p.setImportePedido(rs.getDouble("ImportePedido"));
                 p.setPlazoMeses(rs.getInt("PlazoMeses"));
@@ -115,22 +119,16 @@ public class PrestamoDaoImpl implements PrestamoDao{
                 p.setInteres(rs.getDouble("Interes"));
                 p.setCantidadCuotas(rs.getInt("CantidadCuotas"));
                 p.setEstado(rs.getInt("Estado"));
+
                 lista.add(p);
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                if (rs != null) rs.close();
-                if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
         }
 
         return lista;
     }
+
 
     @Override
     public List<Prestamo> obtenerPrestamosPorCliente(int idCliente) {
@@ -424,8 +422,13 @@ public class PrestamoDaoImpl implements PrestamoDao{
 	    ResultSet rs = null;
 
 	    try {
-	        cn = (Connection) Conexion.getConexion();
-	        String sql = "SELECT * FROM Prestamo WHERE IdPrestamo = ?";
+	        cn = Conexion.getConexion().getSQLConexion();
+
+	        String sql = "SELECT p.*, c.IdCuenta, c.NumeroCuenta, c.Cbu, c.Saldo " +
+	                     "FROM Prestamo p " +
+	                     "LEFT JOIN Cuenta c ON p.IdCuentaAsociada = c.IdCuenta " +
+	                     "WHERE p.IdPrestamo = ?";
+
 	        ps = cn.prepareStatement(sql);
 	        ps.setInt(1, idPrestamo);
 	        rs = ps.executeQuery();
@@ -433,15 +436,20 @@ public class PrestamoDaoImpl implements PrestamoDao{
 	        if (rs.next()) {
 	            prestamo = new Prestamo();
 	            prestamo.setIdPrestamo(rs.getInt("IdPrestamo"));
-	            prestamo.setImportePedido(rs.getDouble("Importe"));
+	            prestamo.setImportePedido(rs.getDouble("ImportePedido"));
 	            prestamo.setImportePorMes(rs.getDouble("ImportePorMes"));
-	            prestamo.setPlazoMeses(rs.getInt("Plazo"));
+	            prestamo.setPlazoMeses(rs.getInt("PlazoMeses"));
 	            prestamo.setInteres(rs.getDouble("Interes"));
 	            prestamo.setFechaAlta(rs.getDate("FechaAlta"));
-	           
 	            prestamo.setEstado(rs.getInt("Estado"));
-	         //   prestamo.setCuentaAsociada(rs.getInt("IdCuenta"));
-	         
+
+	            Cuenta cuenta = new Cuenta();
+	            cuenta.setIdCuenta(rs.getInt("IdCuenta"));
+	            cuenta.setNumeroCuenta(rs.getString("NumeroCuenta"));
+	            cuenta.setCbu(rs.getString("Cbu"));
+	            cuenta.setSaldo(rs.getBigDecimal("Saldo"));
+
+	            prestamo.setCuentaAsociada(cuenta);
 	        }
 
 	    } catch (Exception e) {
@@ -461,10 +469,11 @@ public class PrestamoDaoImpl implements PrestamoDao{
 
 
 
+
 @Override
 public boolean pagarCuotaConTransaccion(int idCuenta, int idPrestamo, Double monto) {
 	
-	 System.out.println("🟡 Ejecutado: pagarCuotaConTransaccion");
+	 System.out.println("ðŸŸ¡ Ejecutado: pagarCuotaConTransaccion");
 
 	    Connection conn = null;
 
@@ -478,17 +487,17 @@ public boolean pagarCuotaConTransaccion(int idCuenta, int idPrestamo, Double mon
 	        // Buscar la cuenta
 	        Cuenta cuenta = cuentaDao.buscarCuentaPorIdDao2(idCuenta, conn);
 	        if (cuenta == null) {
-	            System.out.println("❌ No se encontró la cuenta con ID: " + idCuenta);
+	            System.out.println("â�Œ No se encontrÃ³ la cuenta con ID: " + idCuenta);
 	            conn.rollback();
 	            return false;
 	        }
 
-	        System.out.println("✅ Cuenta encontrada: ID = " + cuenta.getIdCuenta());
+	        System.out.println("âœ… Cuenta encontrada: ID = " + cuenta.getIdCuenta());
 
 	        // Validar fondos suficientes
 	        BigDecimal montoPago = BigDecimal.valueOf(monto);
 	        if (cuenta.getSaldo().compareTo(montoPago) < 0) {
-	            System.out.println("❌ Saldo insuficiente. Saldo actual: " + cuenta.getSaldo() + ", Monto requerido: " + montoPago);
+	            System.out.println("â�Œ Saldo insuficiente. Saldo actual: " + cuenta.getSaldo() + ", Monto requerido: " + montoPago);
 	            conn.rollback();
 	            return false;
 	        }
@@ -501,7 +510,7 @@ public boolean pagarCuotaConTransaccion(int idCuenta, int idPrestamo, Double mon
 	        Movimiento movimiento = new Movimiento();
 	        movimiento.setCuenta(cuenta);
 	        movimiento.setImporte(montoPago);
-	        movimiento.setReferencia("Pago Préstamo");
+	        movimiento.setReferencia("Pago PrÃ©stamo");
 	        movimiento.setFechaHora(LocalDateTime.now());
 
 	        TipoMovimiento tipo = new TipoMovimiento();
@@ -512,12 +521,12 @@ public boolean pagarCuotaConTransaccion(int idCuenta, int idPrestamo, Double mon
 	        boolean exitoMovimiento = movimientoDao.insertMovimientoTransaccion(movimiento, conn);
 
 	        if (!exitoMovimiento) {
-	            System.out.println("❌ No se pudo registrar el movimiento");
+	            System.out.println("â�Œ No se pudo registrar el movimiento");
 	            conn.rollback();
 	            return false;
 	        }
 
-	        // Actualizar el préstamo (cuotas y estado)
+	        // Actualizar el prÃ©stamo (cuotas y estado)
 	        String sql = "UPDATE Prestamo " +
 	                     "SET CantidadCuotas = CantidadCuotas - 1, " +
 	                     "Estado = CASE WHEN CantidadCuotas - 1 <= 0 THEN 0 ELSE Estado END " +
@@ -528,16 +537,16 @@ public boolean pagarCuotaConTransaccion(int idCuenta, int idPrestamo, Double mon
 	            stmt.executeUpdate();
 	        }
 
-	        // Si todo salió bien, confirmar transacción
+	        // Si todo saliÃ³ bien, confirmar transacciÃ³n
 	        conn.commit();
-	        System.out.println("✅ Cuota pagada correctamente. Transacción confirmada.");
+	        System.out.println("âœ… Cuota pagada correctamente. TransacciÃ³n confirmada.");
 	        return true;
 
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	        try {
 	            if (conn != null) {
-	                System.out.println("🔁 Realizando rollback...");
+	                System.out.println("ðŸ”� Realizando rollback...");
 	                conn.rollback();
 	            }
 	        } catch (SQLException ex) {

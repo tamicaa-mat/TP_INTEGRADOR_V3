@@ -38,4 +38,7 @@ public interface CuentaNegocio {
 	public int obtenerIdCuentaPorNumero(String numeroCuenta);
 
 	public Cuenta buscarCuentaPorId(int idCuenta);
+	
+	boolean actualizarSaldo(int idCuenta, double nuevoSaldo);
+
 }

@@ -37,7 +37,7 @@ public interface CuentaDao {
 	public Cuenta buscarCuentaPorIdDao2(int idCuenta, Connection conn);  
 	public Cuenta buscarCuentaPorIdDao(int idCuenta);
 	public boolean actualizarSaldo(int idCuenta, BigDecimal nuevoSaldo, Connection conn);
-	
+	boolean actualizarSaldo(int idCuenta, double nuevoSaldo);
 
 	
 }

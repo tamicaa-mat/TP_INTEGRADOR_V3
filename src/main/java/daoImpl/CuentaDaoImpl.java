@@ -70,6 +70,11 @@ public class CuentaDaoImpl implements CuentaDao {
             "WHERE c.IdCliente = ? AND c.Estado = 1";
     
     
+    private static final String OBTENER_CUENTAS_POR_CLIENTE = 
+    		"SELECT c.*, cl.Dni, cl.Cuil, cl.Nombre, cl.Apellido, tc.IdTipoCuenta, tc.Descripcion AS TipoCuentaDescripcion FROM Cuenta c " +
+            "JOIN Cliente cl ON c.IdCliente = cl.IdCliente " +
+            "JOIN TipoCuenta tc ON c.IdTipoCuenta = tc.IdTipoCuenta " +
+            "WHERE c.IdCliente = ? AND c.Estado = 1";
     
 
     public Cuenta obtenerPorId(int idCuenta) {
@@ -186,7 +191,7 @@ public class CuentaDaoImpl implements CuentaDao {
         cuenta.setNumeroCuenta(resultSet.getString("NumeroCuenta"));
         cuenta.setCbu(resultSet.getString("Cbu"));
         cuenta.setSaldo(resultSet.getBigDecimal("Saldo"));
-        cuenta.setEstado(resultSet.getBoolean("CuentaEstado"));
+        cuenta.setEstado(resultSet.getBoolean("Estado"));
         
         cuenta.setCliente(cliente);
         cuenta.setTipoCuentaObjeto(tipoCuenta);
@@ -459,19 +464,14 @@ public class CuentaDaoImpl implements CuentaDao {
 
         try {
             conn = Conexion.getConexion().getSQLConexion();
-            String query = "SELECT * FROM Cuenta WHERE IdCliente = ? AND Estado = 1";
-            stmt = conn.prepareStatement(query);
+            stmt = conn.prepareStatement(OBTENER_CUENTAS_POR_CLIENTE);
             stmt.setInt(1, idCliente);
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                
-
-                Cuenta cuenta = mapearResultSetACuenta(rs); // Este método ya hace todo el trabajo
+                Cuenta cuenta = mapearResultSetACuenta(rs);
                 cuentas.add(cuenta);
             }
-
-            System.out.println("Total cuentas encontradas: " + cuentas.size());
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -713,6 +713,42 @@ public class CuentaDaoImpl implements CuentaDao {
 	    }
 	}
 
+	
+	@Override
+	public boolean actualizarSaldo(int idCuenta, double nuevoSaldo) {
+	    Connection conn = null;
+	    PreparedStatement stmt = null;
+
+	    try {
+	        conn = Conexion.getConexion().getSQLConexion();
+	        String sql = "UPDATE Cuenta SET Saldo = ? WHERE IdCuenta = ?";
+	        stmt = conn.prepareStatement(sql);
+	        stmt.setBigDecimal(1, BigDecimal.valueOf(nuevoSaldo));
+	        stmt.setInt(2, idCuenta);
+
+	        int filas = stmt.executeUpdate();
+	        conn.commit();
+
+	        return filas > 0;
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        try {
+	            if (conn != null) conn.rollback();
+	        } catch (SQLException ex) {
+	            ex.printStackTrace();
+	        }
+	        return false;
+
+	    } finally {
+	        try {
+	            if (stmt != null) stmt.close();
+	            if (conn != null) conn.close();
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	    }
+	}
 
 
 /// no conexion
