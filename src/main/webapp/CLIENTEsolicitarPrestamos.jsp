@@ -21,7 +21,7 @@
                 <div class="card-body">
                     <h4 class="card-title mb-4 text-center">Solicitar Préstamo</h4>
 
-  <form action="SolicitarPrestamoServlet" method="get">
+  <form action="SolicitarPrestamoServlet" method="post">
     <div class="mb-3">
         <label class="form-label small text-muted">Cuenta</label>
         <select class="form-select" name="cuentaSeleccionada" required>
