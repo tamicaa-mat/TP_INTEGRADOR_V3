@@ -414,7 +414,7 @@ public class PrestamoDaoImpl implements PrestamoDao{
 	    return cantidad;
 	}
 
-///////////// la necesito???
+///////////// la necesito??? siiii para actualizar infor prestamo desp de pagar
 	public Prestamo getPrestamoPorIdPrestamo(int idPrestamo) {
 	    Prestamo prestamo = null;
 	    Connection cn = null;
@@ -435,6 +435,8 @@ public class PrestamoDaoImpl implements PrestamoDao{
 
 	        if (rs.next()) {
 	            prestamo = new Prestamo();
+
+	            // Datos del préstamo
 	            prestamo.setIdPrestamo(rs.getInt("IdPrestamo"));
 	            prestamo.setImportePedido(rs.getDouble("ImportePedido"));
 	            prestamo.setImportePorMes(rs.getDouble("ImportePorMes"));
@@ -442,7 +444,9 @@ public class PrestamoDaoImpl implements PrestamoDao{
 	            prestamo.setInteres(rs.getDouble("Interes"));
 	            prestamo.setFechaAlta(rs.getDate("FechaAlta"));
 	            prestamo.setEstado(rs.getInt("Estado"));
+	            prestamo.setCantidadCuotas(rs.getInt("CantidadCuotas")); 
 
+	            // Datos de la cuenta asociada
 	            Cuenta cuenta = new Cuenta();
 	            cuenta.setIdCuenta(rs.getInt("IdCuenta"));
 	            cuenta.setNumeroCuenta(rs.getString("NumeroCuenta"));
@@ -487,17 +491,17 @@ public boolean pagarCuotaConTransaccion(int idCuenta, int idPrestamo, Double mon
 	        // Buscar la cuenta
 	        Cuenta cuenta = cuentaDao.buscarCuentaPorIdDao2(idCuenta, conn);
 	        if (cuenta == null) {
-	            System.out.println("â�Œ No se encontrÃ³ la cuenta con ID: " + idCuenta);
+	            System.out.println("Œ No se encontrÃ³ la cuenta con ID: " + idCuenta);
 	            conn.rollback();
 	            return false;
 	        }
 
-	        System.out.println("âœ… Cuenta encontrada: ID = " + cuenta.getIdCuenta());
+	        System.out.println("… Cuenta encontrada: ID = " + cuenta.getIdCuenta());
 
 	        // Validar fondos suficientes
 	        BigDecimal montoPago = BigDecimal.valueOf(monto);
 	        if (cuenta.getSaldo().compareTo(montoPago) < 0) {
-	            System.out.println("â�Œ Saldo insuficiente. Saldo actual: " + cuenta.getSaldo() + ", Monto requerido: " + montoPago);
+	            System.out.println(" Saldo insuficiente. Saldo actual: " + cuenta.getSaldo() + ", Monto requerido: " + montoPago);
 	            conn.rollback();
 	            return false;
 	        }
@@ -510,7 +514,7 @@ public boolean pagarCuotaConTransaccion(int idCuenta, int idPrestamo, Double mon
 	        Movimiento movimiento = new Movimiento();
 	        movimiento.setCuenta(cuenta);
 	        movimiento.setImporte(montoPago);
-	        movimiento.setReferencia("Pago PrÃ©stamo");
+	        movimiento.setReferencia("Pago Prstamo");
 	        movimiento.setFechaHora(LocalDateTime.now());
 
 	        TipoMovimiento tipo = new TipoMovimiento();
@@ -521,32 +525,35 @@ public boolean pagarCuotaConTransaccion(int idCuenta, int idPrestamo, Double mon
 	        boolean exitoMovimiento = movimientoDao.insertMovimientoTransaccion(movimiento, conn);
 
 	        if (!exitoMovimiento) {
-	            System.out.println("â�Œ No se pudo registrar el movimiento");
+	            System.out.println(" No se pudo registrar el movimiento");
 	            conn.rollback();
 	            return false;
 	        }
 
-	        // Actualizar el prÃ©stamo (cuotas y estado)
-	        String sql = "UPDATE Prestamo " +
-	                     "SET CantidadCuotas = CantidadCuotas - 1, " +
-	                     "Estado = CASE WHEN CantidadCuotas - 1 <= 0 THEN 0 ELSE Estado END " +
-	                     "WHERE IdPrestamo = ?";
-
-	        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-	            stmt.setInt(1, idPrestamo);
-	            stmt.executeUpdate();
+	     //  Disminuir la cantidad de cuotas
+	        String sql1 = "UPDATE Prestamo SET CantidadCuotas = CantidadCuotas - 1 WHERE IdPrestamo = ?";
+	        try (PreparedStatement stmt1 = conn.prepareStatement(sql1)) {
+	            stmt1.setInt(1, idPrestamo);
+	            stmt1.executeUpdate();
 	        }
 
-	        // Si todo saliÃ³ bien, confirmar transacciÃ³n
+	        // Cambiar estado si ya no quedan cuotas por pagar
+	        String sql2 = "UPDATE Prestamo SET Estado = 0 WHERE IdPrestamo = ? AND CantidadCuotas <= 0";
+	        try (PreparedStatement stmt2 = conn.prepareStatement(sql2)) {
+	            stmt2.setInt(1, idPrestamo);
+	            stmt2.executeUpdate();
+	        }
+
+	        // Si todo bien, confirmar transacc
 	        conn.commit();
-	        System.out.println("âœ… Cuota pagada correctamente. TransacciÃ³n confirmada.");
+	        System.out.println("Cuota pagada correctamente. Transaccin confirmada.");
 	        return true;
 
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	        try {
 	            if (conn != null) {
-	                System.out.println("ðŸ”� Realizando rollback...");
+	                System.out.println("Realizando rollback...");
 	                conn.rollback();
 	            }
 	        } catch (SQLException ex) {

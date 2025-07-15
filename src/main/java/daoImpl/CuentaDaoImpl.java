@@ -2,13 +2,12 @@ package daoImpl;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
-import java.util.Date;
-import java.util.List;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import dao.CuentaDao;
 import dominio.Cliente;

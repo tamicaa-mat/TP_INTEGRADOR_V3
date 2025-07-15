@@ -1,7 +1,5 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -17,35 +15,34 @@
         <div class="card-body">
             <h4 class="text-center mb-4">Pago de Préstamos</h4>
 
+            <!-- ✅ Mostrar mensaje de éxito -->
+            <c:if test="${param.exito == '1'}">
+                <div class="alert alert-success text-center">
+                    ✅ Pago realizado con éxito.
+                </div>
+            </c:if>
 
+            <!-- ✅ Mostrar mensaje de error -->
+            <c:if test="${param.error == '1'}">
+                <div class="alert alert-danger text-center">
+                    ❌ Error en el pago: saldo insuficiente u otro error.
+                </div>
+            </c:if>
 
-<c:if test="${not empty param.exito}">
-    <div class="alert alert-success text-center">
-        ✅ ${param.exito eq '1' ? 'Pago realizado con éxito.' : param.exito}
-    </div>
-</c:if>
-<c:if test="${not empty param.error}">
-    <div class="alert alert-danger text-center">
-        ❌ ${param.error eq '1' ? 'Error en el pago: saldo insuficiente u otro error.' : param.error}
-    </div>
-</c:if>
-
-
-            <!-- Formulario para seleccionar cuenta -->
+            <!-- 🔁 Formulario para seleccionar cuenta -->
             <form action="PagoPrestamoServlet" method="get">
                 <label class="form-label">Seleccione cuenta</label>
                 <select class="form-select mb-3" name="idCuenta" required onchange="this.form.submit()">
                     <option value="" disabled selected>Seleccione una cuenta</option>
                     <c:forEach var="cuenta" items="${cuentas}">
-                        <option value="${cuenta.idCuenta}"
-                                ${cuenta.idCuenta == param.idCuenta ? "selected" : ""}>
+                        <option value="${cuenta.idCuenta}" ${cuenta.idCuenta == param.idCuenta ? "selected" : ""}>
                             ${cuenta.numeroCuenta}
                         </option>
                     </c:forEach>
                 </select>
             </form>
 
-            <!-- Formulario para seleccionar préstamo -->
+            <!-- 🔁 Formulario para seleccionar préstamo -->
             <c:if test="${not empty prestamos}">
                 <form action="PagoPrestamoServlet" method="get">
                     <input type="hidden" name="idCuenta" value="${param.idCuenta}" />
@@ -53,8 +50,7 @@
                     <select class="form-select mb-3" name="idPrestamo" required onchange="this.form.submit()">
                         <option value="" disabled selected>Seleccione un préstamo</option>
                         <c:forEach var="p" items="${prestamos}">
-                            <option value="${p.idPrestamo}"
-                                    ${p.idPrestamo == param.idPrestamo ? "selected" : ""}>
+                            <option value="${p.idPrestamo}" ${p.idPrestamo == param.idPrestamo ? "selected" : ""}>
                                 Préstamo #${p.idPrestamo}
                             </option>
                         </c:forEach>
@@ -62,7 +58,7 @@
                 </form>
             </c:if>
 
-            <!-- Mostrar datos y formulario de pago -->
+            <!-- 🔁 Formulario para pagar cuota -->
             <c:if test="${not empty param.idPrestamo}">
                 <form action="PagarCuotaServlet" method="get">
                     <input type="hidden" name="idCuenta" value="${param.idCuenta}" />
@@ -84,6 +80,7 @@
                     </div>
                 </form>
             </c:if>
+
         </div>
     </div>
 </main>

@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import dominio.Cliente;
+import dominio.Prestamo;
 import Negocio.PrestamoNegocio;
 import NegocioImpl.PrestamoNegocioImpl;
 import daoImpl.PrestamoDaoImpl;
@@ -50,12 +51,16 @@ public class PagarCuotaServlet extends HttpServlet {
 		    PrestamoNegocio prestamoNegocio = new PrestamoNegocioImpl(new PrestamoDaoImpl());
 
 		    boolean exito = prestamoNegocio.pagarCuota(idCuenta, idPrestamo, monto);
-
 		    if (exito) {
-		        response.sendRedirect("CLIENTEpagoPrestamos.jsp?exito=1");
+		        Prestamo prestamoActualizado = prestamoNegocio.obtenerPrestamoPorId(idPrestamo);
+		        request.setAttribute("prestamo", prestamoActualizado);
+		        request.setAttribute("exito", true);
+		        request.getRequestDispatcher("CLIENTEpagoPrestamos.jsp").forward(request, response);
 		    } else {
-		        response.sendRedirect("CLIENTEpagoPrestamos.jsp?error=1No se pudo pagar la cuota");
+		        request.setAttribute("error", "Saldo insuficiente o error al procesar el pago.");
+		        request.getRequestDispatcher("CLIENTEpagoPrestamos.jsp").forward(request, response);
 		    }
+
 
 }
 	
