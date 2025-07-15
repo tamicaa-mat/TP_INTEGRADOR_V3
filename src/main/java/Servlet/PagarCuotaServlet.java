@@ -9,7 +9,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import dominio.Cliente;
+import Negocio.PrestamoNegocio;
+import NegocioImpl.PrestamoNegocioImpl;
+import daoImpl.PrestamoDaoImpl;
 
+;
 /**
  * Servlet implementation class PagarCuotaServlet
  */
@@ -29,39 +33,41 @@ public class PagarCuotaServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		 HttpSession session = request.getSession();
-
+		
+		 System.out.println("Servlet ejecutado: PagarCuotaServlet");
+		HttpSession session = request.getSession();
 		    Cliente cliente = (Cliente) session.getAttribute("clienteLogueado");
+
 		    if (cliente == null) {
 		        response.sendRedirect("login.jsp?mensaje=Debe iniciar sesión");
 		        return;
 		    }
 
-		    try {
-		        int idPrestamo = Integer.parseInt(request.getParameter("idPrestamo"));
-		        int idCuenta = Integer.parseInt(request.getParameter("idCuenta"));
-		        double montoPago = Double.parseDouble(request.getParameter("montoPago"));
+		    int idCuenta = Integer.parseInt(request.getParameter("idCuenta"));
+		    int idPrestamo = Integer.parseInt(request.getParameter("idPrestamo"));
+		    double monto = Double.parseDouble(request.getParameter("montoPago"));
 
-		        // Verificás si hay saldo suficiente, actualizás saldo de cuenta, agregás movimiento, etc.
+		    PrestamoNegocio prestamoNegocio = new PrestamoNegocioImpl(new PrestamoDaoImpl());
 
-		        System.out.println("Procesando pago de $" + montoPago + " para el préstamo ID " + idPrestamo);
+		    boolean exito = prestamoNegocio.pagarCuota(idCuenta, idPrestamo, monto);
 
-		        // Acá iría la lógica de negocio, como pagarCuota(), registrarMovimiento(), etc.
-
-		        response.sendRedirect("CLIENTEpagoPrestamos.jsp?mensaje=Pago exitoso");
-
-		    } catch (Exception e) {
-		        e.printStackTrace();
-		        response.sendRedirect("CLIENTEpagoPrestamos.jsp?mensaje=Error al procesar el pago");
+		    if (exito) {
+		        response.sendRedirect("CLIENTEpagoPrestamos.jsp?exito=1");
+		    } else {
+		        response.sendRedirect("CLIENTEpagoPrestamos.jsp?error=1No se pudo pagar la cuota");
 		    }
-	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
+}
+	
+	
+	
+	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
-
+	
+	
+	
+	
 }

@@ -135,5 +135,12 @@ public class PrestamoNegocioImpl implements PrestamoNegocio	{
 		
 			return prestamoDao.getPrestamoPorIdPrestamo(idPrestamo);
 		}
+
+
+
+
+		public boolean pagarCuota(int idCuenta, int idPrestamo, double monto) {
+			return prestamoDao.pagarCuotaConTransaccion(idCuenta, idPrestamo, monto);
+		}
 	    
 }

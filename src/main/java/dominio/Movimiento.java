@@ -2,7 +2,8 @@ package dominio;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.math.BigDecimal; 
+import java.math.BigDecimal;
+import java.sql.Date; 
 
 
 public class Movimiento {
@@ -93,6 +94,7 @@ public class Movimiento {
 		return "Movimiento [idMovimiento=" + idMovimiento + ", fechaHora=" + fechaHora + ", Referencia=" + Referencia
 				+ ", Importe=" + Importe + ", tipoMovimiento=" + tipoMovimiento + ", idCuenta=" + Cuenta + "]";
 	}
+
 
     
   

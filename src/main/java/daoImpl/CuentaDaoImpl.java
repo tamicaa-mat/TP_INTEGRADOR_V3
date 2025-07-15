@@ -1,5 +1,6 @@
 package daoImpl;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.util.Date;
 import java.util.List;
@@ -643,6 +644,78 @@ public class CuentaDaoImpl implements CuentaDao {
 	}
 
 
+// si conexion transaccion
+
+	@Override
+	public Cuenta buscarCuentaPorIdDao2(int idCuenta,  Connection conn) {
+		
+		 Cuenta cuenta = null;
+		    PreparedStatement stmt = null;
+		    ResultSet rs = null;
+
+		    String sql = "SELECT * FROM Cuenta WHERE IdCuenta = ? AND Estado = 1";
+
+		    try {
+		        stmt = conn.prepareStatement(sql);
+		        stmt.setInt(1, idCuenta);
+		        rs = stmt.executeQuery();
+
+		        if (rs.next()) {
+		            cuenta = new Cuenta();
+		            cuenta.setIdCuenta(rs.getInt("IdCuenta"));
+		            cuenta.setSaldo(rs.getBigDecimal("Saldo"));
+		            cuenta.setNumeroCuenta(rs.getString("NumeroCuenta"));
+		            cuenta.setCbu(rs.getString("Cbu"));
+		            cuenta.setSaldo(rs.getBigDecimal("Saldo"));
+	                cuenta.setEstado(rs.getBoolean("Estado"));
+		        }
+
+		    } catch (SQLException e) {
+		        e.printStackTrace();
+		    } finally {
+		        try {
+		            if (rs != null) rs.close();
+		            if (stmt != null) stmt.close();
+		        } catch (SQLException e) {
+		            e.printStackTrace();
+		        }
+		    }
+
+		    return cuenta;
+		
+		
+	}
+
+
+
+
+	@Override
+	public boolean actualizarSaldo(int idCuenta, BigDecimal nuevoSaldo, Connection conn) {
+	    PreparedStatement ps = null;
+	    try {
+	        String sql = "UPDATE Cuenta SET Saldo = ? WHERE IdCuenta = ?";
+	        ps = conn.prepareStatement(sql);
+	        ps.setBigDecimal(1, nuevoSaldo);
+	        ps.setInt(2, idCuenta);
+
+	        int filasAfectadas = ps.executeUpdate();
+	        return filasAfectadas > 0;
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return false;
+	    } finally {
+	        try {
+	            if (ps != null) ps.close();
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	    }
+	}
+
+
+
+/// no conexion
 
 
 	@Override
@@ -673,7 +746,7 @@ public class CuentaDaoImpl implements CuentaDao {
                 cuenta.setEstado(rs.getBoolean("Estado"));
 	       
 	            
-	            // Si tenés relación con cliente
+	          
 	        }
 
 	    } catch (Exception e) {
@@ -695,7 +768,6 @@ public class CuentaDaoImpl implements CuentaDao {
 		
 	}
 
-    
 	
 	
 }

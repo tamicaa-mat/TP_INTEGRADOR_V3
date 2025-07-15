@@ -159,20 +159,20 @@ public class MovimientoDaoImpl implements MovimientoDao{
 			          
 			            int idCuenta = movimiento.getCuenta().getIdCuenta();
 			            
-			            // --- DEBUG (Opcional pero útil) ---
+			           
 			            System.out.println("🧾 DEBUG Movimiento a Insertar:");
 			            System.out.println("FechaHora: " + movimiento.getFechaHora());
 			            System.out.println("Referencia: " + movimiento.getReferencia());
 			            System.out.println("Importe: " + movimiento.getImporte());
 			            System.out.println("IdTipoMovimiento: " + movimiento.getTipoMovimiento().getIdTipoMovimiento());
-			            System.out.println("IdCuenta: " + idCuenta); // Usamos la variable que acabamos de crear
+			            System.out.println("IdCuenta: " + idCuenta); 
 
 			            // Seteamos los valores en el PreparedStatement
 			            stmt.setTimestamp(1, Timestamp.valueOf(movimiento.getFechaHora()));
 			            stmt.setString(2, movimiento.getReferencia());
 			            stmt.setBigDecimal(3, movimiento.getImporte());
 			            stmt.setInt(4, movimiento.getTipoMovimiento().getIdTipoMovimiento());
-			            stmt.setInt(5, idCuenta); // --- CORRECCIÓN APLICADA AQUÍ ---
+			            stmt.setInt(5, idCuenta); // 
 
 			            int rows = stmt.executeUpdate();
 			            
@@ -209,6 +209,35 @@ public class MovimientoDaoImpl implements MovimientoDao{
 			        }
 			    }
 
-	
-	
+			    public boolean insertMovimientoTransaccion(Movimiento movimiento, Connection conn) {
+			        PreparedStatement stmt = null;
+			        String sql = "INSERT INTO Movimiento (FechaHora, Referencia, Importe, IdTipoMovimiento, IdCuenta) VALUES (?, ?, ?, ?, ?)";
+
+			        try {
+			            stmt = conn.prepareStatement(sql);
+
+			            // Seteamos los valores en el PreparedStatement
+			            stmt.setTimestamp(1, Timestamp.valueOf(movimiento.getFechaHora()));
+			            stmt.setString(2, movimiento.getReferencia());
+			            stmt.setBigDecimal(3, movimiento.getImporte());
+			            stmt.setInt(4, movimiento.getTipoMovimiento().getIdTipoMovimiento());
+			            stmt.setInt(5, movimiento.getCuenta().getIdCuenta());
+
+			            int rows = stmt.executeUpdate();
+			            return rows > 0;
+
+			        } catch (SQLException e) {
+			            e.printStackTrace();
+			            return false;
+			        } finally {
+			            try {
+			                if (stmt != null) stmt.close();
+			            } catch (SQLException e) {
+			                e.printStackTrace();
+			            }
+			        }
+			    }
+
+
+
 }

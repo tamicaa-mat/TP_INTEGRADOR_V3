@@ -21,7 +21,9 @@ public interface PrestamoNegocio {
 
     boolean eliminarPrestamo(int idPrestamo);
 
-    boolean pagarPrestamo(int idPrestamo, double montoPago); 
+    
+    
+    
     List<Prestamo> listarPrestamos();
     boolean actualizarEstadoPrestamo(int idPrestamo, int nuevoEstado);
     
@@ -29,8 +31,11 @@ public interface PrestamoNegocio {
 
     
    Prestamo obtenerPrestamoPorId(int idPrestamo);
+   
     
     public List<Prestamo> obtenerPrestamosActivosPorCuenta(int idCuenta);
+    boolean pagarCuota(int idCuenta, int idPrestamo, double monto);
+    
     
     double obtenerSumaImporteEntreFechas(Date desde, Date hasta);
     int contarPrestamosEntreFechas(Date desde, Date hasta);

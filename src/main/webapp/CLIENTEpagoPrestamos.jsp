@@ -17,6 +17,20 @@
         <div class="card-body">
             <h4 class="text-center mb-4">Pago de Préstamos</h4>
 
+
+
+<c:if test="${not empty param.exito}">
+    <div class="alert alert-success text-center">
+        ✅ ${param.exito eq '1' ? 'Pago realizado con éxito.' : param.exito}
+    </div>
+</c:if>
+<c:if test="${not empty param.error}">
+    <div class="alert alert-danger text-center">
+        ❌ ${param.error eq '1' ? 'Error en el pago: saldo insuficiente u otro error.' : param.error}
+    </div>
+</c:if>
+
+
             <!-- Formulario para seleccionar cuenta -->
             <form action="PagoPrestamoServlet" method="get">
                 <label class="form-label">Seleccione cuenta</label>

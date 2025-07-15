@@ -2,18 +2,24 @@ package daoImpl;
 
 
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import dao.CuentaDao;
 import dao.PrestamoDao;
+import dao.MovimientoDao;
 import dominio.Cliente;
 import dominio.Cuenta;
+import dominio.Movimiento;
 import dominio.Prestamo;
+import dominio.TipoMovimiento;
 
 public class PrestamoDaoImpl implements PrestamoDao{
 
@@ -453,7 +459,109 @@ public class PrestamoDaoImpl implements PrestamoDao{
 	    return prestamo;
 	}
 
+
+
+@Override
+public boolean pagarCuotaConTransaccion(int idCuenta, int idPrestamo, Double monto) {
 	
+	 System.out.println("🟡 Ejecutado: pagarCuotaConTransaccion");
+
+	    Connection conn = null;
+
+	    try {
+	        conn = Conexion.getConexion().getSQLConexion();
+	        conn.setAutoCommit(false);
+
+	        // DAOs
+	        CuentaDao cuentaDao = new CuentaDaoImpl();
+
+	        // Buscar la cuenta
+	        Cuenta cuenta = cuentaDao.buscarCuentaPorIdDao2(idCuenta, conn);
+	        if (cuenta == null) {
+	            System.out.println("❌ No se encontró la cuenta con ID: " + idCuenta);
+	            conn.rollback();
+	            return false;
+	        }
+
+	        System.out.println("✅ Cuenta encontrada: ID = " + cuenta.getIdCuenta());
+
+	        // Validar fondos suficientes
+	        BigDecimal montoPago = BigDecimal.valueOf(monto);
+	        if (cuenta.getSaldo().compareTo(montoPago) < 0) {
+	            System.out.println("❌ Saldo insuficiente. Saldo actual: " + cuenta.getSaldo() + ", Monto requerido: " + montoPago);
+	            conn.rollback();
+	            return false;
+	        }
+
+	        // Descontar el saldo y actualizar
+	        BigDecimal nuevoSaldo = cuenta.getSaldo().subtract(montoPago);
+	        cuentaDao.actualizarSaldo(idCuenta, nuevoSaldo, conn);
+
+	        // Crear el movimiento
+	        Movimiento movimiento = new Movimiento();
+	        movimiento.setCuenta(cuenta);
+	        movimiento.setImporte(montoPago);
+	        movimiento.setReferencia("Pago Préstamo");
+	        movimiento.setFechaHora(LocalDateTime.now());
+
+	        TipoMovimiento tipo = new TipoMovimiento();
+	        tipo.setIdTipoMovimiento(3); // Egreso
+	        movimiento.setTipoMovimiento(tipo);
+
+	        MovimientoDao movimientoDao = new MovimientoDaoImpl();
+	        boolean exitoMovimiento = movimientoDao.insertMovimientoTransaccion(movimiento, conn);
+
+	        if (!exitoMovimiento) {
+	            System.out.println("❌ No se pudo registrar el movimiento");
+	            conn.rollback();
+	            return false;
+	        }
+
+	        // Actualizar el préstamo (cuotas y estado)
+	        String sql = "UPDATE Prestamo " +
+	                     "SET CantidadCuotas = CantidadCuotas - 1, " +
+	                     "Estado = CASE WHEN CantidadCuotas - 1 <= 0 THEN 0 ELSE Estado END " +
+	                     "WHERE IdPrestamo = ?";
+
+	        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+	            stmt.setInt(1, idPrestamo);
+	            stmt.executeUpdate();
+	        }
+
+	        // Si todo salió bien, confirmar transacción
+	        conn.commit();
+	        System.out.println("✅ Cuota pagada correctamente. Transacción confirmada.");
+	        return true;
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        try {
+	            if (conn != null) {
+	                System.out.println("🔁 Realizando rollback...");
+	                conn.rollback();
+	            }
+	        } catch (SQLException ex) {
+	            ex.printStackTrace();
+	        }
+	        return false;
+
+	    } finally {
+	        try {
+	            if (conn != null) conn.close();
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	    }
+}
+
+
+
+	
+	
+
+	
+		
+		
 	
 }
 

@@ -27,5 +27,6 @@ public interface PrestamoDao {
     
     //para pagar
 	Prestamo getPrestamoPorIdPrestamo(int idPrestamo);
-    
+	boolean pagarCuotaConTransaccion(int idCuenta,int idPrestamo, Double monto);
+	
 }

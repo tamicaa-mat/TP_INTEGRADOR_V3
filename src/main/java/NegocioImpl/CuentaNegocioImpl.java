@@ -162,7 +162,7 @@ public class CuentaNegocioImpl implements CuentaNegocio {
 
 }
 
-
+// pagoprestamoservlet
 		@Override
 		public Cuenta buscarCuentaPorId(int idCuenta) {
 			 return cuentaDao.buscarCuentaPorIdDao(idCuenta);

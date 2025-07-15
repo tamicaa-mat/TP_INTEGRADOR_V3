@@ -1,5 +1,7 @@
 package dao;
 
+import java.math.BigDecimal;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -32,8 +34,10 @@ public interface CuentaDao {
 	
 	int getIdCuentaPorNumeroCuenta(String numeroCuenta);
 
+	public Cuenta buscarCuentaPorIdDao2(int idCuenta, Connection conn);  
 	public Cuenta buscarCuentaPorIdDao(int idCuenta);
+	public boolean actualizarSaldo(int idCuenta, BigDecimal nuevoSaldo, Connection conn);
 	
-	
+
 	
 }
