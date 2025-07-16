@@ -4,7 +4,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Pago de Préstamos</title>
+    <title>Pago de Prestamos</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
@@ -13,19 +13,29 @@
 <main class="container py-5">
     <div class="card col-md-6 mx-auto shadow-sm">
         <div class="card-body">
-            <h4 class="text-center mb-4">Pago de Préstamos</h4>
+            <h4 class="text-center mb-4">Pago de Prestamos</h4>
 
-            <!-- ✅ Mostrar mensaje de éxito -->
-            <c:if test="${param.exito == '1'}">
-                <div class="alert alert-success text-center">
-                    ✅ Pago realizado con éxito.
+         <!-- ✅ Mostrar mensaje de error si existe -->
+            <c:if test="${not empty error}">
+                <div class="alert alert-danger text-center">
+                    ❌ ${error}
                 </div>
             </c:if>
 
-            <!-- ✅ Mostrar mensaje de error -->
-            <c:if test="${param.error == '1'}">
-                <div class="alert alert-danger text-center">
-                    ❌ Error en el pago: saldo insuficiente u otro error.
+            <!-- ✅ Mostrar info solo si hay un préstamo válido -->
+            <c:if test="${not empty prestamo}">
+                <c:set var="cuotasPagadas" value="${prestamo.plazoMeses - prestamo.cantidadCuotas}" />
+                <c:set var="cuotaTotalPagada" value="${prestamo.importePorMes * cuotasPagadas}" />
+                <c:set var="saldoRestante" value="${prestamo.importePedido - cuotaTotalPagada}" />
+                <c:set var="cuotasRestantes" value="${prestamo.cantidadCuotas}" />
+
+                <div class="alert alert-info text-center mt-3">
+                     <strong>Saldo restante:</strong> 
+                    $<fmt:formatNumber value="${saldoRestante}" type="number" minFractionDigits="2" />
+                    <br/>
+                     <strong>Cuotas pagadas:</strong> ${cuotasPagadas}
+                    <br/>
+                     <strong>Cuotas restantes:</strong> ${cuotasRestantes}
                 </div>
             </c:if>
 
