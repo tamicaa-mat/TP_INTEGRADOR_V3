@@ -28,56 +28,64 @@ public class MovimientoDaoImpl implements MovimientoDao {
 
 	@Override
 	public List<Movimiento> obtenerMovimientosPorCliente(int idCliente) {
-		List<Movimiento> listaMovimientos = new ArrayList<>();
-		Connection conexion = null;
-		PreparedStatement statement = null;
-		ResultSet resultSet = null;
+	
+		    List<Movimiento> listaMovimientos = new ArrayList<>();
+		    Connection conexion = null;
+		    PreparedStatement statement = null;
+		    ResultSet resultSet = null;
 
-		try {
-			conexion = Conexion.getConexion().getSQLConexion();
-			statement = conexion.prepareStatement(OBTENER_POR_CLIENTE);
-			statement.setInt(1, idCliente);
-			resultSet = statement.executeQuery();
+		    try {
+		        System.out.println("DAO: preparando consulta para cliente ID = " + idCliente);
+		        conexion = Conexion.getConexion().getSQLConexion();
+		        statement = conexion.prepareStatement(OBTENER_POR_CLIENTE);
+		        statement.setInt(1, idCliente);
+		        resultSet = statement.executeQuery();
 
-			while (resultSet.next()) {
-				Movimiento movimiento = new Movimiento();
+		        while (resultSet.next()) {
+		            Movimiento movimiento = new Movimiento();
 
-				TipoMovimiento tm = new TipoMovimiento();
-				tm.setIdTipoMovimiento(resultSet.getInt("IdTipoMovimiento"));
-				tm.setDescripcion(resultSet.getString("TipoMovimientoDesc"));
+		            TipoMovimiento tm = new TipoMovimiento();
+		            tm.setIdTipoMovimiento(resultSet.getInt("IdTipoMovimiento"));
+		            tm.setDescripcion(resultSet.getString("TipoMovimientoDesc"));
 
-				Cuenta c = new Cuenta();
-				c.setIdCuenta(resultSet.getInt("IdCuenta"));
-				c.setNumeroCuenta(resultSet.getString("NumeroCuenta"));
-				c.setCbu(resultSet.getString("Cbu"));
+		            Cuenta c = new Cuenta();
+		            c.setIdCuenta(resultSet.getInt("IdCuenta"));
+		            c.setNumeroCuenta(resultSet.getString("NumeroCuenta"));
+		            c.setCbu(resultSet.getString("Cbu"));
 
-				movimiento.setIdMovimiento(resultSet.getInt("IdMovimiento"));
-				// Convertimos el Timestamp de SQL a LocalDateTime de Java
-				movimiento.setFechaHora(resultSet.getTimestamp("FechaHora").toLocalDateTime());
-				movimiento.setReferencia(resultSet.getString("Referencia"));
-				movimiento.setImporte(resultSet.getBigDecimal("Importe"));
-				movimiento.setTipoMovimiento(tm);
-				movimiento.setCuenta(c);
+		            movimiento.setIdMovimiento(resultSet.getInt("IdMovimiento"));
+		            movimiento.setFechaHora(resultSet.getTimestamp("FechaHora").toLocalDateTime());
+		            movimiento.setReferencia(resultSet.getString("Referencia"));
+		            movimiento.setImporte(resultSet.getBigDecimal("Importe"));
+		            movimiento.setTipoMovimiento(tm);
+		            movimiento.setCuenta(c);
 
-				listaMovimientos.add(movimiento);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			// Cerrar recursos
-			try {
-				if (resultSet != null)
-					resultSet.close();
-				if (statement != null)
-					statement.close();
-				if (conexion != null)
-					conexion.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+		            // 🔎 Depuración de cada movimiento
+		            System.out.println("Movimiento encontrado: " + movimiento.getFechaHora() + " - " + 
+		                               movimiento.getReferencia() + " - $" + movimiento.getImporte());
+
+		            listaMovimientos.add(movimiento);
+		        }
+
+		        // 🔎 Total
+		        System.out.println("Total movimientos encontrados para cliente " + idCliente + ": " + listaMovimientos.size());
+
+		    } catch (SQLException e) {
+		        System.out.println("ERROR en DAO al obtener movimientos por cliente: " + e.getMessage());
+		        e.printStackTrace();
+		    } finally {
+		        try {
+		            if (resultSet != null) resultSet.close();
+		            if (statement != null) statement.close();
+		            if (conexion != null) conexion.close();
+		        } catch (SQLException e) {
+		            e.printStackTrace();
+		        }
+		    }
+		    return listaMovimientos;
 		}
-		return listaMovimientos;
-	}
+
+	
 
 	public List<Movimiento> listarMovimientos(int idCuenta, int idTipo) {
 

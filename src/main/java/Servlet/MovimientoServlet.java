@@ -65,7 +65,13 @@ public class MovimientoServlet extends HttpServlet {
         request.setAttribute("filtroCuenta", idCuenta);
         request.setAttribute("filtroTipo", idTipo);
 
+        System.out.println("Cliente en servlet movimiento: " + cliente.getIdCliente());
+        List<Movimiento> todosLosMovimientos = movimientoNegocio.obtenerMovimientosPorCliente(cliente.getIdCliente());
+        request.setAttribute("todosLosMovimientos", todosLosMovimientos);
+        
         request.getRequestDispatcher("ClienteListaMovimientos.jsp").forward(request, response);
+        
+        
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

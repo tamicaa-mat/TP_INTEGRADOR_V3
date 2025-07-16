@@ -26,6 +26,7 @@ public class MovimientoNegocioImpl implements MovimientoNegocio{
 	    
 	    
 	    public List<Movimiento> obtenerMovimientosPorCliente(int idCliente) {
+	    System.out.println("Obteniendo movimientos para el cliente ID: " + idCliente);
 	        return movimientoDao.obtenerMovimientosPorCliente(idCliente);
 	    }
 	    
