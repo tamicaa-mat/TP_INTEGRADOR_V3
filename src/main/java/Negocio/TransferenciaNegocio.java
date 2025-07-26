@@ -1,14 +1,17 @@
-// --- INTERFAZ (negocio/TransferenciaNegocio.java) ---
+
 package Negocio;
 
 import java.math.BigDecimal;
+import java.util.List;
+
+import dominio.Transferencia;
 
 public interface TransferenciaNegocio {
 	
 	
 	
 	
-    public boolean realizarTransferencia(int idCuentaOrigen, String cbuDestino, BigDecimal monto) throws Exception;
-
+    public boolean realizarTransferencia(String numeroCuentaOrigen, String cbuDestino, BigDecimal monto);
+    List<Transferencia> listarTransferenciasPorCuenta(String numeroCuentaOrigen);
 
 }

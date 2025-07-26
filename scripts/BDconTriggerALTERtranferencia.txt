@@ -234,7 +234,123 @@ INSERT INTO Cliente (Dni, Cuil, Nombre, Apellido, Sexo, Nacionalidad, FechaNacim
  'Rambla NNN 2255', 'marcopanpolo@hotmail.com', '1555566622', 7, NULL, 1);
 
 
+17/07 falta columna transferencia en la bd, y en el dominio del back lo agregué
+
 ALTER TABLE Transferencia
 ADD Monto DECIMAL(15, 2) NOT NULL DEFAULT 0;
 
+UPDATE `bancotpintegrador3`.`transferencia` SET `Monto`='50000' WHERE `IdTransferencia`='1';
+UPDATE `bancotpintegrador3`.`transferencia` SET `Monto`='30000' WHERE `IdTransferencia`='2';
+INSERT INTO `bancotpintegrador3`.`transferencia` (`Monto`) VALUES ('150000');
+
+// agrego localidades para filtrar por provincia 
+USE BancoTpIntegrador3;
+
+-- San Luis (IdProvincia = 1)
+INSERT INTO localidad (Descripcion, IdProvincia) VALUES 
+('Villa Mercedes', 1), 
+('Merlo', 1), 
+('San Luis Capital', 1);
+
+-- Misiones (2)
+INSERT INTO localidad (Descripcion, IdProvincia) VALUES 
+('Posadas', 2), 
+('Oberá', 2), 
+('Eldorado', 2);
+
+-- Córdoba (3)
+INSERT INTO localidad (Descripcion, IdProvincia) VALUES 
+('Córdoba Capital', 3), 
+('Villa Carlos Paz', 3), 
+('Río Cuarto', 3);
+
+-- Buenos Aires (4)
+INSERT INTO localidad (Descripcion, IdProvincia) VALUES 
+('La Plata', 4), 
+('Mar del Plata', 4), 
+('Bahía Blanca', 4);
+
+-- La Rioja (5)
+INSERT INTO localidad (Descripcion, IdProvincia) VALUES 
+('La Rioja Capital', 5), 
+('Chilecito', 5), 
+('Aimogasta', 5);
+
+-- Tierra del Fuego (6)
+INSERT INTO localidad (Descripcion, IdProvincia) VALUES 
+('Ushuaia', 6), 
+('Río Grande', 6), 
+('Tolhuin', 6);
+
+-- Mendoza (7)
+INSERT INTO localidad (Descripcion, IdProvincia) VALUES 
+('Mendoza Capital', 7), 
+('San Rafael', 7), 
+('Godoy Cruz', 7);
+
+-- Santa Cruz (8)
+INSERT INTO localidad (Descripcion, IdProvincia) VALUES 
+('Río Gallegos', 8), 
+('Caleta Olivia', 8), 
+('El Calafate', 8);
+
+-- Formosa (9)
+INSERT INTO localidad (Descripcion, IdProvincia) VALUES 
+('Formosa Capital', 9), 
+('Clorinda', 9), 
+('Pirané', 9);
+
+-- Tucumán (10)
+INSERT INTO localidad (Descripcion, IdProvincia) VALUES 
+('San Miguel de Tucumán', 10), 
+('Yerba Buena', 10), 
+('Tafí Viejo', 10);
+
+-- Jujuy (11)
+INSERT INTO localidad (Descripcion, IdProvincia) VALUES 
+('San Salvador de Jujuy', 11), 
+('Palpalá', 11), 
+('Libertador General San Martín', 11);
+
+-- Neuquén (12)
+INSERT INTO localidad (Descripcion, IdProvincia) VALUES 
+('Neuquén Capital', 12), 
+('Cutral Có', 12), 
+('Plottier', 12);
+
+-- La Pampa (13)
+INSERT INTO localidad (Descripcion, IdProvincia) VALUES 
+('Santa Rosa', 13), 
+('General Pico', 13), 
+('Toay', 13);
+
+-- Río Negro (14)
+INSERT INTO localidad (Descripcion, IdProvincia) VALUES 
+('Viedma', 14), 
+('Bariloche', 14), 
+('General Roca', 14);
+
+-- Entre Ríos (15)
+INSERT INTO localidad (Descripcion, IdProvincia) VALUES 
+('Paraná', 15), 
+('Concordia', 15), 
+('Gualeguaychú', 15);
+
+-- Chaco (16)
+INSERT INTO localidad (Descripcion, IdProvincia) VALUES 
+('Resistencia', 16), 
+('Presidencia Roque Sáenz Peña', 16), 
+('Villa Ángela', 16);
+
+-- Chubut (17)
+INSERT INTO localidad (Descripcion, IdProvincia) VALUES 
+('Rawson', 17), 
+('Comodoro Rivadavia', 17), 
+('Trelew', 17);
+
+-- Santa Fe (18)
+INSERT INTO localidad (Descripcion, IdProvincia) VALUES 
+('Santa Fe Capital', 18), 
+('Rosario', 18), 
+('Rafaela', 18);
 

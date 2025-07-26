@@ -50,7 +50,7 @@
                 <p class="fs-4">Gestioná tus cuentas y finanzas de forma fácil y segura.</p>
                 <hr class="my-4" style="width: 50%; border-top: 1px solid white;">
                 <p>¿Qué te gustaría hacer hoy?</p>
-                <a class="btn btn-primary btn-lg" href="${pageContext.request.contextPath}/MovimientoServlet" role="button">Ver mis movimientos</a>
+                <a class="btn btn-info btn-lg" href="${pageContext.request.contextPath}/MovimientoServlet" role="button">Ver mis movimientos</a>
             </div>
         </div>
         

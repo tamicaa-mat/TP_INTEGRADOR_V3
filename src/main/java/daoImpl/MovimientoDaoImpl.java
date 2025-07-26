@@ -60,14 +60,14 @@ public class MovimientoDaoImpl implements MovimientoDao {
 		            movimiento.setTipoMovimiento(tm);
 		            movimiento.setCuenta(c);
 
-		            // 🔎 Depuración de cada movimiento
+		            //  Depuración de cada movimiento
 		            System.out.println("Movimiento encontrado: " + movimiento.getFechaHora() + " - " + 
 		                               movimiento.getReferencia() + " - $" + movimiento.getImporte());
 
 		            listaMovimientos.add(movimiento);
 		        }
 
-		        // 🔎 Total
+		        //  Total
 		        System.out.println("Total movimientos encontrados para cliente " + idCliente + ": " + listaMovimientos.size());
 
 		    } catch (SQLException e) {
@@ -117,18 +117,17 @@ public class MovimientoDaoImpl implements MovimientoDao {
 				m.setReferencia(rs.getString("Referencia"));
 				m.setImporte(rs.getBigDecimal("Importe"));
 
-				// --- ESTA ES LA CORRECCIÓN ---
+				
 				// 1. Crea un objeto Cuenta.
 				Cuenta c = new Cuenta();
-				// 2. Asígnale el ID que obtienes del ResultSet.
+				// 2. Asígna el ID que obtienes del ResultSet.
 				c.setIdCuenta(rs.getInt("IdCuenta"));
 				// 3. Asigna el objeto Cuenta completo al Movimiento.
 				m.setCuenta(c);
-				// --- FIN DE LA CORRECCIÓN ---
+				
 
 				TipoMovimiento tm = new TipoMovimiento();
-				// Asumo que tu SELECT tiene alias para estas columnas, ej: "tm.IdTipoMovimiento
-				// AS tm_id"
+			
 				tm.setIdTipoMovimiento(rs.getInt("tm_id"));
 				tm.setDescripcion(rs.getString("tm_desc"));
 				m.setTipoMovimiento(tm);
@@ -155,7 +154,7 @@ public class MovimientoDaoImpl implements MovimientoDao {
 
 			int idCuenta = movimiento.getCuenta().getIdCuenta();
 
-			System.out.println("🧾 DEBUG Movimiento a Insertar:");
+			System.out.println(" DEBUG Movimiento a Insertar:");
 			System.out.println("FechaHora: " + movimiento.getFechaHora());
 			System.out.println("Referencia: " + movimiento.getReferencia());
 			System.out.println("Importe: " + movimiento.getImporte());

@@ -26,4 +26,7 @@ public interface ClienteDao {
      public ArrayList<Cliente> leerTodosLosClientesActivos(); // Para ver solo activos (Estado = 1)
      public ArrayList<Cliente> leerTodosLosClientesInactivos();
 
+     public boolean existeDni(String dni);
+     
+     
 }

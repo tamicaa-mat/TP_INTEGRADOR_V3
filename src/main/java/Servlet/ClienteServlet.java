@@ -39,19 +39,48 @@ public class ClienteServlet extends HttpServlet {
         
       
         if (action != null && action.equals("mostrarFormulario")) {
+            System.out.println("[DEBUG] Acción recibida: " + action);
+
             ProvinciaNegocio provNegocio = new ProvinciaNegocioImpl();
             ArrayList<Provincia> listaProvincias = provNegocio.leerTodasLasProvincias();
             
             LocalidadNegocio locNegocio = new LocalidadNegocioImpl();
             ArrayList<Localidad> listaLocalidades = locNegocio.leerTodasLasLocalidades();
-            
+
+            String recargarLocalidades = request.getParameter("recargarLocalidades");
+            String idProvinciaStr = request.getParameter("ddlProvincia");
+
+            System.out.println("[DEBUG] recargarLocalidades: " + recargarLocalidades);
+            System.out.println("[DEBUG] ddlProvincia (ID): " + idProvinciaStr);
+
+            ArrayList<Localidad> listaLocalidadesFiltradas = null;
+
+            if ("true".equals(recargarLocalidades) && idProvinciaStr != null && !idProvinciaStr.isEmpty()) {
+                try {
+                    int idProvincia = Integer.parseInt(idProvinciaStr);
+                    System.out.println("[DEBUG] Filtrando localidades por provincia ID: " + idProvincia);
+                    
+                    listaLocalidadesFiltradas = locNegocio.leerLocalidadesPorProvincia(idProvincia);
+                    System.out.println("[DEBUG] Localidades filtradas encontradas: " + (listaLocalidadesFiltradas != null ? listaLocalidadesFiltradas.size() : "null"));
+                } catch (NumberFormatException e) {
+                    System.out.println("[ERROR] No se pudo parsear el ID de provincia: " + idProvinciaStr);
+                }
+            }
+
             request.setAttribute("listaProvincias", listaProvincias);
             request.setAttribute("listaLocalidades", listaLocalidades);
-            
+
+            if (listaLocalidadesFiltradas != null) {
+                System.out.println("[DEBUG] Enviando lista filtrada al JSP");
+                request.setAttribute("listaLocalidadesFiltradas", listaLocalidadesFiltradas);
+            } else {
+                System.out.println("[DEBUG] No se cargó lista filtrada, se usará completa en el JSP");
+            }
+
             RequestDispatcher rd = request.getRequestDispatcher("/clientesFormulario.jsp");
             rd.forward(request, response);
         }
-      
+
         else if (action != null && action.equals("editar")) {
             String dni = request.getParameter("dni");
             

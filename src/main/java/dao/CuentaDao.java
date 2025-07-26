@@ -31,13 +31,17 @@ public interface CuentaDao {
 	double obtenerSaldoTotalCuentasCreadasEntreFechas(Date desde, Date hasta);
 	
 	
+	public int getIdCuentaPorNumeroCuenta(String numeroCuenta);
 	
-	int getIdCuentaPorNumeroCuenta(String numeroCuenta);
+	public Cuenta buscarCuentaPorNumeroCuenta(String numeroCuenta);
+
+	//para transf
 
 	public Cuenta buscarCuentaPorIdDao2(int idCuenta, Connection conn);  
 	public Cuenta buscarCuentaPorIdDao(int idCuenta);
 	public boolean actualizarSaldo(int idCuenta, BigDecimal nuevoSaldo, Connection conn);
 	boolean actualizarSaldo(int idCuenta, double nuevoSaldo);
 
+	
 	
 }

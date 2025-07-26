@@ -66,11 +66,11 @@ public class PrestamoDaoImpl implements PrestamoDao{
 
                 if (filas > 0) {
                     conn.commit();
-                    System.out.println("TransacciÃ³n commit OK");
+                    System.out.println("Transaccion commit OK");
                     return true;
                 } else {
                     conn.rollback();
-                    System.err.println("No se insertÃ³ ninguna fila, se hizo rollback");
+                    System.err.println("No se inserto ninguna fila, se hizo rollback");
                     return false;
                 }
             } catch (SQLException e) {
@@ -83,7 +83,7 @@ public class PrestamoDaoImpl implements PrestamoDao{
                 conn.setAutoCommit(true);
             }
         } catch (SQLException e) {
-            System.err.println("Error grave en la conexiÃ³n");
+            System.err.println("Error grave en la conexion");
             e.printStackTrace();
             return false;
         }
@@ -477,7 +477,7 @@ public class PrestamoDaoImpl implements PrestamoDao{
 @Override
 public boolean pagarCuotaConTransaccion(int idCuenta, int idPrestamo, Double monto) {
 	
-	 System.out.println("ðŸŸ¡ Ejecutado: pagarCuotaConTransaccion");
+	 System.out.println(" Ejecutado: pagarCuotaConTransaccion");
 
 	    Connection conn = null;
 
@@ -514,7 +514,7 @@ public boolean pagarCuotaConTransaccion(int idCuenta, int idPrestamo, Double mon
 	        Movimiento movimiento = new Movimiento();
 	        movimiento.setCuenta(cuenta);
 	        movimiento.setImporte(montoPago);
-	        movimiento.setReferencia("Pago Prstamo");
+	        movimiento.setReferencia("Pago Prestamo");
 	        movimiento.setFechaHora(LocalDateTime.now());
 
 	        TipoMovimiento tipo = new TipoMovimiento();

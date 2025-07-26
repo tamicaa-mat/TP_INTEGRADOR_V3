@@ -3,17 +3,24 @@ package daoImpl;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 import daoImpl.Conexion;
 import dao.TransferenciaDao;
 import dominio.Cuenta;
+import dominio.Transferencia;
 
 public class TransferenciaDaoImpl implements TransferenciaDao {
 
     private static final String ACTUALIZAR_SALDO = "UPDATE Cuenta SET Saldo = ? WHERE IdCuenta = ?";
     private static final String INSERTAR_MOVIMIENTO = "INSERT INTO Movimiento (FechaHora, Referencia, Importe, IdTipoMovimiento, IdCuenta) VALUES (NOW(), ?, ?, ?, ?)";
-    private static final String INSERTAR_TRANSFERENCIA = "INSERT INTO Transferencia (IdCuentaOrigen, IdCuentaDestino) VALUES (?, ?)";
+    private static final String INSERTAR_TRANSFERENCIA = "INSERT INTO Transferencia (IdCuentaOrigen, IdCuentaDestino, Monto) VALUES (?, ?, ?)";
     private static final int ID_TIPO_MOVIMIENTO_TRANSFERENCIA = 4; 
+    private static final String SELECT_TRANSFERENCIAS = 
+    	    "SELECT IdTransferencia, IdCuentaOrigen, IdCuentaDestino, Monto FROM Transferencia WHERE IdCuentaOrigen = ?";
 
     
     
@@ -66,7 +73,10 @@ public class TransferenciaDaoImpl implements TransferenciaDao {
             // 5. Registrar en la tabla Transferencia (si es necesario para auditoría)
             try (PreparedStatement psTransferencia = conexion.prepareStatement(INSERTAR_TRANSFERENCIA)) {
                 psTransferencia.setInt(1, cuentaOrigen.getIdCuenta());
+                
                 psTransferencia.setInt(2, cuentaDestino.getIdCuenta());
+                psTransferencia.setBigDecimal(3, monto);
+              
                 psTransferencia.executeUpdate();
             }
 
@@ -101,6 +111,38 @@ public class TransferenciaDaoImpl implements TransferenciaDao {
         }
         return exito;
     }
+
+
+
+
+
+	@Override
+	public List<Transferencia> obtenerTransferenciasPorCuentaOrigen(int idCuentaOrigen) {
+		 List<Transferencia> lista = new ArrayList<>();
+		    
+		 
+		 
+		    try (Connection conexion = Conexion.getConexion().getSQLConexion();
+		         PreparedStatement ps = conexion.prepareStatement(SELECT_TRANSFERENCIAS)) {
+		        
+		        ps.setInt(1, idCuentaOrigen);
+		        ResultSet rs = ps.executeQuery();
+		        
+		        while (rs.next()) {
+		            Transferencia t = new Transferencia();
+		            t.setIdTransferencia(rs.getInt("IdTransferencia"));
+		            t.setIdCuentaOrigen(rs.getInt("IdCuentaOrigen"));
+		            t.setIdCuentaDestino(rs.getInt("IdCuentaDestino"));
+		            t.setMonto(rs.getDouble("Monto"));
+		            lista.add(t);
+		        }
+		        
+		    } catch (SQLException e) {
+		        e.printStackTrace();
+		    }
+		    
+		    return lista;
+	}
 }
 
 

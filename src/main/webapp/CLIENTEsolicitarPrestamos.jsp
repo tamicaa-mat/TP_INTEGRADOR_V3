@@ -44,12 +44,26 @@
                         </div>
 
                         <button type="submit" class="btn btn-secondary w-50 d-block mx-auto">Enviar solicitud</button>
-    
-    
+                        
+        
     
 </form>
 
                 </div>
+                 <!-- ✅ Mostrar mensaje de prestamo solicitado en proceso si existe -->
+            <c:if test="${not empty mensajeError}">
+                <div class="alert alert-danger text-center">
+                    ❌ ${mensajeError}
+                </div>
+            </c:if>
+    
+                       <!-- ✅ Mostrar mensaje de prestamo solicitado en proceso si existe -->
+            <c:if test="${not empty mensajeExito}">
+                <div class="alert alert-success text-center">
+                    ✅ ${mensajeExito}
+                </div>
+            </c:if>
+    
             </div>
         </div>
     </main>

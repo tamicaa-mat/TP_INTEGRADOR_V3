@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -692,7 +693,7 @@ public class CuentaDaoImpl implements CuentaDao {
 	public boolean actualizarSaldo(int idCuenta, BigDecimal nuevoSaldo, Connection conn) {
 	    PreparedStatement ps = null;
 	    try {
-	        String sql = "UPDATE Cuenta SET Saldo = ? WHERE IdCuenta = ?";
+	        String sql = "UPDATE Cuenta SET Saldo = ? WHERE IdCuenta = ? AND Estado = 1";
 	        ps = conn.prepareStatement(sql);
 	        ps.setBigDecimal(1, nuevoSaldo);
 	        ps.setInt(2, idCuenta);
@@ -755,15 +756,28 @@ public class CuentaDaoImpl implements CuentaDao {
 
 	@Override
 	public Cuenta buscarCuentaPorIdDao(int idCuenta) {
-		
-		Cuenta cuenta = null;
+
+	    Cuenta cuenta = null;
 	    Connection cn = null;
 	    PreparedStatement ps = null;
 	    ResultSet rs = null;
 
 	    try {
 	        cn = (Connection) Conexion.getConexion();
-	        String sql = "SELECT * FROM Cuenta WHERE IdCuenta = ?";
+
+	        System.out.println("Conexión activa? " + (cn != null && !cn.isClosed()));
+
+	        // Verificar que hay datos en la tabla Cuenta
+	        Statement stmt = cn.createStatement();
+	        ResultSet rsVerificacion = stmt.executeQuery("SELECT COUNT(*) FROM Cuenta");
+	        if (rsVerificacion.next()) {
+	            System.out.println("Cantidad de cuentas en la BD conectada: " + rsVerificacion.getInt(1));
+	        }
+	        rsVerificacion.close();
+	        stmt.close();
+
+	        // Consulta real
+	        String sql = "SELECT * FROM Cuenta WHERE IdCuenta = ? AND Estado = 1";
 	        ps = cn.prepareStatement(sql);
 	        ps.setInt(1, idCuenta);
 	        rs = ps.executeQuery();
@@ -771,17 +785,17 @@ public class CuentaDaoImpl implements CuentaDao {
 	        if (rs.next()) {
 	            cuenta = new Cuenta();
 	            cuenta.setIdCuenta(rs.getInt("IdCuenta"));
-	            cuenta.setIdCliente(rs.getInt("IdCliente")); 
+	            cuenta.setIdCliente(rs.getInt("IdCliente"));
 	            cuenta.setFechaCreacion(rs.getDate("FechaCreacion").toLocalDate());
+
 	            TipoCuenta tipo = new TipoCuenta();
 	            tipo.setIdTipoCuenta(rs.getInt("IdTipoCuenta"));
+	            cuenta.setTipoCuenta(tipo);
+
 	            cuenta.setNumeroCuenta(rs.getString("NumeroCuenta"));
-	            cuenta.setCbu(rs.getString("CBU"));
+	            cuenta.setCbu(rs.getString("Cbu"));
 	            cuenta.setSaldo(rs.getBigDecimal("Saldo"));
-                cuenta.setEstado(rs.getBoolean("Estado"));
-	       
-	            
-	          
+	            cuenta.setEstado(rs.getBoolean("Estado"));
 	        }
 
 	    } catch (Exception e) {
@@ -797,10 +811,42 @@ public class CuentaDaoImpl implements CuentaDao {
 	    }
 
 	    return cuenta;
-		
-		
-		
-		
+	}
+
+
+
+
+	@Override
+	public Cuenta buscarCuentaPorNumeroCuenta(String numeroCuenta) {
+		 Cuenta cuenta = null;
+		    try (Connection conexion = Conexion.getConexion().getSQLConexion();
+		    		
+		    		
+		    		
+		    		
+		    		
+		         PreparedStatement ps = conexion.prepareStatement("SELECT * FROM Cuenta WHERE numeroCuenta = ?")) {
+
+		        ps.setString(1, numeroCuenta);
+		        ResultSet rs = ps.executeQuery();
+
+		        if (rs.next()) {
+		            cuenta = new Cuenta();
+		            cuenta.setIdCuenta(rs.getInt("IdCuenta"));
+		            cuenta.setFechaCreacion(rs.getDate("FechaCreacion").toLocalDate());
+		            cuenta.setNumeroCuenta(rs.getString("numeroCuenta"));
+		            cuenta.setSaldo(rs.getBigDecimal("Saldo"));
+		            cuenta.setCbu(rs.getString("Cbu"));
+		            // ver si el estado lo toma
+		            cuenta.setEstado(rs.getBoolean("Estado"));
+		           
+		        }
+
+		    } catch (SQLException e) {
+		        e.printStackTrace();
+		    }
+
+		    return cuenta;
 	}
 
 	

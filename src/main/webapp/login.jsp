@@ -4,9 +4,32 @@
 <head>
     <meta charset="UTF-8">
     <title>Ingresar al sistema</title>
+    
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="CSS/login.css">
+
+    <!-- ✅ Estilos embebidos -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .card {
+            border-radius: 15px;
+            border: 1px solid #ccc;
+        }
+
+        .btn {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        .btn:hover {
+            background-color: #0b5ed7;
+        }
+    </style>
 </head>
+
 <body class="bg-light">
     <header class="navbar navbar-dark bg-secondary">
         <div class="container-fluid">
@@ -18,7 +41,7 @@
         <div class="col-md-4">
             <div class="card shadow">
                 <div class="card-body">
-                    <h4 class="card-title text-center mb-4">Ingresar al sistema prueba</h4>
+                    <h4 class="card-title text-center mb-4">Ingresar al sistema</h4>
                     <form action="LoginServlet" method="post">
                         <div class="mb-3">
                             <input type="text" class="form-control" id="usuario" name="usuario" placeholder="Usuario" required>

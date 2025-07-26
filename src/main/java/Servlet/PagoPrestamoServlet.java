@@ -89,14 +89,14 @@ public class PagoPrestamoServlet extends HttpServlet {
     	                System.out.println("Cuenta encontrada. Saldo: " + cuentaSeleccionada.getSaldo());
     	                request.setAttribute("saldoCuenta", cuentaSeleccionada.getSaldo());
     	            } else {
-    	                System.out.println("No se encontró la cuenta con ID: " + idCuenta);
+    	                System.out.println("No encontro la cuenta con ID: " + idCuenta);
     	            }
 
     	        } catch (NumberFormatException e) {
     	            System.out.println("Error al parsear idCuenta: " + e.getMessage());
     	        }
     	    } else {
-    	        System.out.println("No se recibió parámetro idCuenta en el request.");
+    	        System.out.println("No se recibio parametro idCuenta enrequest.");
     	    }
 
     	    request.getRequestDispatcher("CLIENTEpagoPrestamos.jsp").forward(request, response);      

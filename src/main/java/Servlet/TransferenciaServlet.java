@@ -1,10 +1,9 @@
-package Servlet; // O "servelt" según la estructura de tu proyecto
+package Servlet; // 
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -12,15 +11,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import dominio.Cliente;
-import dominio.Cuenta;
-import dominio.Movimiento; // Importación necesaria
 import Negocio.CuentaNegocio;
-import Negocio.MovimientoNegocio; // Importación necesaria
 import Negocio.TransferenciaNegocio;
 import NegocioImpl.CuentaNegocioImpl;
-import NegocioImpl.MovimientoNegocioImpl; // Importación necesaria
 import NegocioImpl.TransferenciaNegocioImpl;
+import daoImpl.CuentaDaoImpl;
+import daoImpl.TransferenciaDaoImpl;
+import dominio.Cliente;
+import dominio.Cuenta;
+import dominio.Transferencia;
+import excepciones.TransferenciaInvalidaException;
 
 @WebServlet("/TransferenciaServlet")
 public class TransferenciaServlet extends HttpServlet {
@@ -30,99 +30,81 @@ public class TransferenciaServlet extends HttpServlet {
         super();
     }
 
+    //  GET: Carga el formulario
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        System.out.println("GET TransferenciaServlet ejecutado");
+
         HttpSession session = request.getSession();
         Cliente clienteLogueado = (Cliente) session.getAttribute("clienteLogueado");
 
-        // Seguridad: si no hay cliente en sesión, se va al login.
         if (clienteLogueado == null) {
-            response.sendRedirect("login.jsp?mensaje=Debe iniciar sesion");
+            response.sendRedirect("login.jsp?mensaje=Debe iniciar sesión");
             return;
         }
 
-        String action = request.getParameter("action");
+        CuentaNegocio cuentaNegocio = new CuentaNegocioImpl(new CuentaDaoImpl());
+        List<Cuenta> cuentas = cuentaNegocio.getCuentasPorCliente(clienteLogueado);
+        request.setAttribute("cuentas", cuentas);
 
-        // Si la acción es mostrar el formulario para una NUEVA transferencia...
-        if ("mostrarFormulario".equals(action)) {
-            cargarFormulario(request, response, clienteLogueado);
-        } 
-        // Si no, por defecto, se muestra el HISTORIAL de movimientos.
-        else {
-            mostrarHistorial(request, response, clienteLogueado);
-        }
+        request.getRequestDispatcher("ClienteNuevaTransferencia.jsp").forward(request, response);
     }
 
+    //  POST: Procesa la transferencia
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        System.out.println("POST TransferenciaServlet ejecutado");
+
         HttpSession session = request.getSession();
         Cliente clienteLogueado = (Cliente) session.getAttribute("clienteLogueado");
 
         if (clienteLogueado == null) {
-            response.sendRedirect("login.jsp?mensaje=Debe iniciar sesion");
+            response.sendRedirect("login.jsp?mensaje=Debe iniciar sesión");
             return;
         }
-        
-        String action = request.getParameter("action");
-        
-        // Procesa el envío del formulario de nueva transferencia
-        if ("transferir".equals(action)) {
-            realizarTransferencia(request, response, clienteLogueado);
-        } else {
-            // Por si acaso, si llega un POST raro, lo mandamos al historial.
-            mostrarHistorial(request, response, clienteLogueado);
-        }
-    }
 
-    private void mostrarHistorial(HttpServletRequest request, HttpServletResponse response, Cliente cliente) throws ServletException, IOException {
-        try {
-            MovimientoNegocio movNegocio = new MovimientoNegocioImpl();
-            List<Movimiento> historial = movNegocio.obtenerMovimientosPorCliente(cliente.getIdCliente());
+        CuentaNegocio cuentaNegocio = new CuentaNegocioImpl(new CuentaDaoImpl());
+        List<Cuenta> cuentas = cuentaNegocio.getCuentasPorCliente(clienteLogueado);
+        request.setAttribute("cuentas", cuentas);
+
+        // Leer parámetros
+        String numeroCuentaOrigenStr = request.getParameter("idCuentaOrigen");
+        String numeroCuentaDestino = request.getParameter("numeroCuentaDestino");
+        String montoStr = request.getParameter("monto");
+
+        if (numeroCuentaOrigenStr != null && montoStr != null && numeroCuentaDestino != null &&
+            !numeroCuentaOrigenStr.isEmpty() && !montoStr.isEmpty() && !numeroCuentaDestino.isEmpty()) {
             
-            request.setAttribute("historialTransferencias", historial);
-            
-            RequestDispatcher rd = request.getRequestDispatcher("/CLIENTEtransferencias.jsp");
-            rd.forward(request, response);
-        } catch (Exception e) {
-            e.printStackTrace();
-            // Manejo de error si falla la carga del historial
-        }
-    }
+            try {
+               
+                BigDecimal monto = new BigDecimal(montoStr);
 
-    private void cargarFormulario(HttpServletRequest request, HttpServletResponse response, Cliente cliente) throws ServletException, IOException {
-        try {
-            CuentaNegocio cuentaNegocio = new CuentaNegocioImpl();
-            List<Cuenta> listaCuentas = cuentaNegocio.obtenerCuentasPorCliente(cliente.getIdCliente());
-            
-            request.setAttribute("cuentas", listaCuentas);
-            
-            RequestDispatcher rd = request.getRequestDispatcher("/ClienteNuevaTransferencia.jsp");
-            rd.forward(request, response);
-        } catch (Exception e) {
-            e.printStackTrace();
-            // Manejo de error si falla la carga de cuentas
-        }
-    }
+                TransferenciaNegocio transferenciaNeg = new TransferenciaNegocioImpl(new TransferenciaDaoImpl());
 
-    private void realizarTransferencia(HttpServletRequest request, HttpServletResponse response, Cliente cliente) throws ServletException, IOException {
-        String mensaje = null;
-        try {
-            int idCuentaOrigen = Integer.parseInt(request.getParameter("idCuentaOrigen"));
-            String cbuDestino = request.getParameter("cbuDestino");
-            BigDecimal monto = new BigDecimal(request.getParameter("monto"));
+                // Ejecutar transferencia
+                transferenciaNeg.realizarTransferencia(numeroCuentaOrigenStr, numeroCuentaDestino, monto);
+                request.setAttribute("mensajeExito", "Transferencia realizada correctamente.");
 
-            TransferenciaNegocio transferenciaNegocio = new TransferenciaNegocioImpl();
-            boolean exito = transferenciaNegocio.realizarTransferencia(idCuentaOrigen, cbuDestino, monto);
+                //request.setAttribute("numeroCuentaDestino",numeroCuentaDestino); no tengo en transferencia numero cuenta, tengo solo el id
+                //request.setAttribute("numeroCuentaOrigen",numeroCuentaOrigenStr);
+                
+                
+                
+                
+                // Mostrar historial
+                List<Transferencia> transferencias = transferenciaNeg.listarTransferenciasPorCuenta(numeroCuentaOrigenStr);
+                request.setAttribute("transferencias", transferencias);
 
-            if (exito) {
-                mensaje = "¡Transferencia realizada con éxito!";
-            } else {
-                mensaje = "No se pudo realizar la transferencia. Verifique los datos.";
+            } catch (TransferenciaInvalidaException e) {
+                request.setAttribute("mensajeError", e.getMessage());
+            } catch (NumberFormatException e) {
+                request.setAttribute("mensajeError", "Formato de número inválido.");
             }
-        } catch (Exception e) {
-            mensaje = e.getMessage(); // Mostramos el mensaje de error específico (ej. "Saldo insuficiente")
+        } else {
+            request.setAttribute("mensajeError", "Todos los campos son obligatorios.");
         }
-        
-        // Después de intentar la transferencia, volvemos al formulario para mostrar el mensaje
-        request.setAttribute("mensaje", mensaje);
-        cargarFormulario(request, response, cliente);
+
+        // Volver al JSP
+        request.getRequestDispatcher("ClienteNuevaTransferencia.jsp").forward(request, response);
     }
 }

@@ -17,7 +17,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Informacion</title>
-    <link rel="stylesheet" type="text/css" href="CSS/estilos.css">
+   
  
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     
@@ -172,7 +172,7 @@
                         <label class="form-label">Nueva Contraseña</label>
                         <input type="password" name="nuevaPassword" class="form-control" required>
                     </div>
-                    <button type="submit" class="btn btn-primary">Actualizar Contraseña</button>
+                    <button type="submit" class="btn btn-info">Actualizar Contraseña</button>
                 </form>
 
              

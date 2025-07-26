@@ -1,6 +1,7 @@
 package Servlet;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -68,15 +69,17 @@ public class SolicitarPrestamoServlet extends HttpServlet {
     	                prestamo.setImportePedido(importe);
     	                prestamo.setPlazoMeses(plazo);
 
-    	                // Interés fijo (opcional, también puede fijarse en negocio si lo omitís)
+    	                // Interés fijo 
     	                prestamo.setInteres(5.0);
 
-    	                // Llamar a la capa de negocio para procesar todo (cálculos + persistencia)
+    	                // Llamar a la capa de negocio para procesar todo
     	                PrestamoNegocioImpl prestamoNegocio = new PrestamoNegocioImpl(new PrestamoDaoImpl());
     	                boolean exito = prestamoNegocio.solicitarPrestamo(prestamo);
 
     	                if (exito) {
     	                    request.setAttribute("mensajeExito", "¡Solicitud enviada con éxito!");
+    	           
+    	                    
     	                } else {
     	                    request.setAttribute("mensajeError", "Error al registrar la solicitud.");
     	                }
@@ -100,6 +103,10 @@ public class SolicitarPrestamoServlet extends HttpServlet {
     	        request.setAttribute("mensajeError", "Debe iniciar sesión.");
     	    }
 
+    	    
+    
+    	
+    	    
     	    // Redirigir a la vista JSP
     	    request.getRequestDispatcher("/CLIENTEsolicitarPrestamos.jsp").forward(request, response);
     
@@ -108,11 +115,7 @@ public class SolicitarPrestamoServlet extends HttpServlet {
     
     
     
-    
-    
-    
-    
-    
+ 
     
     
     }

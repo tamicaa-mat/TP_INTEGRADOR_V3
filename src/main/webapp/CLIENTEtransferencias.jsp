@@ -53,7 +53,7 @@
                             <tr>
                                 <td class="fecha-hora">
                                    
-            							${mov.fechaHoraFormateada}  <%-- JSTL llama automáticamente a getFechaHoraFormateada() --%>
+            							${mov.fechaHoraFormateada}  
 
                                 </td>
                                 <td>${mov.getTipoMovimiento().getDescripcion()}</td>
@@ -74,7 +74,7 @@
                     </tbody>
                 </table>
             </div>
-            <%-- Aquí podrías agregar la lógica de paginación si la implementas --%>
+          
             
             
             

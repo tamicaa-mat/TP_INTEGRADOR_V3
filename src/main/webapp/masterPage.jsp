@@ -10,7 +10,8 @@
 <head>
     <meta charset="UTF-8" />
     <title>SISTEMA BANCARIO UTN</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
 </head>
 <body>
     <header class="navbar navbar-dark bg-secondary">
@@ -36,7 +37,7 @@
                 <span class="text-white mx-3">
                     Usuario: <strong><c:out value="${sessionScope.usuarioLogueado.getNombreUsuario()}" /></strong>
                 </span>
-                <a href="LogoutServlet" class="btn btn-outline-light btn-sm">Cerrar sesión</a>
+                <a href="LogoutServlet" class="btn btn-primary btn-sm">Cerrar sesión</a>
             </c:if>
 
             <c:if test="${empty sessionScope.usuarioLogueado}">
@@ -51,15 +52,16 @@
             <c:if test="${sessionScope.usuarioLogueado.getTipoUsuario().getDescripcion() == 'Administrador'}">
                 <div class="mb-3 w-100 d-flex justify-content-center flex-wrap gap-2">
                     <span class="fw-bold text-secondary me-3 align-self-center">ADMINISTRADOR</span>
-                <a href="${pageContext.request.contextPath}/ClienteServlet" class="btn btn-secondary btn-sm">Gestión Clientes</a>
+                <a href="${pageContext.request.contextPath}/ClienteServlet" class="btn btn-primary btn-sm">Gestión Clientes</a>
 	           
-	            <a href="${pageContext.request.contextPath}/UsuarioServlet" class="btn btn-secondary btn-sm">Gestión Usuarios</a>
+	            <a href="${pageContext.request.contextPath}/UsuarioServlet" class="btn btn-primary btn-sm">Gestión Usuarios</a>
 	            
-	            <a href="AdministradorListaCuentas.jsp" class="btn btn-secondary btn-sm">Gestión Cuentas</a>
-	         <a href="${pageContext.request.contextPath}/PrestamoServlet" class="btn btn-secondary btn-sm">Autorizar Préstamos</a>
 	         
-	            <a href="AdministradorReportes.jsp" class="btn btn-secondary btn-sm">Reportes Admin</a>
-	            <a href="${pageContext.request.contextPath}/ClienteServlet?Action=verDirectorio" class="btn btn-secondary btn-sm">Directorio de Clientes</a>	
+	            
+	         <a href="${pageContext.request.contextPath}/PrestamoServlet" class="btn btn-primary btn-sm">Autorizar Préstamos</a>
+	         
+	            <a href="AdministradorReportes.jsp" class="btn btn-primary btn-sm">Reportes Admin</a>
+	            <a href="${pageContext.request.contextPath}/ClienteServlet?Action=verDirectorio" class="btn btn-primary btn-sm">Directorio de Clientes</a>	
                 </div>
             </c:if>
 
@@ -69,17 +71,17 @@
                     
                     
                  
-                 <a href="${pageContext.request.contextPath}/MovimientoServlet" class="btn btn-secondary btn-sm">Movimientos</a>
+                 <a href="${pageContext.request.contextPath}/MovimientoServlet" class="btn btn-info btn-sm">Movimientos</a>
                     
-	            <a href="${pageContext.request.contextPath}/TransferenciaServlet" class="btn btn-secondary btn-sm">Transferencias</a>
-	          <a href="${pageContext.request.contextPath}/SolicitarPrestamoServlet" class="btn btn-secondary btn-sm">Solicitar Préstamo</a>
+	            <a href="${pageContext.request.contextPath}/TransferenciaServlet" class="btn btn-info btn-sm">Transferencias</a>
+	          <a href="${pageContext.request.contextPath}/SolicitarPrestamoServlet" class="btn btn-info btn-sm">Solicitar Préstamo</a>
 	          
 	      
 	            
-	            <a href="${pageContext.request.contextPath}/PagoPrestamoServlet" class="btn btn-secondary btn-sm">Pago Préstamos</a>
+	            <a href="${pageContext.request.contextPath}/PagoPrestamoServlet" class="btn btn-info btn-sm">Pago Préstamos</a>
 	            
 	            
-	            <a href="ClienteInfoPersonal.jsp" class="btn btn-secondary btn-sm">Mi Información</a>
+	            <a href="ClienteInfoPersonal.jsp" class="btn btn-info btn-sm">Mi Información</a>
                 </div>
             </c:if>
 
@@ -92,6 +94,6 @@
         </div>
     </nav>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
 </body>
 </html>

@@ -9,6 +9,9 @@
     // Obtenemos las listas para los menús desplegables.
     ArrayList<Provincia> listaProvincias = (ArrayList<Provincia>) request.getAttribute("listaProvincias");
     ArrayList<Localidad> listaLocalidades = (ArrayList<Localidad>) request.getAttribute("listaLocalidades");
+    
+    // Nueva lista filtrada (si existe)
+    ArrayList<Localidad> listaLocalidadesFiltradas = (ArrayList<Localidad>) request.getAttribute("listaLocalidadesFiltradas");
 
     // Decidimos los títulos de la página y el formulario.
     String tituloPagina = (clienteAEditar != null) ? "Editar Cliente" : "Alta de Cliente";
@@ -31,7 +34,7 @@
                 <div class="card-body">
                     <h4 class="card-title text-center mb-4"><%= tituloFormulario %></h4>
                     
-                    <form action="ClienteServlet" method="post">
+                    <form action="ClienteServlet" method="post" id="formCliente">
                     
                     <%
 				        String mensajeError = (String) request.getAttribute("mensajeError");
@@ -44,51 +47,76 @@
 				        }
 				    %>
                     
-                    
-                    
-                        
                         <%-- 2. LÓGICA PARA LA ACCIÓN (AGREGAR O MODIFICAR) --%>
                         <% if (clienteAEditar != null) { %>
                             <input type="hidden" name="action" value="modificar"/>
-                          
                             <input type="hidden" name="txtDni" value="<%= clienteAEditar.getDni() %>"/>
                         <% } else { %>
                             <input type="hidden" name="action" value="agregar"/>
                         <% } %>
 
-                        
                         <div class="mb-3">
                              <% if (clienteAEditar != null) { %>
                                 <input type="text" class="form-control" value="DNI: <%= clienteAEditar.getDni() %>" disabled>
                             <% } else { %>
-                                <input type="text" class="form-control" name="txtDni" placeholder="DNI" required>
+                                <input type="text" class="form-control" name="txtDni" placeholder="DNI" 
+                                       value="<%= request.getParameter("txtDni") != null ? request.getParameter("txtDni") : "" %>" required>
                             <% } %>
                         </div>
                         
-                       
-                        <div class="mb-3"><input type="text" class="form-control" name="txtCuil" placeholder="CUIL" value="<%= (clienteAEditar != null) ? clienteAEditar.getCuil() : "" %>" required></div>
-                        <div class="mb-3"><input type="text" class="form-control" name="txtNombre" placeholder="Nombre" value="<%= (clienteAEditar != null) ? clienteAEditar.getNombre() : "" %>" required></div>
-                        <div class="mb-3"><input type="text" class="form-control" name="txtApellido" placeholder="Apellido" value="<%= (clienteAEditar != null) ? clienteAEditar.getApellido() : "" %>" required></div>
+                        <div class="mb-3">
+                            <input type="text" class="form-control" name="txtCuil" placeholder="CUIL" 
+                                   value="<%= (clienteAEditar != null) ? clienteAEditar.getCuil() : (request.getParameter("txtCuil") != null ? request.getParameter("txtCuil") : "") %>" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <input type="text" class="form-control" name="txtNombre" placeholder="Nombre" 
+                                   value="<%= (clienteAEditar != null) ? clienteAEditar.getNombre() : (request.getParameter("txtNombre") != null ? request.getParameter("txtNombre") : "") %>" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <input type="text" class="form-control" name="txtApellido" placeholder="Apellido" 
+                                   value="<%= (clienteAEditar != null) ? clienteAEditar.getApellido() : (request.getParameter("txtApellido") != null ? request.getParameter("txtApellido") : "") %>" required>
+                        </div>
                         
                         <div class="mb-3">
                             <select class="form-select" name="ddlSexo" required>
-                                <option value="M" <%= (clienteAEditar != null && "M".equals(clienteAEditar.getSexo())) ? "selected" : "" %>>Masculino</option>
-                                <option value="F" <%= (clienteAEditar != null && "F".equals(clienteAEditar.getSexo())) ? "selected" : "" %>>Femenino</option>
+                                <%
+                                    String sexoSeleccionado = (clienteAEditar != null) ? clienteAEditar.getSexo() : request.getParameter("ddlSexo");
+                                %>
+                                <option value="">Seleccione sexo</option>
+                                <option value="M" <%= "M".equals(sexoSeleccionado) ? "selected" : "" %>>Masculino</option>
+                                <option value="F" <%= "F".equals(sexoSeleccionado) ? "selected" : "" %>>Femenino</option>
                             </select>
                         </div>
                         
-                        <div class="mb-3"><input type="date" class="form-control" name="txtFechaNacimiento" value="<%= (clienteAEditar != null && clienteAEditar.getFechaNacimiento() != null) ? clienteAEditar.getFechaNacimiento() : "" %>" required></div>
-                        <div class="mb-3"><input type="text" class="form-control" name="txtDireccion" placeholder="Dirección" value="<%= (clienteAEditar != null) ? clienteAEditar.getDireccion() : "" %>" required></div>
+                        <div class="mb-3">
+                            <input type="date" class="form-control" name="txtFechaNacimiento" 
+                                   value="<%= (clienteAEditar != null && clienteAEditar.getFechaNacimiento() != null) ? clienteAEditar.getFechaNacimiento() : (request.getParameter("txtFechaNacimiento") != null ? request.getParameter("txtFechaNacimiento") : "") %>" required>
+                        </div>
                         
                         <div class="mb-3">
-                            <select class="form-select" name="ddlProvincia" required>
+                            <input type="text" class="form-control" name="txtDireccion" placeholder="Dirección" 
+                                   value="<%= (clienteAEditar != null) ? clienteAEditar.getDireccion() : (request.getParameter("txtDireccion") != null ? request.getParameter("txtDireccion") : "") %>" required>
+                        </div>
+                        
+                        <!-- DESPLEGABLE DE PROVINCIAS MODIFICADO -->
+                        <div class="mb-3">
+                            <select class="form-select" name="ddlProvincia" id="ddlProvincia" onchange="cargarLocalidades()" required>
                                 <option value="">Provincia</option>
                                 <%
                                     if (listaProvincias != null) {
+                                        // Determinar qué provincia está seleccionada
+                                        String provinciaSeleccionada = request.getParameter("ddlProvincia");
+                                        if (clienteAEditar != null && clienteAEditar.getLocalidad() != null && 
+                                            clienteAEditar.getLocalidad().getProvincia() != null) {
+                                            provinciaSeleccionada = String.valueOf(clienteAEditar.getLocalidad().getProvincia().getIdProvincia());
+                                        }
+                                        
                                         for (Provincia prov : listaProvincias) {
                                             String selected = "";
-                                            // Verificación segura para evitar errores
-                                            if (clienteAEditar != null && clienteAEditar.getLocalidad() != null && clienteAEditar.getLocalidad().getProvincia() != null && clienteAEditar.getLocalidad().getProvincia().getIdProvincia() == prov.getIdProvincia()) {
+                                            if (provinciaSeleccionada != null && 
+                                                provinciaSeleccionada.equals(String.valueOf(prov.getIdProvincia()))) {
                                                 selected = "selected";
                                             }
                                             out.println("<option value='" + prov.getIdProvincia() + "' " + selected + ">" + prov.getDescripcion() + "</option>");
@@ -97,28 +125,62 @@
                                 %>
                             </select>
                         </div>
+                        
+                        <!-- DESPLEGABLE DE LOCALIDADES MODIFICADO -->
                         <div class="mb-3">
-                            <select class="form-select" name="ddlLocalidad" required>
-                                <option value="">Localidad</option>
+                            <select class="form-select" name="ddlLocalidad" id="ddlLocalidad" required>
                                 <%
-                                    if (listaLocalidades != null) {
-                                        for (Localidad loc : listaLocalidades) {
-                                            String selected = "";
-                                            if (clienteAEditar != null && clienteAEditar.getLocalidad() != null && clienteAEditar.getLocalidad().getIdLocalidad() == loc.getIdLocalidad()) {
-                                                selected = "selected";
+                                    String provinciaParam = request.getParameter("ddlProvincia");
+                                    boolean hayProvinciaSeleccionada = (provinciaParam != null && !provinciaParam.isEmpty()) || 
+                                                                      (clienteAEditar != null && clienteAEditar.getLocalidad() != null);
+                                    
+                                    if (!hayProvinciaSeleccionada) {
+                                %>
+                                        <option value="">Primero seleccione una provincia</option>
+                                <%
+                                    } else {
+                                %>
+                                        <option value="">Localidad</option>
+                                <%
+                                        // Usar lista filtrada si existe, sino usar lista completa
+                                        ArrayList<Localidad> localidadesAMostrar = (listaLocalidadesFiltradas != null) ? 
+                                                                                    listaLocalidadesFiltradas : listaLocalidades;
+                                        
+                                        if (localidadesAMostrar != null) {
+                                            // Determinar qué localidad está seleccionada
+                                            String localidadSeleccionada = request.getParameter("ddlLocalidad");
+                                            if (clienteAEditar != null && clienteAEditar.getLocalidad() != null) {
+                                                localidadSeleccionada = String.valueOf(clienteAEditar.getLocalidad().getIdLocalidad());
                                             }
-                                            out.println("<option value='" + loc.getIdLocalidad() + "' " + selected + ">" + loc.getDescripcion() + "</option>");
+                                            
+                                            for (Localidad loc : localidadesAMostrar) {
+                                                String selected = "";
+                                                if (localidadSeleccionada != null && 
+                                                    localidadSeleccionada.equals(String.valueOf(loc.getIdLocalidad()))) {
+                                                    selected = "selected";
+                                                }
+                                                out.println("<option value='" + loc.getIdLocalidad() + "' " + selected + ">" + loc.getDescripcion() + "</option>");
+                                            }
                                         }
                                     }
                                 %>
                             </select>
                         </div>
                         
-                        <div class="mb-3"><input type="text" class="form-control" name="txtNacionalidad" placeholder="Nacionalidad" value="<%= (clienteAEditar != null) ? clienteAEditar.getNacionalidad() : "" %>" required></div>
-                        <div class="mb-3"><input type="email" class="form-control" name="txtEmail" placeholder="Correo Electrónico" value="<%= (clienteAEditar != null) ? clienteAEditar.getCorreoElectronico() : "" %>" required></div>
-                        <div class="mb-3"><input type="text" class="form-control" name="txtTelefono" placeholder="Teléfono" value="<%= (clienteAEditar != null) ? clienteAEditar.getTelefono() : "" %>" required></div>
+                        <div class="mb-3">
+                            <input type="text" class="form-control" name="txtNacionalidad" placeholder="Nacionalidad" 
+                                   value="<%= (clienteAEditar != null) ? clienteAEditar.getNacionalidad() : (request.getParameter("txtNacionalidad") != null ? request.getParameter("txtNacionalidad") : "") %>" required>
+                        </div>
                         
-                   
+                        <div class="mb-3">
+                            <input type="email" class="form-control" name="txtEmail" placeholder="Correo Electrónico" 
+                                   value="<%= (clienteAEditar != null) ? clienteAEditar.getCorreoElectronico() : (request.getParameter("txtEmail") != null ? request.getParameter("txtEmail") : "") %>" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <input type="text" class="form-control" name="txtTelefono" placeholder="Teléfono" 
+                                   value="<%= (clienteAEditar != null) ? clienteAEditar.getTelefono() : (request.getParameter("txtTelefono") != null ? request.getParameter("txtTelefono") : "") %>" required>
+                        </div>
 
                         <div class="d-flex justify-content-center gap-2">
                             <button type="submit" class="btn btn-success btn-sm w-50">Guardar</button>
@@ -128,6 +190,37 @@
             </div>
         </div>
     </main>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        function cargarLocalidades() {
+            var provinciaSelect = document.getElementById('ddlProvincia');
+            var idProvincia = provinciaSelect.value;
+            
+            if (idProvincia) {
+                // Guardar todos los valores del formulario
+                var form = document.getElementById('formCliente');
+                var formData = new FormData(form);
+                
+                // Construir URL con todos los parámetros
+                var url = 'ClienteServlet?Action=mostrarFormulario&recargarLocalidades=true&ddlProvincia=' + idProvincia;
+                
+                // Agregar todos los campos del formulario a la URL (excepto la acción)
+                for (var pair of formData.entries()) {
+                    if (pair[0] !== 'action' && pair[0] !== 'ddlProvincia') {
+                        url += '&' + pair[0] + '=' + encodeURIComponent(pair[1]);
+                    }
+                }
+                
+                // Redirigir con todos los datos preservados
+                window.location.href = url;
+            } else {
+                // Si no hay provincia seleccionada, limpiar localidades
+                var localidadSelect = document.getElementById('ddlLocalidad');
+                localidadSelect.innerHTML = '<option value="">Primero seleccione una provincia</option>';
+            }
+        }
+    </script>
 </body>
 </html>

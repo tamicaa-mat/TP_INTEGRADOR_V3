@@ -48,6 +48,9 @@ public class PagarCuotaServlet extends HttpServlet {
 		    int idPrestamo = Integer.parseInt(request.getParameter("idPrestamo"));
 		    double monto = Double.parseDouble(request.getParameter("montoPago"));
 
+		    
+
+		    
 		    PrestamoNegocio prestamoNegocio = new PrestamoNegocioImpl(new PrestamoDaoImpl());
 
 		    boolean exito = prestamoNegocio.pagarCuota(idCuenta, idPrestamo, monto);

@@ -17,5 +17,8 @@ public interface LocalidadDao {
 	  
 
 	public ArrayList<Localidad> leerTodasLasLocalidades();
+
+
+	ArrayList<Localidad> obtenerLocalidadesPorProvincia(int idProvincia);
 }
 

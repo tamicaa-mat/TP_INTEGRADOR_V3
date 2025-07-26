@@ -46,8 +46,8 @@
                 <select name="tipo" id="tipo" class="form-select">
                     <option value="0" ${filtroTipo == 0 ? "selected" : ""}>Todos</option>
                     <option value="1" ${filtroTipo == 1 ? "selected" : ""}>Alta Cuenta</option>
-                    <option value="2" ${filtroTipo == 2 ? "selected" : ""}>Alta Préstamo</option>
-                    <option value="3" ${filtroTipo == 3 ? "selected" : ""}>Pago Préstamo</option>
+                    <option value="2" ${filtroTipo == 2 ? "selected" : ""}>Alta Prestamo</option>
+                    <option value="3" ${filtroTipo == 3 ? "selected" : ""}>Pago Prestamo</option>
                     <option value="4" ${filtroTipo == 4 ? "selected" : ""}>Transferencia</option>
                 </select>
             </div>

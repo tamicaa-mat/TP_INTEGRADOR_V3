@@ -487,4 +487,29 @@ private static final String INSERTAR_CLIENTE_SOLO = "insert into cliente(DNI, CU
 	}
 	
 	
+	
+	
+	public boolean existeDni(String dni) {
+	    boolean existe = false;
+	    String sql = "SELECT 1 FROM Cliente WHERE Dni = ?";
+	    
+	    try (Connection conn = Conexion.getConexion().getSQLConexion();
+	         PreparedStatement ps = conn.prepareStatement(sql)) {
+	         
+	        ps.setString(1, dni);
+	        ResultSet rs = ps.executeQuery();
+	        existe = rs.next(); // Devuelve true si encontró al menos un resultado
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+
+	    return existe;
+	}
+
+	
+	
+	
+	
+	
 }

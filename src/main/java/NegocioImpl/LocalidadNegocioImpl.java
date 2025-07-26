@@ -19,4 +19,11 @@ public class LocalidadNegocioImpl implements LocalidadNegocio {
     public ArrayList<Localidad> leerTodasLasLocalidades() {
         return localidadDao.leerTodasLasLocalidades();
     }
+    
+    
+    @Override
+    public ArrayList<Localidad> leerLocalidadesPorProvincia(int idProvincia) {
+        return localidadDao.obtenerLocalidadesPorProvincia(idProvincia);
+    }
+
 }
