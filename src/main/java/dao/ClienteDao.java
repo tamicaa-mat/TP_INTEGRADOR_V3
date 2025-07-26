@@ -28,5 +28,6 @@ public interface ClienteDao {
 
      public boolean existeDni(String dni);
      
-     
+     // Nuevo método para validar email único
+    public boolean existeEmail(String email);
 }

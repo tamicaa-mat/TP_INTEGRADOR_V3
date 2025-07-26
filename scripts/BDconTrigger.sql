@@ -124,11 +124,10 @@ CREATE TABLE Transferencia (
   IdTransferencia INT AUTO_INCREMENT PRIMARY KEY,
   IdCuentaOrigen INT,
   IdCuentaDestino INT,
+  Monto DECIMAL(15, 2) NOT NULL DEFAULT 0,
   FOREIGN KEY (IdCuentaOrigen) REFERENCES Cuenta(IdCuenta),
   FOREIGN KEY (IdCuentaDestino) REFERENCES Cuenta(IdCuenta)
 );
-
-
 
 -- INSERTS
 INSERT INTO Provincia (Descripcion) VALUES 
@@ -146,56 +145,81 @@ INSERT INTO Localidad (Descripcion, IdProvincia) VALUES
 
 INSERT INTO TipoUsuario (Descripcion) VALUES ('Administrador'), ('Cliente');
 
-INSERT INTO Usuario (NombreUsuario, Password, IdTipoUsuario, Estado) VALUES 
-('adminbank', 'admin123', 1 , 1),
-('clienteAmoMariaFernanda', 'cliente1', 2, 1),
-('clienteVenecioSalvador', 'cliente2', 2, 1),
-('clientetamaramarilyn', 'cliente3', 2, 1),
-('clienteHomeroChispa', 'cliente4', 2, 1);
+INSERT INTO Usuario (NombreUsuario, Password, IdTipoUsuario, Estado) VALUES
+('adminbank', 'admin123', 1 , 1);
+
+-- ============================================
+-- USUARIOS
+-- ============================================
+
+INSERT INTO Usuario (NombreUsuario, Password, IdTipoUsuario, Estado)
+VALUES ('clienteLucianaSoria', 'clave123', 2, 1);
+SET @IdUsuarioLuciana := LAST_INSERT_ID();
+
+INSERT INTO Usuario (NombreUsuario, Password, IdTipoUsuario, Estado)
+VALUES ('clienteBrunoFarias', 'clave456', 2, 1);
+SET @IdUsuarioBruno := LAST_INSERT_ID();
+
+INSERT INTO Usuario (NombreUsuario, Password, IdTipoUsuario, Estado)
+VALUES ('clienteNoeliaPaz', 'clave789', 2, 1);
+SET @IdUsuarioNoelia := LAST_INSERT_ID();
+
+INSERT INTO Usuario (NombreUsuario, Password, IdTipoUsuario, Estado)
+VALUES ('clienteGastonRios', 'clave101', 2, 1);
+SET @IdUsuarioGaston := LAST_INSERT_ID();
+
+INSERT INTO Usuario (NombreUsuario, Password, IdTipoUsuario, Estado)
+VALUES ('clienteAndreaMartinez', 'clave202', 2, 1);
+SET @IdUsuarioAndrea := LAST_INSERT_ID();
+
+-- ============================================
+-- CLIENTES
+-- ============================================
 
 INSERT INTO Cliente (Dni, Cuil, Nombre, Apellido, Sexo, Nacionalidad, FechaNacimiento,
-  Direccion, CorreoElectronico, Telefono, IdLocalidad, IdUsuario, Estado) VALUES 
-('12345688', '21-12345688-5', 'Maria Fernanda', 'Amo', 'F', 'ARGENTINA', '1990-06-20', 
- 'Rambla 999', 'mariafernandaamo@hotmail.com', '1588977400', 2, 2, 1),
-('31553699', '20-31553699-5', 'Salvador', 'Venecio', 'M', 'ARGENTINA', '1985-10-02', 
- 'Calle ILDEFONZO 3456', 'salvadorvenecio@hotmail.com', '1578599666', 1, 3, 1),
-('30123456', '20-30123456-5', 'Tamara', 'Marilyn', 'F', 'ARGENTINA', '1993-08-20', 
- 'Calle Sol 123', 'tamaramarilyn@hotmail.com', '1500055500', 1, 4, 1),
-('29685599', '20-29685599-5', 'Homero', 'Chispa', 'M', 'ARGENTINA', '1986-06-14', 
- 'Calle luna 689', 'homerochispa@hotmail.com', '15777888', 3, 5, 1);
+  Direccion, CorreoElectronico, Telefono, IdLocalidad, IdUsuario, Estado)
+VALUES
+('40444111', '27-40444111-3', 'Luciana', 'Soria', 'F', 'ARGENTINA', '1992-09-01',
+ 'Calle Los Sauces 12', 'luciana.soria@mail.com', '1155667788', 4, @IdUsuarioLuciana, 1),
+
+('38555122', '20-38555122-6', 'Bruno', 'Farias', 'M', 'ARGENTINA', '1988-04-18',
+ 'Avenida Belgrano 222', 'bruno.farias@mail.com', '1166778899', 5, @IdUsuarioBruno, 1),
+
+('42666333', '27-42666333-5', 'Noelia', 'Paz', 'F', 'ARGENTINA', '1995-12-05',
+ 'Calle Luna Nueva 101', 'noelia.paz@mail.com', '1177889900', 6, @IdUsuarioNoelia, 1),
+
+('39777444', '20-39777444-1', 'Gaston', 'Rios', 'M', 'ARGENTINA', '1990-02-28',
+ 'Pasaje Las Rosas 400', 'gaston.rios@mail.com', '1144556677', 7, @IdUsuarioGaston, 1),
+
+('43333555', '27-43333555-2', 'Andrea', 'Martinez', 'F', 'ARGENTINA', '1983-07-11',
+ 'Boulevard Mitre 999', 'andrea.martinez@mail.com', '1133445566', 8, @IdUsuarioAndrea, 1);
+
 
 INSERT INTO TipoCuenta (Descripcion) VALUES ('Caja de Ahorro'), ('Cuenta Corriente');
 
-INSERT INTO Cuenta (IdCliente, FechaCreacion, IdTipoCuenta, NumeroCuenta, Cbu, Saldo, Estado) VALUES 
-(1, '2023-01-20', 1, '1111222233', '3211234567890123456789', 55000.00, 1),
-(2, '2023-03-15', 2, '4444555566', '6549871234567890123456', 87000.00, 1),
-(3, '2023-07-08', 1, '7777888899', '7896541234567890123456', 30000.00, 1),
-(4, '2024-01-01', 1, '1010101010', '9998887776665554443332', 20000.00, 1);
+-- ============================================
+-- OBTENER ID CLIENTES
+-- ============================================
 
-INSERT INTO Prestamo (IdCliente, IdCuentaAsociada, FechaAlta, ImportePedido, PlazoMeses, ImportePorMes, Interes, CantidadCuotas, Estado) VALUES 
-(1, 1, '2024-09-15', 120000.00, 12, 11000.00, 10.00, 12, 1),
-(2, 2, '2024-11-01', 90000.00, 18, 6200.00, 12.50, 18, 1),
-(3, 3, '2025-01-10', 60000.00, 6, 10200.00, 15.00, 6, 1),
-(4, 4, '2025-03-05', 30000.00, 3, 10500.00, 5.00, 3, 1);
+SELECT IdCliente INTO @IdClienteLuciana FROM Cliente WHERE Dni = '40444111';
+SELECT IdCliente INTO @IdClienteBruno   FROM Cliente WHERE Dni = '38555122';
+SELECT IdCliente INTO @IdClienteNoelia  FROM Cliente WHERE Dni = '42666333';
+SELECT IdCliente INTO @IdClienteGaston  FROM Cliente WHERE Dni = '39777444';
+SELECT IdCliente INTO @IdClienteAndrea  FROM Cliente WHERE Dni = '43333555';
 
-INSERT INTO Cuota (IdPrestamo, NumeroCuota, Monto, FechaPago, Estado) VALUES
-(1, 1, 11000.00, '2024-10-15', 1),
-(2, 1, 6200.00, '2024-12-01', 1),
-(2, 2, 6200.00, '2025-01-01', 1),
-(3, 1, 10200.00, '2025-02-10', 1),
-(4, 1, 10500.00, '2025-04-05', 1);
+-- ============================================
+-- CUENTAS
+-- ============================================
+
+INSERT INTO Cuenta (IdCliente, FechaCreacion, IdTipoCuenta, NumeroCuenta, Cbu, Saldo, Estado) VALUES
+(@IdClienteLuciana, '2024-08-10', 1, '2020202020', '4567891234567890123456', 150000.00, 1),
+(@IdClienteBruno,   '2024-09-22', 2, '3030303030', '5678912345678901234567', 97000.00, 1),
+(@IdClienteNoelia,  '2024-10-05', 1, '4040404040', '6789123456789012345678', 25000.00, 1),
+(@IdClienteGaston,  '2024-12-01', 1, '5050505050', '7891234567890123456789', 40000.00, 1),
+(@IdClienteAndrea,  '2025-01-15', 2, '6060606060', '8901234567890123456789', 30000.00, 1);
 
 INSERT INTO TipoMovimiento (Descripcion) VALUES 
 ('Alta Cuenta'), ('Alta Prestamo'), ('Pago Prestamo'), ('Transferencia');
-
-INSERT INTO Movimiento (FechaHora, Referencia, Importe, IdTipoMovimiento, IdCuenta) VALUES 
-('2025-04-18 21:16:35', 'Alta de préstamo a cuenta', 1051.02, 2, 2),
-('2025-03-28 07:14:33', 'Transferencia realizada', 42979.87, 4, 3),
-('2024-07-03 20:58:32', 'Alta de cuenta con depósito inicial', 27372.81, 1, 2);
-
-INSERT INTO Transferencia (IdCuentaOrigen, IdCuentaDestino) VALUES 
-(3, 2),
-(2, 1);
 
 
 -- TRIGGER 
@@ -221,20 +245,4 @@ END;
 //
 
 DELIMITER ;
-
-
-
-
-
--- PRUEBO TRIGGER EN LA NUEVA BD
-
-INSERT INTO Cliente (Dni, Cuil, Nombre, Apellido, Sexo, Nacionalidad, FechaNacimiento,
-  Direccion, CorreoElectronico, Telefono, IdLocalidad, IdUsuario, Estado) VALUES 
-('55555555', '21-55555555-5', 'Marco Pan', 'Polo', 'M', 'ARGENTINO', '1990-05-20', 
- 'Rambla NNN 2255', 'marcopanpolo@hotmail.com', '1555566622', 7, NULL, 1);
-
-
-ALTER TABLE Transferencia
-ADD Monto DECIMAL(15, 2) NOT NULL DEFAULT 0;
-
 

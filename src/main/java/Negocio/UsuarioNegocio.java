@@ -20,4 +20,8 @@ public interface UsuarioNegocio {
     
     public boolean resetearPasswordUsuario(int idUsuario);
     public boolean cambiarEstadoUsuario(int idUsuario, boolean nuevoEstado);
+    
+    // Nuevos métodos para validaciones
+    public boolean existeUsuario(String nombreUsuario);
+    public boolean clienteTieneUsuario(String dniCliente);
 }

@@ -99,4 +99,15 @@ public class UsuarioNegocioImpl implements UsuarioNegocio {
         return usuarioDao.resetearPassword(idUsuario, nuevaPassword);
     }
     
+    @Override
+    public boolean existeUsuario(String nombreUsuario) {
+        Usuario usuario = usuarioDao.obtenerUsuarioPorUsername(nombreUsuario);
+        return usuario != null;
+    }
+    
+    @Override
+    public boolean clienteTieneUsuario(String dniCliente) {
+        // Verificar si ya existe un usuario asignado al cliente con este DNI
+        return usuarioDao.clienteTieneUsuario(dniCliente);
+    }
 }

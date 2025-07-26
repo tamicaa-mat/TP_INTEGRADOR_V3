@@ -53,6 +53,8 @@ public class ClienteNegocioImpl implements ClienteNegocio {
 	
 	@Override
 	public boolean altaLogicaCliente(String dni) {
+		System.out.println("[DEBUG] Iniciando reactivación de cliente con DNI: " + dni);
+		
 		Connection conexion = null;
 	    boolean exito = false;
 	    
@@ -63,9 +65,10 @@ public class ClienteNegocioImpl implements ClienteNegocio {
 	        conexion.setAutoCommit(false); 
 
 	        // 3. Buscamos al cliente (incluso si está inactivo) para obtener su IdUsuario
-	        // Es crucial que tu DAO tenga un método que pueda encontrar clientes con Estado = 0
 	        ClienteDao clienteDao = new ClienteDaoImpl(); 
 	        Cliente clienteAReactivar = clienteDao.obtenerClientePorDniSinFiltro(dni);
+	        
+	        System.out.println("[DEBUG] Cliente encontrado: " + (clienteAReactivar != null ? "Sí" : "No"));
 
 	        boolean clienteReactivado = false;
 	        boolean usuarioReactivado = false;
@@ -73,14 +76,17 @@ public class ClienteNegocioImpl implements ClienteNegocio {
 	        if (clienteAReactivar != null) {
 	            // 4. Reactivamos al cliente (Estado = 1)
 	            clienteReactivado = clienteDao.altaLogicaCliente(dni);
+	            System.out.println("[DEBUG] Cliente reactivado: " + clienteReactivado);
 
 	            // 5. Si el cliente tiene un usuario asociado, lo reactivamos también
 	            if (clienteAReactivar.getUsuario() != null && clienteAReactivar.getUsuario().getIdUsuario() > 0) {
 	                UsuarioDao usuarioDao = new UsuarioDaoImpl();
 	                usuarioReactivado = usuarioDao.altaLogicaUsuario(clienteAReactivar.getUsuario().getIdUsuario());
+	                System.out.println("[DEBUG] Usuario reactivado: " + usuarioReactivado);
 	            } else {
 	                // Si el cliente no tenía un usuario, no hay nada que reactivar. Se considera un éxito.
 	                usuarioReactivado = true; 
+	                System.out.println("[DEBUG] Cliente sin usuario, marcando como éxito");
 	            }
 	        }
 
@@ -88,12 +94,15 @@ public class ClienteNegocioImpl implements ClienteNegocio {
 	        if (clienteReactivado && usuarioReactivado) {
 	            conexion.commit();
 	            exito = true;
+	            System.out.println("[DEBUG] Reactivación exitosa, COMMIT realizado");
 	        } else {
 	            // Si algo falló, deshacemos todos los cambios
 	            conexion.rollback();
+	            System.out.println("[DEBUG] Reactivación falló, ROLLBACK realizado");
 	        }
 
 	    } catch (SQLException e) {
+	        System.out.println("[ERROR] SQLException en reactivación: " + e.getMessage());
 	        e.printStackTrace();
 	        // Si ocurre cualquier error de SQL, también deshacemos todo
 	        try { 
@@ -114,115 +123,51 @@ public class ClienteNegocioImpl implements ClienteNegocio {
 	        }
 	    }
 	    
+	    System.out.println("[DEBUG] Resultado final de reactivación: " + exito);
 	    return exito;
 	}
 
     @Override
     public boolean bajaLogicaCliente(String dni) {
-      
-    	Connection conexion = null;
-        boolean exito = false;
-        
-        try {
-            
-            conexion = Conexion.getConexion().getSQLConexion();
-           
-            conexion.setAutoCommit(false); 
+        System.out.println("[DEBUG] Intentando eliminar cliente con DNI: " + dni);
+        boolean resultado = cdao.bajaLogicaCliente(dni);
+        System.out.println("[DEBUG] Resultado eliminación cliente: " + resultado);
+        return resultado;
+    }
+    
+    @Override
+    public boolean existeEmail(String email) {
+        return cdao.existeEmail(email);
+    }
+    
+    // Agregar métodos faltantes de la interfaz
+    @Override
+    public Cliente obtenerClientePorDni(String dni) {
+        return cdao.obtenerClientePorDni(dni);
+    }
 
-            
-            ClienteDao clienteDao = new ClienteDaoImpl(); // Creamos una instancia del DAO
-            Cliente clienteAEliminar = clienteDao.obtenerClientePorDni(dni);
+    @Override
+    public boolean actualizarCliente(Cliente cliente) {
+        return cdao.actualizarCliente(cliente);
+    }
 
-            boolean clienteEliminado = false;
-            boolean usuarioEliminado = false;
-
-            if (clienteAEliminar != null) {
-                
-                clienteEliminado = clienteDao.bajaLogicaCliente(dni);
-
-               
-                if (clienteAEliminar.getUsuario() != null && clienteAEliminar.getUsuario().getIdUsuario() > 0) {
-                    UsuarioDao usuarioDao = new UsuarioDaoImpl();
-                    usuarioEliminado = usuarioDao.bajaLogicaUsuario(clienteAEliminar.getUsuario().getIdUsuario());
-                } else {
-                 
-                    usuarioEliminado = true; 
-                }
-            }
-
-           
-            if (clienteEliminado && usuarioEliminado) {
-                conexion.commit();
-                exito = true;
-            } else {
-              
-                conexion.rollback();
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-         
-            try { 
-                if (conexion != null) {
-                    conexion.rollback();
-                }
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-        } finally {
-           
-            try { 
-                if (conexion != null) {
-                    conexion.setAutoCommit(true);
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        
-        return exito;
-    	
-    	
+    @Override
+    public Cliente obtenerClienteConCuentasPorUsuario(int idUsuario) {
+        return cdao.getClienteConCuentasPorUsuario(idUsuario);
     }
 
     @Override
     public ArrayList<Cliente> leerTodosLosClientes() {
         return cdao.leerTodosLosClientes();
     }
-    
-    
-    @Override
-    public Cliente obtenerClientePorDni(String dni) {
-        // pasando la llamada al dao
-        return cdao.obtenerClientePorDni(dni);
-    }
-    
-    
-    @Override
-    public boolean actualizarCliente(Cliente cliente) {
-     
-        return cdao.actualizarCliente(cliente);
-    }
-    
-    
-	@Override
-	public Cliente obtenerClienteConCuentasPorUsuario(int idUsuario) {
-		
-		return cdao.getClienteConCuentasPorUsuario(idUsuario);
-	}
 
+    @Override
+    public ArrayList<Cliente> leerTodosLosClientesActivos() {
+        return cdao.leerTodosLosClientesActivos();
+    }
 
-	
-	@Override
-	public ArrayList<Cliente> leerTodosLosClientesActivos(){
-		return cdao.leerTodosLosClientesActivos();
-	}
-	
-	
-	
-	@Override
-	public ArrayList<Cliente> leerTodosLosClientesInactivos(){
-		return cdao.leerTodosLosClientesInactivos();
-	}
-	
+    @Override
+    public ArrayList<Cliente> leerTodosLosClientesInactivos() {
+        return cdao.leerTodosLosClientesInactivos();
+    }
 }

@@ -26,6 +26,7 @@ public interface UsuarioDao {
        
        boolean cambiarEstado(int idUsuario, boolean nuevoEstado);
        boolean resetearPassword(int idUsuario, String nuevaPassword);
-
-    
+       
+       // Nuevo método para validar si cliente ya tiene usuario
+       boolean clienteTieneUsuario(String dniCliente);
 }

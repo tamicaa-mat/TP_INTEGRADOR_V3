@@ -22,6 +22,9 @@ import NegocioImpl.ClienteNegocioImpl;
 import NegocioImpl.LocalidadNegocioImpl;
 import NegocioImpl.ProvinciaNegocioImpl;
 import daoImpl.ClienteDaoImpl;
+import excepciones.ClienteExistenteException;
+import excepciones.DatosInvalidosException;
+import excepciones.EdadInvalidaException;
 
 @WebServlet("/ClienteServlet")
 public class ClienteServlet extends HttpServlet {
@@ -46,6 +49,14 @@ public class ClienteServlet extends HttpServlet {
             
             LocalidadNegocio locNegocio = new LocalidadNegocioImpl();
             ArrayList<Localidad> listaLocalidades = locNegocio.leerTodasLasLocalidades();
+
+            // Verificar si hay datos temporales de cliente para restaurar
+            HttpSession session = request.getSession();
+            Cliente clienteTemporal = (Cliente) session.getAttribute("clienteTemporal");
+            if (clienteTemporal != null) {
+                request.setAttribute("clienteARecuperar", clienteTemporal);
+                System.out.println("[DEBUG] Recuperando datos del cliente temporal: " + clienteTemporal.getDni());
+            }
 
             String recargarLocalidades = request.getParameter("recargarLocalidades");
             String idProvinciaStr = request.getParameter("ddlProvincia");
@@ -116,11 +127,23 @@ public class ClienteServlet extends HttpServlet {
         
         
         else if (action != null && action.equals("reactivar")) {
+            System.out.println("[DEBUG] Acción reactivar recibida para DNI: " + request.getParameter("dni"));
+            
         	 String dni = request.getParameter("dni");
              if (dni != null) {
             	 ClienteNegocio clienteNegocio = new ClienteNegocioImpl();
-                 clienteNegocio.altaLogicaCliente(dni); 
-                 request.getSession().setAttribute("mensaje", "Cliente reactivado con éxito.");
+                 boolean reactivado = clienteNegocio.altaLogicaCliente(dni);
+                 
+                 System.out.println("[DEBUG] Resultado reactivación: " + reactivado);
+                 
+                 if (reactivado) {
+                     request.getSession().setAttribute("mensaje", "Cliente reactivado con éxito.");
+                 } else {
+                     request.getSession().setAttribute("mensaje", "Error: No se pudo reactivar el cliente.");
+                 }
+             } else {
+                 System.out.println("[ERROR] DNI es null en reactivación");
+                 request.getSession().setAttribute("mensaje", "Error: DNI no válido para reactivación.");
              }
             
              response.sendRedirect(request.getContextPath() + "/ClienteServlet");
@@ -136,6 +159,17 @@ public class ClienteServlet extends HttpServlet {
             RequestDispatcher rd = request.getRequestDispatcher("/AdministradorDirectorioClientes.jsp");
             rd.forward(request, response);
             
+        }
+        
+        else if(action != null && action.equals("limpiarTemporal")) {
+            // Limpiar datos temporales de sesión
+            HttpSession session = request.getSession();
+            session.removeAttribute("clienteTemporal");
+            session.removeAttribute("datosValidados");
+            
+            // Redirigir al formulario limpio
+            response.sendRedirect(request.getContextPath() + "/ClienteServlet?Action=mostrarFormulario");
+            return;
         }
        
         
@@ -169,61 +203,94 @@ public class ClienteServlet extends HttpServlet {
         ClienteNegocio clienteNegocio = new ClienteNegocioImpl(); 
         HttpSession session = request.getSession();
 
-      
         if (action != null && action.equals("agregar")) {
-            
-           
-            String dni = request.getParameter("txtDni");
-            String cuil = request.getParameter("txtCuil");
-            String nombre = request.getParameter("txtNombre");
-            String apellido = request.getParameter("txtApellido");
-            String sexo = request.getParameter("ddlSexo");
-            LocalDate fechaNacimiento = LocalDate.parse(request.getParameter("txtFechaNacimiento"));
-            String direccion = request.getParameter("txtDireccion");
-            String nacionalidad = request.getParameter("txtNacionalidad");
-            String email = request.getParameter("txtEmail");
-            String telefono = request.getParameter("txtTelefono");
-            
-            
-            int idLocalidad = Integer.parseInt(request.getParameter("ddlLocalidad"));
-            int idProvincia = Integer.parseInt(request.getParameter("ddlProvincia"));
-            
-            Provincia prov = new Provincia();
-            prov.setIdProvincia(idProvincia);
-            
-           
-          
-            Localidad loc = new Localidad();
-            loc.setIdLocalidad(idLocalidad);
-            loc.setProvincia(prov); // la provincia va adentro de la localidad
-
-            Cliente cliente = new Cliente();
-            cliente.setDni(dni);
-            cliente.setCuil(cuil);
-            cliente.setNombre(nombre);
-            cliente.setApellido(apellido);
-            cliente.setSexo(sexo);
-            cliente.setFechaNacimiento(fechaNacimiento);
-            cliente.setDireccion(direccion);
-            cliente.setLocalidad(loc); // la localidad completa  adentro del cliente
-            cliente.setNacionalidad(nacionalidad);
-            cliente.setCorreoElectronico(email);
-            cliente.setTelefono(telefono);
-            
-            
-            boolean seAgrego = clienteNegocio.insertarCliente(cliente); 
-
-            
-            if (seAgrego) {
-                response.sendRedirect(request.getContextPath() + "/UsuarioServlet?action=mostrarFormularioAlta&dniCliente=" + dni);
-            } 
-            else {
-            	 
+            try {
+                String dni = request.getParameter("txtDni");
+                String cuil = request.getParameter("txtCuil");
+                String nombre = request.getParameter("txtNombre");
+                String apellido = request.getParameter("txtApellido");
+                String email = request.getParameter("txtEmail");
+                String telefono = request.getParameter("txtTelefono");
                 
-               
-                request.setAttribute("mensajeError", "El DNI ingresado ya existe. Por favor, verifique los datos.");
+                // Validaciones básicas
+                if (dni == null || dni.trim().isEmpty() || 
+                    nombre == null || nombre.trim().isEmpty() || 
+                    apellido == null || apellido.trim().isEmpty()) {
+                    throw new DatosInvalidosException("Los campos DNI, Nombre y Apellido son obligatorios");
+                }
+                
+                // Validar formato de email si no está vacío
+                if (email != null && !email.trim().isEmpty() && !email.contains("@")) {
+                    throw new DatosInvalidosException("El formato del correo electrónico no es válido");
+                }
+                
+                // Validar que el email no exista ya en el sistema
+                if (email != null && !email.trim().isEmpty() && clienteNegocio.existeEmail(email.trim())) {
+                    throw new DatosInvalidosException("El correo electrónico '" + email.trim() + "' ya está registrado en el sistema");
+                }
 
-                // cargamos las listas de nuevo para que el Usuario haga una nueva carga si quiere
+                String sexo = request.getParameter("ddlSexo");
+                LocalDate fechaNacimiento = LocalDate.parse(request.getParameter("txtFechaNacimiento"));
+                String direccion = request.getParameter("txtDireccion");
+                String nacionalidad = request.getParameter("txtNacionalidad");
+                
+                // Validar edad mínima de 18 años
+                LocalDate fechaActual = LocalDate.now();
+                int edad = fechaActual.getYear() - fechaNacimiento.getYear();
+                
+                // Ajustar si aún no ha cumplido años este año
+                if (fechaNacimiento.plusYears(edad).isAfter(fechaActual)) {
+                    edad--;
+                }
+                
+                if (edad < 18) {
+                    throw new EdadInvalidaException("El cliente debe tener al menos 18 años. Edad actual: " + edad + " años.");
+                }
+                
+                // Validar que la fecha no sea futura
+                if (fechaNacimiento.isAfter(fechaActual)) {
+                    throw new EdadInvalidaException("La fecha de nacimiento no puede ser posterior a la fecha actual.");
+                }
+
+                int idLocalidad = Integer.parseInt(request.getParameter("ddlLocalidad"));
+                int idProvincia = Integer.parseInt(request.getParameter("ddlProvincia"));
+                
+                Provincia prov = new Provincia();
+                prov.setIdProvincia(idProvincia);
+                
+                Localidad loc = new Localidad();
+                loc.setIdLocalidad(idLocalidad);
+                loc.setProvincia(prov); // la provincia va adentro de la localidad
+
+                Cliente cliente = new Cliente();
+                cliente.setDni(dni);
+                cliente.setCuil(cuil);
+                cliente.setNombre(nombre);
+                cliente.setApellido(apellido);
+                cliente.setSexo(sexo);
+                cliente.setFechaNacimiento(fechaNacimiento);
+                cliente.setDireccion(direccion);
+                cliente.setLocalidad(loc); // la localidad completa  adentro del cliente
+                cliente.setNacionalidad(nacionalidad);
+                cliente.setCorreoElectronico(email);
+                cliente.setTelefono(telefono);
+                
+                // VALIDAR DNI existente ANTES de continuar
+                if (clienteNegocio.obtenerClientePorDni(dni) != null) {
+                    throw new ClienteExistenteException("El DNI ingresado ya existe. Por favor, verifique los datos.");
+                }
+                
+                // NO insertar en BD todavía, solo guardar en sesión
+                session.setAttribute("clienteTemporal", cliente);
+                session.setAttribute("datosValidados", true);
+                
+                System.out.println("[DEBUG] Cliente temporal creado en sesión: " + dni);
+                
+                response.sendRedirect(request.getContextPath() + "/UsuarioServlet?action=mostrarFormularioAlta&dniCliente=" + dni);
+            } catch (ClienteExistenteException | DatosInvalidosException | EdadInvalidaException e) {
+                request.setAttribute("errorCliente", e.getMessage());
+                
+                // Recargar listas para el formulario
                 ProvinciaNegocio provNegocio = new ProvinciaNegocioImpl();
                 ArrayList<Provincia> listaProvincias = provNegocio.leerTodasLasProvincias();
                 LocalidadNegocio locNegocio = new LocalidadNegocioImpl();
@@ -231,62 +298,111 @@ public class ClienteServlet extends HttpServlet {
                 request.setAttribute("listaProvincias", listaProvincias);
                 request.setAttribute("listaLocalidades", listaLocalidades);
                 
-                // Hacemos forward de vuelta al formulario para mostrar el error y mantener los datos.
                 RequestDispatcher rd = request.getRequestDispatcher("/clientesFormulario.jsp");
                 rd.forward(request, response);
-            	
             }
         } 
-       
         else if (action != null && action.equals("modificar")) {
-            
-          
-            String dni = request.getParameter("txtDni");
-            String cuil = request.getParameter("txtCuil");
-            String nombre = request.getParameter("txtNombre");
-            String apellido = request.getParameter("txtApellido");
-            String nacionalidad = request.getParameter("txtNacionalidad");
-            LocalDate fechaNacimiento = LocalDate.parse(request.getParameter("txtFechaNacimiento"));
-            String sexo = request.getParameter("ddlSexo");
-            String email = request.getParameter("txtEmail");
-            String telefono = request.getParameter("txtTelefono");
-            String direccion = request.getParameter("txtDireccion");
-            int idLocalidad = Integer.parseInt(request.getParameter("ddlLocalidad"));
-            int idProvincia = Integer.parseInt(request.getParameter("ddlProvincia"));
+            try {
+                String dni = request.getParameter("txtDni");
+                String cuil = request.getParameter("txtCuil");
+                String nombre = request.getParameter("txtNombre");
+                String apellido = request.getParameter("txtApellido");
+                String nacionalidad = request.getParameter("txtNacionalidad");
+                LocalDate fechaNacimiento = LocalDate.parse(request.getParameter("txtFechaNacimiento"));
+                String sexo = request.getParameter("ddlSexo");
+                String email = request.getParameter("txtEmail");
+                String telefono = request.getParameter("txtTelefono");
+                String direccion = request.getParameter("txtDireccion");
+                
+                // Validaciones básicas
+                if (dni == null || dni.trim().isEmpty() || 
+                    nombre == null || nombre.trim().isEmpty() || 
+                    apellido == null || apellido.trim().isEmpty()) {
+                    throw new DatosInvalidosException("Los campos DNI, Nombre y Apellido son obligatorios");
+                }
+                
+                // Validar formato de email si no está vacío
+                if (email != null && !email.trim().isEmpty() && !email.contains("@")) {
+                    throw new DatosInvalidosException("El formato del correo electrónico no es válido");
+                }
+                
+                // Validar que el email no exista ya en el sistema (excepto para este cliente)
+                Cliente clienteExistente = clienteNegocio.obtenerClientePorDni(dni);
+                if (email != null && !email.trim().isEmpty() && clienteNegocio.existeEmail(email.trim())) {
+                    // Verificar si el email pertenece al mismo cliente que estamos editando
+                    if (clienteExistente == null || !email.trim().equals(clienteExistente.getCorreoElectronico())) {
+                        throw new DatosInvalidosException("El correo electrónico '" + email.trim() + "' ya está registrado en el sistema");
+                    }
+                }
+                
+                // Validar edad mínima de 18 años
+                LocalDate fechaActual = LocalDate.now();
+                int edad = fechaActual.getYear() - fechaNacimiento.getYear();
+                
+                // Ajustar si aún no ha cumplido años este año
+                if (fechaNacimiento.plusYears(edad).isAfter(fechaActual)) {
+                    edad--;
+                }
+                
+                if (edad < 18) {
+                    throw new EdadInvalidaException("El cliente debe tener al menos 18 años. Edad actual: " + edad + " años.");
+                }
+                
+                // Validar que la fecha no sea futura
+                if (fechaNacimiento.isAfter(fechaActual)) {
+                    throw new EdadInvalidaException("La fecha de nacimiento no puede ser posterior a la fecha actual.");
+                }
 
-            Provincia prov = new Provincia();
-            prov.setIdProvincia(idProvincia);
-            
-            Localidad loc = new Localidad();
-            loc.setIdLocalidad(idLocalidad);
-            loc.setProvincia(prov);
-            
-            
-            
-            
-            Cliente cliente = new Cliente();
-            cliente.setDni(dni);
-            cliente.setCuil(cuil);
-            cliente.setNombre(nombre);
-            cliente.setApellido(apellido);
-            cliente.setNacionalidad(nacionalidad);
-            cliente.setFechaNacimiento(fechaNacimiento);
-            cliente.setSexo(sexo);
-            cliente.setCorreoElectronico(email);
-            cliente.setTelefono(telefono);
-            cliente.setDireccion(direccion);
-            cliente.setLocalidad(loc);
+                int idLocalidad = Integer.parseInt(request.getParameter("ddlLocalidad"));
+                int idProvincia = Integer.parseInt(request.getParameter("ddlProvincia"));
 
-           
-            boolean seModifico = clienteNegocio.actualizarCliente(cliente); 
+                Provincia prov = new Provincia();
+                prov.setIdProvincia(idProvincia);
+                
+                Localidad loc = new Localidad();
+                loc.setIdLocalidad(idLocalidad);
+                loc.setProvincia(prov);
 
-           
-            if (seModifico) {
-                session.setAttribute("mensaje", "¡Cliente modificado correctamente!");
-            } else {
-                session.setAttribute("mensaje", "Error: No se pudo modificar el cliente.");
+                Cliente cliente = new Cliente();
+                cliente.setDni(dni);
+                cliente.setCuil(cuil);
+                cliente.setNombre(nombre);
+                cliente.setApellido(apellido);
+                cliente.setNacionalidad(nacionalidad);
+                cliente.setFechaNacimiento(fechaNacimiento);
+                cliente.setSexo(sexo);
+                cliente.setCorreoElectronico(email);
+                cliente.setTelefono(telefono);
+                cliente.setDireccion(direccion);
+                cliente.setLocalidad(loc);
+
+                boolean seModifico = clienteNegocio.actualizarCliente(cliente); 
+
+                if (seModifico) {
+                    session.setAttribute("mensaje", "¡Cliente modificado correctamente!");
+                } else {
+                    session.setAttribute("mensaje", "Error: No se pudo modificar el cliente.");
+                }
+                response.sendRedirect(request.getContextPath() + "/ClienteServlet");
+                
+            } catch (DatosInvalidosException | EdadInvalidaException e) {
+                request.setAttribute("errorCliente", e.getMessage());
+                
+                // Recargar datos del cliente y listas para el formulario
+                Cliente clienteAEditar = clienteNegocio.obtenerClientePorDni(request.getParameter("txtDni"));
+                request.setAttribute("clienteAEditar", clienteAEditar);
+                
+                ProvinciaNegocio provNegocio = new ProvinciaNegocioImpl();
+                ArrayList<Provincia> listaProvincias = provNegocio.leerTodasLasProvincias();
+                LocalidadNegocio locNegocio = new LocalidadNegocioImpl();
+                ArrayList<Localidad> listaLocalidades = locNegocio.leerTodasLasLocalidades();
+                request.setAttribute("listaProvincias", listaProvincias);
+                request.setAttribute("listaLocalidades", listaLocalidades);
+                
+                RequestDispatcher rd = request.getRequestDispatcher("/clientesFormulario.jsp");
+                rd.forward(request, response);
             }
-            response.sendRedirect(request.getContextPath() + "/ClienteServlet");
         }
     }
     

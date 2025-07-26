@@ -370,4 +370,36 @@ public class UsuarioDaoImpl implements UsuarioDao {
         return usuario;
     }    
     
+    @Override
+    public boolean clienteTieneUsuario(String dniCliente) {
+        Connection conexion = null;
+        PreparedStatement mensajero = null;
+        ResultSet resultado = null;
+        boolean tieneUsuario = false;
+
+        try {
+            conexion = Conexion.getConexion().getSQLConexion();
+            String sql = "SELECT COUNT(*) as count FROM Cliente WHERE DNI = ? AND IdUsuario IS NOT NULL";
+            
+            mensajero = conexion.prepareStatement(sql);
+            mensajero.setString(1, dniCliente);
+            resultado = mensajero.executeQuery();
+
+            if (resultado.next()) {
+                int count = resultado.getInt("count");
+                tieneUsuario = count > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (resultado != null) resultado.close();
+                if (mensajero != null) mensajero.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return tieneUsuario;
+    }
 }

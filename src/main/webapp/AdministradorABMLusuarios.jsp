@@ -43,12 +43,22 @@
 					    
 					    <div class="d-flex justify-content-center gap-2">
 					        <button type="submit" class="btn btn-secondary btn-sm w-50">Crear Usuario y Finalizar</button>
-					        <button type="reset" class="btn btn-secondary btn-sm w-50">Limpiar Formulario</button>
+					        <a href="ClienteServlet?Action=mostrarFormulario" class="btn btn-outline-secondary btn-sm w-50">Cancelar y Volver</a>
 					    </div>
 					    
-					    
-					    
 					</form>
+					
+					<% if (request.getAttribute("errorUsuario") != null) { %>
+					    <div class="alert alert-danger text-center mt-3">
+					        <%= request.getAttribute("errorUsuario") %>
+					    </div>
+					<% } %>
+					
+					<% if (request.getAttribute("exitoUsuario") != null) { %>
+					    <div class="alert alert-success text-center mt-3">
+					        <%= request.getAttribute("exitoUsuario") %>
+					    </div>
+					<% } %>
 					
 					
 					
@@ -61,4 +71,3 @@
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-    

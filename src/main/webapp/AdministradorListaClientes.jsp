@@ -89,7 +89,8 @@
                                 </c:if>
                             </c:when>
                             <c:otherwise>
-                                <a href="ClienteServlet?action=reactivar&dni=${cliente.dni}">Reactivar</a>
+                                <a href="ClienteServlet?Action=reactivar&dni=${cliente.dni}" 
+                                   onclick="return confirm('¿Está seguro de que desea reactivar este cliente?');">Reactivar</a>
                             </c:otherwise>
                         </c:choose>
                     </td>

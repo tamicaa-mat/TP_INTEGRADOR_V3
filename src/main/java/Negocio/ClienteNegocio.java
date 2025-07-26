@@ -18,10 +18,6 @@ public interface ClienteNegocio {
     public ArrayList<Cliente> leerTodosLosClientesInactivos();
     public Cliente obtenerClientePorDniSinFiltro(String dni);
     
-    
-    
-   
-
-
-	
+    // Nuevo método para validar email único
+    public boolean existeEmail(String email);
 }
