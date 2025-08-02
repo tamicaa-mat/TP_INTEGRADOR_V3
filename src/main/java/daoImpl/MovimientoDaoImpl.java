@@ -23,67 +23,69 @@ public class MovimientoDaoImpl implements MovimientoDao {
 			+ "m.IdMovimiento, m.FechaHora, m.Referencia, m.Importe, "
 			+ "tm.IdTipoMovimiento, tm.Descripcion AS TipoMovimientoDesc, " + "c.IdCuenta, c.NumeroCuenta, c.Cbu "
 			+ "FROM Movimiento m " + "INNER JOIN TipoMovimiento tm ON m.IdTipoMovimiento = tm.IdTipoMovimiento "
-			+ "INNER JOIN Cuenta c ON m.IdCuenta = c.IdCuenta " + "WHERE c.IdCliente = ? "
+			+ "INNER JOIN Cuenta c ON m.IdCuenta = c.IdCuenta " + "WHERE c.IdCliente = ? AND c.Estado = 1 "
 			+ "ORDER BY m.FechaHora DESC";
 
 	@Override
 	public List<Movimiento> obtenerMovimientosPorCliente(int idCliente) {
-	
-		    List<Movimiento> listaMovimientos = new ArrayList<>();
-		    Connection conexion = null;
-		    PreparedStatement statement = null;
-		    ResultSet resultSet = null;
 
-		    try {
-		        System.out.println("DAO: preparando consulta para cliente ID = " + idCliente);
-		        conexion = Conexion.getConexion().getSQLConexion();
-		        statement = conexion.prepareStatement(OBTENER_POR_CLIENTE);
-		        statement.setInt(1, idCliente);
-		        resultSet = statement.executeQuery();
+		List<Movimiento> listaMovimientos = new ArrayList<>();
+		Connection conexion = null;
+		PreparedStatement statement = null;
+		ResultSet resultSet = null;
 
-		        while (resultSet.next()) {
-		            Movimiento movimiento = new Movimiento();
+		try {
+			System.out.println("DAO: preparando consulta para cliente ID = " + idCliente);
+			conexion = Conexion.getConexion().getSQLConexion();
+			statement = conexion.prepareStatement(OBTENER_POR_CLIENTE);
+			statement.setInt(1, idCliente);
+			resultSet = statement.executeQuery();
 
-		            TipoMovimiento tm = new TipoMovimiento();
-		            tm.setIdTipoMovimiento(resultSet.getInt("IdTipoMovimiento"));
-		            tm.setDescripcion(resultSet.getString("TipoMovimientoDesc"));
+			while (resultSet.next()) {
+				Movimiento movimiento = new Movimiento();
 
-		            Cuenta c = new Cuenta();
-		            c.setIdCuenta(resultSet.getInt("IdCuenta"));
-		            c.setNumeroCuenta(resultSet.getString("NumeroCuenta"));
-		            c.setCbu(resultSet.getString("Cbu"));
+				TipoMovimiento tm = new TipoMovimiento();
+				tm.setIdTipoMovimiento(resultSet.getInt("IdTipoMovimiento"));
+				tm.setDescripcion(resultSet.getString("TipoMovimientoDesc"));
 
-		            movimiento.setIdMovimiento(resultSet.getInt("IdMovimiento"));
-		            movimiento.setFechaHora(resultSet.getTimestamp("FechaHora").toLocalDateTime());
-		            movimiento.setReferencia(resultSet.getString("Referencia"));
-		            movimiento.setImporte(resultSet.getBigDecimal("Importe"));
-		            movimiento.setTipoMovimiento(tm);
-		            movimiento.setCuenta(c);
+				Cuenta c = new Cuenta();
+				c.setIdCuenta(resultSet.getInt("IdCuenta"));
+				c.setNumeroCuenta(resultSet.getString("NumeroCuenta"));
+				c.setCbu(resultSet.getString("Cbu"));
 
-		            System.out.println("Movimiento encontrado: " + movimiento.getFechaHora() + " - " + 
-		                               movimiento.getReferencia() + " - $" + movimiento.getImporte());
+				movimiento.setIdMovimiento(resultSet.getInt("IdMovimiento"));
+				movimiento.setFechaHora(resultSet.getTimestamp("FechaHora").toLocalDateTime());
+				movimiento.setReferencia(resultSet.getString("Referencia"));
+				movimiento.setImporte(resultSet.getBigDecimal("Importe"));
+				movimiento.setTipoMovimiento(tm);
+				movimiento.setCuenta(c);
 
-		            listaMovimientos.add(movimiento);
-		        }
+				System.out.println("Movimiento encontrado: " + movimiento.getFechaHora() + " - "
+						+ movimiento.getReferencia() + " - $" + movimiento.getImporte());
 
-		        System.out.println("Total movimientos encontrados para cliente " + idCliente + ": " + listaMovimientos.size());
+				listaMovimientos.add(movimiento);
+			}
 
-		    } catch (SQLException e) {
-		        System.out.println("ERROR en DAO al obtener movimientos por cliente: " + e.getMessage());
-		        e.printStackTrace();
-		    } finally {
-		        try {
-		            if (resultSet != null) resultSet.close();
-		            if (statement != null) statement.close();
-		            if (conexion != null) conexion.close();
-		        } catch (SQLException e) {
-		            e.printStackTrace();
-		        }
-		    }
-		    return listaMovimientos;
+			System.out.println(
+					"Total movimientos encontrados para cliente " + idCliente + ": " + listaMovimientos.size());
+
+		} catch (SQLException e) {
+			System.out.println("ERROR en DAO al obtener movimientos por cliente: " + e.getMessage());
+			e.printStackTrace();
+		} finally {
+			try {
+				if (resultSet != null)
+					resultSet.close();
+				if (statement != null)
+					statement.close();
+				if (conexion != null)
+					conexion.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
-
-	
+		return listaMovimientos;
+	}
 
 	public List<Movimiento> listarMovimientos(int idCuenta, int idTipo) {
 
@@ -120,7 +122,7 @@ public class MovimientoDaoImpl implements MovimientoDao {
 				m.setCuenta(c);
 
 				TipoMovimiento tm = new TipoMovimiento();
-			
+
 				tm.setIdTipoMovimiento(rs.getInt("tm_id"));
 				tm.setDescripcion(rs.getString("tm_desc"));
 				m.setTipoMovimiento(tm);
