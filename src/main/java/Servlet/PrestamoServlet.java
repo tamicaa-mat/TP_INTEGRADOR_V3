@@ -28,150 +28,142 @@ import dominio.Movimiento;
 import dominio.Prestamo;
 import dominio.TipoMovimiento;
 
-
 @WebServlet("/PrestamoServlet")
 public class PrestamoServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-   
-    public PrestamoServlet() {
-        super();
-     
-    }
 
-    private MovimientoNegocio movimientoNegocio = new MovimientoNegocioImpl(new MovimientoDaoImpl());
-    private PrestamoNegocio prestamoNegocio = new PrestamoNegocioImpl(new PrestamoDaoImpl());
-    private CuentaNegocio cuentaNegocio = new CuentaNegocioImpl(new CuentaDaoImpl());
+	public PrestamoServlet() {
+		super();
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String action = request.getParameter("action");
+	}
 
-        if (action != null && action.equals("reportePrestamos")) {
-            String desdeStr = request.getParameter("fechaInicioPrestamo");
-            String hastaStr = request.getParameter("fechaFinPrestamo");
+	private MovimientoNegocio movimientoNegocio = new MovimientoNegocioImpl(new MovimientoDaoImpl());
+	private PrestamoNegocio prestamoNegocio = new PrestamoNegocioImpl(new PrestamoDaoImpl());
+	private CuentaNegocio cuentaNegocio = new CuentaNegocioImpl(new CuentaDaoImpl());
 
-            try {
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                Date desde = sdf.parse(desdeStr);
-                Date hasta = sdf.parse(hastaStr);
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		String action = request.getParameter("action");
 
-                // Obtener reporte de préstamos
-                double totalPrestamos = prestamoNegocio.obtenerSumaImporteEntreFechas(desde, hasta);
-                int cantidadPrestamos = prestamoNegocio.contarPrestamosEntreFechas(desde, hasta);
+		if (action != null && action.equals("reportePrestamos")) {
+			String desdeStr = request.getParameter("fechaInicioPrestamo");
+			String hastaStr = request.getParameter("fechaFinPrestamo");
 
-                request.setAttribute("totalPrestamos", totalPrestamos);
-                request.setAttribute("cantidadPrestamos", cantidadPrestamos);
-                request.setAttribute("fechaInicioPrestamo", desdeStr);
-                request.setAttribute("fechaFinPrestamo", hastaStr);
+			try {
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+				Date desde = sdf.parse(desdeStr);
+				Date hasta = sdf.parse(hastaStr);
 
-                // Mostrar el reporte en la página JSP
-                request.getRequestDispatcher("AdministradorReportes.jsp").forward(request, response);
-                return;
+				double totalPrestamos = prestamoNegocio.obtenerSumaImporteEntreFechas(desde, hasta);
+				int cantidadPrestamos = prestamoNegocio.contarPrestamosEntreFechas(desde, hasta);
 
-            } catch (ParseException e) {
-                request.setAttribute("error", "Formato de fecha inválido. Use el formato YYYY-MM-DD");
-                request.getRequestDispatcher("AdministradorReportes.jsp").forward(request, response);
-                return;
-            } catch (Exception e) {
-                request.setAttribute("error", "Hubo un error al generar el reporte. Por favor intente nuevamente.");
-                request.getRequestDispatcher("AdministradorReportes.jsp").forward(request, response);
-                return;
-            }
-        }
+				request.setAttribute("totalPrestamos", totalPrestamos);
+				request.setAttribute("cantidadPrestamos", cantidadPrestamos);
+				request.setAttribute("fechaInicioPrestamo", desdeStr);
+				request.setAttribute("fechaFinPrestamo", hastaStr);
 
-        // Listar todos los préstamos
-        List<Prestamo> prestamos = prestamoNegocio.listarPrestamos();
-        request.setAttribute("prestamos", prestamos);
-        request.getRequestDispatcher("AdministradorListaPrestamos.jsp").forward(request, response);
-    }
+				request.getRequestDispatcher("AdministradorReportes.jsp").forward(request, response);
+				return;
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String id = request.getParameter("idPrestamo");
-        String accion = request.getParameter("accion");
+			} catch (ParseException e) {
+				request.setAttribute("error", "Formato de fecha inválido. Use el formato YYYY-MM-DD");
+				request.getRequestDispatcher("AdministradorReportes.jsp").forward(request, response);
+				return;
+			} catch (Exception e) {
+				request.setAttribute("error", "Hubo un error al generar el reporte. Por favor intente nuevamente.");
+				request.getRequestDispatcher("AdministradorReportes.jsp").forward(request, response);
+				return;
+			}
+		}
 
-        System.out.println("doPost id=" + id + ", accion=" + accion);
+		List<Prestamo> prestamos = prestamoNegocio.listarPrestamos();
+		request.setAttribute("prestamos", prestamos);
+		request.getRequestDispatcher("AdministradorListaPrestamos.jsp").forward(request, response);
+	}
 
-        if (id != null && accion != null) {
-            try {
-                int idPrestamo = Integer.parseInt(id);
-                int nuevoEstado = accion.equals("aprobar") ? 1 : 2;
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		String id = request.getParameter("idPrestamo");
+		String accion = request.getParameter("accion");
 
-                prestamoNegocio.actualizarEstadoPrestamo(idPrestamo, nuevoEstado);
+		System.out.println("doPost id=" + id + ", accion=" + accion);
 
-                if (nuevoEstado == 1) {
-                    Prestamo prestamo = prestamoNegocio.obtenerPrestamoPorId(idPrestamo);
+		if (id != null && accion != null) {
+			try {
+				int idPrestamo = Integer.parseInt(id);
+				int nuevoEstado = accion.equals("aprobar") ? 1 : 2;
 
-                    if (prestamo == null) {
-                        System.err.println("ERROR: No se encontró el préstamo con ID " + idPrestamo);
-                        request.setAttribute("error", "No se encontró el préstamo con ID: " + idPrestamo);
-                        request.getRequestDispatcher("AdministradorListaPrestamos.jsp").forward(request, response);
-                        return;
-                    }
+				prestamoNegocio.actualizarEstadoPrestamo(idPrestamo, nuevoEstado);
 
-                    if (prestamo.getCuentaAsociada() == null) {
-                        System.err.println("ERROR: El préstamo no tiene cuenta asociada.");
-                        request.setAttribute("error", "El préstamo no tiene cuenta asociada.");
-                        request.getRequestDispatcher("AdministradorListaPrestamos.jsp").forward(request, response);
-                        return;
-                    }
+				if (nuevoEstado == 1) {
+					Prestamo prestamo = prestamoNegocio.obtenerPrestamoPorId(idPrestamo);
 
-                    Movimiento movimiento = new Movimiento();
-                    movimiento.setFechaHora(LocalDateTime.now());
-                    movimiento.setReferencia("ALTA PRESTAMO ID: " + idPrestamo);
-                    movimiento.setImporte(BigDecimal.valueOf(prestamo.getImportePedido()));
+					if (prestamo == null) {
+						System.err.println("ERROR: No se encontró el préstamo con ID " + idPrestamo);
+						request.setAttribute("error", "No se encontró el préstamo con ID: " + idPrestamo);
+						request.getRequestDispatcher("AdministradorListaPrestamos.jsp").forward(request, response);
+						return;
+					}
 
-                    TipoMovimiento tipo = new TipoMovimiento();
-                    tipo.setIdTipoMovimiento(2);
-                    movimiento.setTipoMovimiento(tipo);
+					if (prestamo.getCuentaAsociada() == null) {
+						System.err.println("ERROR: El préstamo no tiene cuenta asociada.");
+						request.setAttribute("error", "El préstamo no tiene cuenta asociada.");
+						request.getRequestDispatcher("AdministradorListaPrestamos.jsp").forward(request, response);
+						return;
+					}
 
-                    movimiento.setCuenta(prestamo.getCuentaAsociada());
+					Movimiento movimiento = new Movimiento();
+					movimiento.setFechaHora(LocalDateTime.now());
+					movimiento.setReferencia("ALTA PRESTAMO ID: " + idPrestamo);
+					movimiento.setImporte(BigDecimal.valueOf(prestamo.getImportePedido()));
 
-                    System.out.println("Datos del movimiento a insertar:");
-                    System.out.println("FechaHora: " + movimiento.getFechaHora());
-                    System.out.println("Referencia: " + movimiento.getReferencia());
-                    System.out.println("Importe: " + movimiento.getImporte());
-                    System.out.println("IdTipoMovimiento: " + movimiento.getTipoMovimiento().getIdTipoMovimiento());
-                    System.out.println("IdCuenta: " + movimiento.getCuenta().getIdCuenta());
+					TipoMovimiento tipo = new TipoMovimiento();
+					tipo.setIdTipoMovimiento(2);
+					movimiento.setTipoMovimiento(tipo);
 
-                    boolean resultado = movimientoNegocio.crearMovimiento(movimiento);	
+					movimiento.setCuenta(prestamo.getCuentaAsociada());
 
-                    if (resultado) {
-                        System.out.println("Resultado inserción movimiento: " + resultado);
+					System.out.println("Datos del movimiento a insertar:");
+					System.out.println("FechaHora: " + movimiento.getFechaHora());
+					System.out.println("Referencia: " + movimiento.getReferencia());
+					System.out.println("Importe: " + movimiento.getImporte());
+					System.out.println("IdTipoMovimiento: " + movimiento.getTipoMovimiento().getIdTipoMovimiento());
+					System.out.println("IdCuenta: " + movimiento.getCuenta().getIdCuenta());
 
-                        Cuenta cuenta = prestamo.getCuentaAsociada();
-                        BigDecimal nuevoSaldo = cuenta.getSaldo().add(movimiento.getImporte());
+					boolean resultado = movimientoNegocio.crearMovimiento(movimiento);
 
-                        boolean saldoActualizado = cuentaNegocio.actualizarSaldo(cuenta.getIdCuenta(), nuevoSaldo.doubleValue());
+					if (resultado) {
+						System.out.println("Resultado inserción movimiento: " + resultado);
 
-                        if (!saldoActualizado) {
-                            request.setAttribute("error", "Movimiento creado, pero no se pudo actualizar el saldo.");
-                            request.getRequestDispatcher("AdministradorListaPrestamos.jsp").forward(request, response);
-                            return;
-                        }
-                    } else {
-                        request.setAttribute("error", "Hubo un problema al crear el movimiento.");
-                        request.getRequestDispatcher("AdministradorListaPrestamos.jsp").forward(request, response);
-                        return;
-                    }
-                }
-            } catch (NumberFormatException e) {
-                request.setAttribute("error", "ID de préstamo inválido.");
-                request.getRequestDispatcher("AdministradorListaPrestamos.jsp").forward(request, response);
-                return;
-            } catch (Exception e) {
-                request.setAttribute("error", "Hubo un error al procesar la solicitud. Por favor intente nuevamente.");
-                request.getRequestDispatcher("AdministradorListaPrestamos.jsp").forward(request, response);
-                return;
-            }
-        }
+						Cuenta cuenta = prestamo.getCuentaAsociada();
+						BigDecimal nuevoSaldo = cuenta.getSaldo().add(movimiento.getImporte());
 
-        response.sendRedirect("PrestamoServlet");
-    }
+						boolean saldoActualizado = cuentaNegocio.actualizarSaldo(cuenta.getIdCuenta(),
+								nuevoSaldo.doubleValue());
 
+						if (!saldoActualizado) {
+							request.setAttribute("error", "Movimiento creado, pero no se pudo actualizar el saldo.");
+							request.getRequestDispatcher("AdministradorListaPrestamos.jsp").forward(request, response);
+							return;
+						}
+					} else {
+						request.setAttribute("error", "Hubo un problema al crear el movimiento.");
+						request.getRequestDispatcher("AdministradorListaPrestamos.jsp").forward(request, response);
+						return;
+					}
+				}
+			} catch (NumberFormatException e) {
+				request.setAttribute("error", "ID de préstamo inválido.");
+				request.getRequestDispatcher("AdministradorListaPrestamos.jsp").forward(request, response);
+				return;
+			} catch (Exception e) {
+				request.setAttribute("error", "Hubo un error al procesar la solicitud. Por favor intente nuevamente.");
+				request.getRequestDispatcher("AdministradorListaPrestamos.jsp").forward(request, response);
+				return;
+			}
+		}
 
-	
+		response.sendRedirect("PrestamoServlet");
+	}
+
 }
-

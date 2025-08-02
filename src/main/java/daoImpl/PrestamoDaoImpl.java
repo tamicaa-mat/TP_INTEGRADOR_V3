@@ -1,7 +1,5 @@
 package daoImpl;
 
-
-
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,568 +19,561 @@ import dominio.Movimiento;
 import dominio.Prestamo;
 import dominio.TipoMovimiento;
 
-public class PrestamoDaoImpl implements PrestamoDao{
+public class PrestamoDaoImpl implements PrestamoDao {
 
-    private static final String INSERT = "INSERT INTO Prestamo (IdCliente, IdCuentaAsociada, FechaAlta, ImportePedido, PlazoMeses, ImportePorMes, Interes, CantidadCuotas, Estado) VALUES (?, ?, CURRENT_DATE, ?, ?, ?, ?, ?, 0)";
-    //private static final String UPDATE = "UPDATE Prestamo SET Estado = ? WHERE IdPrestamo = ?";
-    private static final String SELECT_ALL = "SELECT * FROM Prestamo";
-    private static final String SELECT_BY_CLIENTE = "SELECT * FROM Prestamo WHERE IdCliente = ?";
-    //private static final String GETPRESTAMO = "SELECT * FROM Prestamo WHERE IdPrestamo = ?";
-    private static final String GETPRESTAMOPORCUENTA = "SELECT * FROM Prestamo WHERE IdCuentaAsociada = ? AND Estado = 1";
-    private static final String ACTUALIZARIMPORTE = "UPDATE Prestamo SET ImportePedido = ? WHERE IdPrestamo = ?";
-    private static final String OBTENER_PRESTAMOS = "SELECT  \r\n"
-    		+ "  p.*, \r\n"
-    		+ "  c.Nombre AS NombreCliente,  \r\n"
-    		+ "  c.Apellido AS ApellidoCliente,  \r\n"
-    		+ "  cu.NumeroCuenta \r\n"
-    		+ "FROM Prestamo p \r\n"
-    		+ "JOIN Cliente c ON p.IdCliente = c.IdCliente \r\n"
-    		+ "JOIN Cuenta cu ON p.IdCuentaAsociada = cu.IdCuenta;";
-    private static final String UPDATE_ESTADO = "UPDATE Prestamo SET Estado = ? WHERE IdPrestamo = ?" ;
+	private static final String INSERT = "INSERT INTO Prestamo (IdCliente, IdCuentaAsociada, FechaAlta, ImportePedido, PlazoMeses, ImportePorMes, Interes, CantidadCuotas, Estado) VALUES (?, ?, CURRENT_DATE, ?, ?, ?, ?, ?, 0)";
+	private static final String SELECT_ALL = "SELECT * FROM Prestamo";
+	private static final String SELECT_BY_CLIENTE = "SELECT * FROM Prestamo WHERE IdCliente = ?";
+	private static final String GETPRESTAMOPORCUENTA = "SELECT * FROM Prestamo WHERE IdCuentaAsociada = ? AND Estado = 1";
+	private static final String ACTUALIZARIMPORTE = "UPDATE Prestamo SET ImportePedido = ? WHERE IdPrestamo = ?";
+	private static final String OBTENER_PRESTAMOS = "SELECT  \r\n" + "  p.*, \r\n"
+			+ "  c.Nombre AS NombreCliente,  \r\n" + "  c.Apellido AS ApellidoCliente,  \r\n" + "  cu.NumeroCuenta \r\n"
+			+ "FROM Prestamo p \r\n" + "JOIN Cliente c ON p.IdCliente = c.IdCliente \r\n"
+			+ "JOIN Cuenta cu ON p.IdCuentaAsociada = cu.IdCuenta;";
+	private static final String UPDATE_ESTADO = "UPDATE Prestamo SET Estado = ? WHERE IdPrestamo = ?";
 
-    private static final String SUMAR_PRESTAMOS_FECHA = "SELECT SUM(ImportePedido) AS Total FROM Prestamo WHERE FechaAlta BETWEEN ? AND ?";
-    private static final String CONTAR_PRESTAMOS_FECHA = "SELECT COUNT(*) AS Cantidad FROM Prestamo WHERE FechaAlta BETWEEN ? AND ?";
+	private static final String SUMAR_PRESTAMOS_FECHA = "SELECT SUM(ImportePedido) AS Total FROM Prestamo WHERE FechaAlta BETWEEN ? AND ? AND Estado = 1";
+	private static final String CONTAR_PRESTAMOS_FECHA = "SELECT COUNT(*) AS Cantidad FROM Prestamo WHERE FechaAlta BETWEEN ? AND ? AND Estado = 1";
 
-    
-    
-    public boolean insert(Prestamo prestamo) {
-        
-        try (Connection conn = Conexion.getConexion().getSQLConexion()) {
-           
-            conn.setAutoCommit(false);
+	public boolean insert(Prestamo prestamo) {
 
-            try (PreparedStatement stmt = conn.prepareStatement(INSERT)) {
-                stmt.setInt(1, prestamo.getCliente().getIdCliente());
-                stmt.setInt(2, prestamo.getCuentaAsociada().getIdCuenta());
-                stmt.setDouble(3, prestamo.getImportePedido());
-                stmt.setInt(4, prestamo.getPlazoMeses());
-                stmt.setDouble(5, prestamo.getImportePorMes());
-                stmt.setDouble(6, prestamo.getInteres());
-                stmt.setInt(7, prestamo.getCantidadCuotas());
-               // stmt.setInt(8, prestamo.getEstado());
+		try (Connection conn = Conexion.getConexion().getSQLConexion()) {
 
-                int filas = stmt.executeUpdate();
-                System.out.println("Insert ejecutado, filas afectadas: " + filas);
+			conn.setAutoCommit(false);
 
-                if (filas > 0) {
-                    conn.commit();
-                    System.out.println("Transaccion commit OK");
-                    return true;
-                } else {
-                    conn.rollback();
-                    System.err.println("No se inserto ninguna fila, se hizo rollback");
-                    return false;
-                }
-            } catch (SQLException e) {
-                conn.rollback();
-                System.err.println("Error en insert, se hace rollback");
-                e.printStackTrace();
-                return false;
-            } finally {
-             
-                conn.setAutoCommit(true);
-            }
-        } catch (SQLException e) {
-            System.err.println("Error grave en la conexion");
-            e.printStackTrace();
-            return false;
-        }
-    }
+			try (PreparedStatement stmt = conn.prepareStatement(INSERT)) {
+				stmt.setInt(1, prestamo.getCliente().getIdCliente());
+				stmt.setInt(2, prestamo.getCuentaAsociada().getIdCuenta());
+				stmt.setDouble(3, prestamo.getImportePedido());
+				stmt.setInt(4, prestamo.getPlazoMeses());
+				stmt.setDouble(5, prestamo.getImportePorMes());
+				stmt.setDouble(6, prestamo.getInteres());
+				stmt.setInt(7, prestamo.getCantidadCuotas());
 
-   
+				int filas = stmt.executeUpdate();
+				System.out.println("Insert ejecutado, filas afectadas: " + filas);
 
-    @Override
-    public ArrayList<Prestamo> readAll() {
-        ArrayList<Prestamo> lista = new ArrayList<>();
+				if (filas > 0) {
+					conn.commit();
+					System.out.println("Transaccion commit OK");
+					return true;
+				} else {
+					conn.rollback();
+					System.err.println("No se inserto ninguna fila, se hizo rollback");
+					return false;
+				}
+			} catch (SQLException e) {
+				conn.rollback();
+				System.err.println("Error en insert, se hace rollback");
+				e.printStackTrace();
+				return false;
+			} finally {
 
-        try (Connection conn = Conexion.getConexion().getSQLConexion();
-             PreparedStatement stmt = conn.prepareStatement(OBTENER_PRESTAMOS);
-             ResultSet rs = stmt.executeQuery()) {
+				conn.setAutoCommit(true);
+			}
+		} catch (SQLException e) {
+			System.err.println("Error grave en la conexion");
+			e.printStackTrace();
+			return false;
+		}
+	}
 
-            while (rs.next()) {
-                Prestamo p = new Prestamo();
-                p.setIdPrestamo(rs.getInt("IdPrestamo"));
+	@Override
+	public ArrayList<Prestamo> readAll() {
+		ArrayList<Prestamo> lista = new ArrayList<>();
 
-                Cliente cliente = new Cliente();
-                cliente.setNombre(rs.getString("NombreCliente"));
-                cliente.setApellido(rs.getString("ApellidoCliente"));
-                p.setCliente(cliente);
+		try (Connection conn = Conexion.getConexion().getSQLConexion();
+				PreparedStatement stmt = conn.prepareStatement(OBTENER_PRESTAMOS);
+				ResultSet rs = stmt.executeQuery()) {
 
-                Cuenta cuenta = new Cuenta();
-                cuenta.setNumeroCuenta(rs.getString("NumeroCuenta"));
-                p.setCuentaAsociada(cuenta);
+			while (rs.next()) {
+				Prestamo p = new Prestamo();
+				p.setIdPrestamo(rs.getInt("IdPrestamo"));
 
-                p.setFechaAlta(rs.getDate("FechaAlta"));
-                p.setImportePedido(rs.getDouble("ImportePedido"));
-                p.setPlazoMeses(rs.getInt("PlazoMeses"));
-                p.setImportePorMes(rs.getDouble("ImportePorMes"));
-                p.setInteres(rs.getDouble("Interes"));
-                p.setCantidadCuotas(rs.getInt("CantidadCuotas"));
-                p.setEstado(rs.getInt("Estado"));
+				Cliente cliente = new Cliente();
+				cliente.setNombre(rs.getString("NombreCliente"));
+				cliente.setApellido(rs.getString("ApellidoCliente"));
+				p.setCliente(cliente);
 
-                lista.add(p);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+				Cuenta cuenta = new Cuenta();
+				cuenta.setNumeroCuenta(rs.getString("NumeroCuenta"));
+				p.setCuentaAsociada(cuenta);
 
-        return lista;
-    }
+				p.setFechaAlta(rs.getDate("FechaAlta"));
+				p.setImportePedido(rs.getDouble("ImportePedido"));
+				p.setPlazoMeses(rs.getInt("PlazoMeses"));
+				p.setImportePorMes(rs.getDouble("ImportePorMes"));
+				p.setInteres(rs.getDouble("Interes"));
+				p.setCantidadCuotas(rs.getInt("CantidadCuotas"));
+				p.setEstado(rs.getInt("Estado"));
 
+				lista.add(p);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
-    @Override
-    public List<Prestamo> obtenerPrestamosPorCliente(int idCliente) {
-        List<Prestamo> lista = new ArrayList<>();
-        Connection conn = null;
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
+		return lista;
+	}
 
-        try {
-            conn = Conexion.getConexion().getSQLConexion();
-            stmt = conn.prepareStatement(SELECT_BY_CLIENTE);
-            stmt.setInt(1, idCliente);
-            rs = stmt.executeQuery();
+	@Override
+	public List<Prestamo> obtenerPrestamosPorCliente(int idCliente) {
+		List<Prestamo> lista = new ArrayList<>();
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
 
-            while (rs.next()) {
-                Prestamo p = new Prestamo();
-                p.setIdPrestamo(rs.getInt("IdPrestamo"));
-                p.setFechaAlta(rs.getDate("FechaAlta"));
-                p.setImportePedido(rs.getDouble("ImportePedido"));
-                p.setPlazoMeses(rs.getInt("PlazoMeses"));
-                p.setImportePorMes(rs.getDouble("ImportePorMes"));
-                p.setInteres(rs.getDouble("Interes"));
-                p.setCantidadCuotas(rs.getInt("CantidadCuotas"));
-                p.setEstado(rs.getInt("Estado"));
-                lista.add(p);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (rs != null) rs.close();
-                if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
+		try {
+			conn = Conexion.getConexion().getSQLConexion();
+			stmt = conn.prepareStatement(SELECT_BY_CLIENTE);
+			stmt.setInt(1, idCliente);
+			rs = stmt.executeQuery();
 
-        return lista;
-    }
-	
-    
+			while (rs.next()) {
+				Prestamo p = new Prestamo();
+				p.setIdPrestamo(rs.getInt("IdPrestamo"));
+				p.setFechaAlta(rs.getDate("FechaAlta"));
+				p.setImportePedido(rs.getDouble("ImportePedido"));
+				p.setPlazoMeses(rs.getInt("PlazoMeses"));
+				p.setImportePorMes(rs.getDouble("ImportePorMes"));
+				p.setInteres(rs.getDouble("Interes"));
+				p.setCantidadCuotas(rs.getInt("CantidadCuotas"));
+				p.setEstado(rs.getInt("Estado"));
+				lista.add(p);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+				if (stmt != null)
+					stmt.close();
+				if (conn != null)
+					conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
 
-    public List<Prestamo> getPrestamoPorIdCuenta(int idCuenta) {
-        List<Prestamo> lista = new ArrayList<>();
-        Connection conn = null;
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
+		return lista;
+	}
 
-        try {
-            conn = Conexion.getConexion().getSQLConexion();
-            stmt = conn.prepareStatement(GETPRESTAMOPORCUENTA);
-            stmt.setInt(1, idCuenta);
-            rs = stmt.executeQuery();
+	public List<Prestamo> getPrestamoPorIdCuenta(int idCuenta) {
+		List<Prestamo> lista = new ArrayList<>();
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
 
-            while (rs.next()) {
-                Prestamo prestamo = new Prestamo();
-                prestamo.setIdPrestamo(rs.getInt("IdPrestamo"));
+		try {
+			conn = Conexion.getConexion().getSQLConexion();
+			stmt = conn.prepareStatement(GETPRESTAMOPORCUENTA);
+			stmt.setInt(1, idCuenta);
+			rs = stmt.executeQuery();
 
-                Cliente cliente = new Cliente();
-                cliente.setIdCliente(rs.getInt("IdCliente"));
-                prestamo.setCliente(cliente);
+			while (rs.next()) {
+				Prestamo prestamo = new Prestamo();
+				prestamo.setIdPrestamo(rs.getInt("IdPrestamo"));
 
-                Cuenta cuenta = new Cuenta();
-                cuenta.setIdCuenta(rs.getInt("IdCuentaAsociada"));
-                prestamo.setCuentaAsociada(cuenta);
+				Cliente cliente = new Cliente();
+				cliente.setIdCliente(rs.getInt("IdCliente"));
+				prestamo.setCliente(cliente);
 
-                prestamo.setFechaAlta(rs.getDate("FechaAlta"));
-                prestamo.setImportePedido(rs.getDouble("ImportePedido"));
-                prestamo.setPlazoMeses(rs.getInt("PlazoMeses"));
-                prestamo.setImportePorMes(rs.getDouble("ImportePorMes"));
-                prestamo.setInteres(rs.getDouble("Interes"));
-                prestamo.setCantidadCuotas(rs.getInt("CantidadCuotas"));
-                prestamo.setEstado(rs.getInt("Estado")); 
+				Cuenta cuenta = new Cuenta();
+				cuenta.setIdCuenta(rs.getInt("IdCuentaAsociada"));
+				prestamo.setCuentaAsociada(cuenta);
 
-                lista.add(prestamo);
-            }
+				prestamo.setFechaAlta(rs.getDate("FechaAlta"));
+				prestamo.setImportePedido(rs.getDouble("ImportePedido"));
+				prestamo.setPlazoMeses(rs.getInt("PlazoMeses"));
+				prestamo.setImportePorMes(rs.getDouble("ImportePorMes"));
+				prestamo.setInteres(rs.getDouble("Interes"));
+				prestamo.setCantidadCuotas(rs.getInt("CantidadCuotas"));
+				prestamo.setEstado(rs.getInt("Estado"));
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (rs != null) rs.close();
-                if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
+				lista.add(prestamo);
+			}
 
-        return lista;
-    }
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+				if (stmt != null)
+					stmt.close();
+				if (conn != null)
+					conn.close();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
 
-    
-    @Override
-    public boolean actualizarImportePedido(int idPrestamo, double nuevoImporte) {
-        Connection conn = null;
-        PreparedStatement stmt = null;
-        boolean exito = false;
+		return lista;
+	}
 
-        try {
-            conn = Conexion.getConexion().getSQLConexion();
-            stmt = conn.prepareStatement(ACTUALIZARIMPORTE);
-            stmt.setDouble(1, nuevoImporte);
-            stmt.setInt(2, idPrestamo);
+	@Override
+	public boolean actualizarImportePedido(int idPrestamo, double nuevoImporte) {
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		boolean exito = false;
 
-            if (stmt.executeUpdate() > 0) {
-                conn.commit();  
-                exito = true;
-            } else {
-                conn.rollback();
-            }
+		try {
+			conn = Conexion.getConexion().getSQLConexion();
+			stmt = conn.prepareStatement(ACTUALIZARIMPORTE);
+			stmt.setDouble(1, nuevoImporte);
+			stmt.setInt(2, idPrestamo);
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            try {
-                if (conn != null) conn.rollback();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-        } finally {
-            try {
-                if (stmt != null) stmt.close();
-                if (conn != null) conn.setAutoCommit(true);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
+			if (stmt.executeUpdate() > 0) {
+				conn.commit();
+				exito = true;
+			} else {
+				conn.rollback();
+			}
 
-        return exito;
-    }
+		} catch (SQLException e) {
+			e.printStackTrace();
+			try {
+				if (conn != null)
+					conn.rollback();
+			} catch (SQLException ex) {
+				ex.printStackTrace();
+			}
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+				if (conn != null)
+					conn.setAutoCommit(true);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return exito;
+	}
 
 	@Override
 	public List<Prestamo> obtenerTodosLosPrestamos() {
-		 List<Prestamo> lista = new ArrayList<>();
-		  
-           
-	        try {
-	            Connection cn = Conexion.getConexion().getSQLConexion();
-	            PreparedStatement stmt = cn.prepareStatement(OBTENER_PRESTAMOS);
-	            ResultSet rs = stmt.executeQuery();
+		List<Prestamo> lista = new ArrayList<>();
 
-	            while (rs.next()) {
-	                Prestamo p = new Prestamo();
+		try {
+			Connection cn = Conexion.getConexion().getSQLConexion();
+			PreparedStatement stmt = cn.prepareStatement(OBTENER_PRESTAMOS);
+			ResultSet rs = stmt.executeQuery();
 
-	                p.setIdPrestamo(rs.getInt("IdPrestamo"));
+			while (rs.next()) {
+				Prestamo p = new Prestamo();
 
-	                Cliente cliente = new Cliente();
-	                cliente.setNombre(rs.getString("NombreCliente"));
-	                cliente.setApellido(rs.getString("ApellidoCliente"));
-	                p.setCliente(cliente);
+				p.setIdPrestamo(rs.getInt("IdPrestamo"));
 
-	                Cuenta cuenta = new Cuenta();
-	                cuenta.setNumeroCuenta(rs.getString("NumeroCuenta"));
-	                p.setCuentaAsociada(cuenta);
+				Cliente cliente = new Cliente();
+				cliente.setNombre(rs.getString("NombreCliente"));
+				cliente.setApellido(rs.getString("ApellidoCliente"));
+				p.setCliente(cliente);
 
-	                p.setFechaAlta(rs.getDate("FechaAlta"));
-	                p.setImportePedido(rs.getDouble("ImportePedido"));
-	                p.setPlazoMeses(rs.getInt("PlazoMeses"));
-	                p.setImportePorMes(rs.getDouble("ImportePorMes"));
-	                p.setInteres(rs.getDouble("Interes"));
-	                p.setEstado(rs.getInt("Estado"));
-	                p.setCantidadCuotas(rs.getInt("CantidadCuotas"));
+				Cuenta cuenta = new Cuenta();
+				cuenta.setNumeroCuenta(rs.getString("NumeroCuenta"));
+				p.setCuentaAsociada(cuenta);
 
-	                lista.add(p);
-	            }
+				p.setFechaAlta(rs.getDate("FechaAlta"));
+				p.setImportePedido(rs.getDouble("ImportePedido"));
+				p.setPlazoMeses(rs.getInt("PlazoMeses"));
+				p.setImportePorMes(rs.getDouble("ImportePorMes"));
+				p.setInteres(rs.getDouble("Interes"));
+				p.setEstado(rs.getInt("Estado"));
+				p.setCantidadCuotas(rs.getInt("CantidadCuotas"));
 
+				lista.add(p);
+			}
 
-	            cn.close();
+			cn.close();
 
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	        }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-	        return lista;
+		return lista;
 	}
 
 	@Override
 	public boolean actualizarEstado(int idPrestamo, int nuevoEstado) {
-		   Connection conn = null;
-		    PreparedStatement stmt = null;
-		    try {
-		        conn = Conexion.getConexion().getSQLConexion();
-		        conn.setAutoCommit(false); 
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		try {
+			conn = Conexion.getConexion().getSQLConexion();
+			conn.setAutoCommit(false);
 
-		        stmt = conn.prepareStatement(UPDATE_ESTADO);
-		        stmt.setInt(1, nuevoEstado);
-		        stmt.setInt(2, idPrestamo);
-		        int filas = stmt.executeUpdate();
-		        System.out.println("updateEstado: filas afectadas = " + filas);
+			stmt = conn.prepareStatement(UPDATE_ESTADO);
+			stmt.setInt(1, nuevoEstado);
+			stmt.setInt(2, idPrestamo);
+			int filas = stmt.executeUpdate();
+			System.out.println("updateEstado: filas afectadas = " + filas);
 
-		        if (filas > 0) {
-		            conn.commit(); 
-		            return true;
-		        } else {
-		            conn.rollback(); 
-		            return false;
-		        }
-		    } catch (SQLException e) {
-		        try {
-		            if (conn != null) conn.rollback(); 
-		        } catch (SQLException ex) {
-		            ex.printStackTrace();
-		        }
-		        e.printStackTrace();
-		        return false;
-		    } finally {
-		        try {
-		            if (stmt != null) stmt.close();
-		            if (conn != null) {
-		                conn.setAutoCommit(true); 
-		                conn.close();
-		            }
-		        } catch (SQLException e) {
-		            e.printStackTrace();
-		        }
-		    }
-	    }
-	
-	
-	@Override
-	public double obtenerSumaImporteEntreFechas(Date desde, Date hasta) {
-	    double total = 0;
-	    Connection conn = null;
-	    PreparedStatement stmt = null;
-	    ResultSet rs = null;
-
-	    try {
-	        conn = Conexion.getConexion().getSQLConexion();
-	        stmt = conn.prepareStatement(SUMAR_PRESTAMOS_FECHA);
-	        stmt.setDate(1, new java.sql.Date(desde.getTime()));
-	        stmt.setDate(2, new java.sql.Date(hasta.getTime()));
-
-	        rs = stmt.executeQuery();
-
-	        if (rs.next()) {
-	            total = rs.getDouble("Total");
-	        }
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	    } finally {
-	        try {
-	            if (rs != null) rs.close();
-	            if (stmt != null) stmt.close();
-	            if (conn != null) conn.close();
-	        } catch (SQLException e) {
-	            e.printStackTrace();
-	        }
-	    }
-	    return total;
+			if (filas > 0) {
+				conn.commit();
+				return true;
+			} else {
+				conn.rollback();
+				return false;
+			}
+		} catch (SQLException e) {
+			try {
+				if (conn != null)
+					conn.rollback();
+			} catch (SQLException ex) {
+				ex.printStackTrace();
+			}
+			e.printStackTrace();
+			return false;
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+				if (conn != null) {
+					conn.setAutoCommit(true);
+					conn.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
+	@Override
+	public double obtenerSumaImporteEntreFechas(Date desde, Date hasta) {
+		double total = 0;
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+
+		try {
+			conn = Conexion.getConexion().getSQLConexion();
+			stmt = conn.prepareStatement(SUMAR_PRESTAMOS_FECHA);
+			stmt.setDate(1, new java.sql.Date(desde.getTime()));
+			stmt.setDate(2, new java.sql.Date(hasta.getTime()));
+
+			rs = stmt.executeQuery();
+
+			if (rs.next()) {
+				total = rs.getDouble("Total");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+				if (stmt != null)
+					stmt.close();
+				if (conn != null)
+					conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return total;
+	}
 
 	@Override
 	public int contarPrestamosEntreFechas(Date desde, Date hasta) {
-	    int cantidad = 0;
-	    Connection conn = null;
-	    PreparedStatement stmt = null;
-	    ResultSet rs = null;
+		int cantidad = 0;
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
 
-	    try {
-	        conn = Conexion.getConexion().getSQLConexion();
-	        stmt = conn.prepareStatement(CONTAR_PRESTAMOS_FECHA);
-	        stmt.setDate(1, new java.sql.Date(desde.getTime()));
-	        stmt.setDate(2, new java.sql.Date(hasta.getTime()));
+		try {
+			conn = Conexion.getConexion().getSQLConexion();
+			stmt = conn.prepareStatement(CONTAR_PRESTAMOS_FECHA);
+			stmt.setDate(1, new java.sql.Date(desde.getTime()));
+			stmt.setDate(2, new java.sql.Date(hasta.getTime()));
 
-	        rs = stmt.executeQuery();
+			rs = stmt.executeQuery();
 
-	        if (rs.next()) {
-	            cantidad = rs.getInt("Cantidad");
-	        }
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	    } finally {
-	        try {
-	            if (rs != null) rs.close();
-	            if (stmt != null) stmt.close();
-	            if (conn != null) conn.close();
-	        } catch (SQLException e) {
-	            e.printStackTrace();
-	        }
-	    }
-	    return cantidad;
+			if (rs.next()) {
+				cantidad = rs.getInt("Cantidad");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+				if (stmt != null)
+					stmt.close();
+				if (conn != null)
+					conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return cantidad;
 	}
 
-///////////// la necesito??? siiii para actualizar infor prestamo desp de pagar
 	public Prestamo getPrestamoPorIdPrestamo(int idPrestamo) {
-	    Prestamo prestamo = null;
-	    Connection cn = null;
-	    PreparedStatement ps = null;
-	    ResultSet rs = null;
+		Prestamo prestamo = null;
+		Connection cn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
 
-	    try {
-	        cn = Conexion.getConexion().getSQLConexion();
+		try {
+			cn = Conexion.getConexion().getSQLConexion();
 
-	        String sql = "SELECT p.*, c.IdCuenta, c.NumeroCuenta, c.Cbu, c.Saldo " +
-	                     "FROM Prestamo p " +
-	                     "LEFT JOIN Cuenta c ON p.IdCuentaAsociada = c.IdCuenta " +
-	                     "WHERE p.IdPrestamo = ?";
+			String sql = "SELECT p.*, c.IdCuenta, c.NumeroCuenta, c.Cbu, c.Saldo " + "FROM Prestamo p "
+					+ "LEFT JOIN Cuenta c ON p.IdCuentaAsociada = c.IdCuenta " + "WHERE p.IdPrestamo = ?";
 
-	        ps = cn.prepareStatement(sql);
-	        ps.setInt(1, idPrestamo);
-	        rs = ps.executeQuery();
+			ps = cn.prepareStatement(sql);
+			ps.setInt(1, idPrestamo);
+			rs = ps.executeQuery();
 
-	        if (rs.next()) {
-	            prestamo = new Prestamo();
+			if (rs.next()) {
+				prestamo = new Prestamo();
 
-	            // Datos del préstamo
-	            prestamo.setIdPrestamo(rs.getInt("IdPrestamo"));
-	            prestamo.setImportePedido(rs.getDouble("ImportePedido"));
-	            prestamo.setImportePorMes(rs.getDouble("ImportePorMes"));
-	            prestamo.setPlazoMeses(rs.getInt("PlazoMeses"));
-	            prestamo.setInteres(rs.getDouble("Interes"));
-	            prestamo.setFechaAlta(rs.getDate("FechaAlta"));
-	            prestamo.setEstado(rs.getInt("Estado"));
-	            prestamo.setCantidadCuotas(rs.getInt("CantidadCuotas")); 
+				prestamo.setIdPrestamo(rs.getInt("IdPrestamo"));
+				prestamo.setImportePedido(rs.getDouble("ImportePedido"));
+				prestamo.setImportePorMes(rs.getDouble("ImportePorMes"));
+				prestamo.setPlazoMeses(rs.getInt("PlazoMeses"));
+				prestamo.setInteres(rs.getDouble("Interes"));
+				prestamo.setFechaAlta(rs.getDate("FechaAlta"));
+				prestamo.setEstado(rs.getInt("Estado"));
+				prestamo.setCantidadCuotas(rs.getInt("CantidadCuotas"));
 
-	            // Datos de la cuenta asociada
-	            Cuenta cuenta = new Cuenta();
-	            cuenta.setIdCuenta(rs.getInt("IdCuenta"));
-	            cuenta.setNumeroCuenta(rs.getString("NumeroCuenta"));
-	            cuenta.setCbu(rs.getString("Cbu"));
-	            cuenta.setSaldo(rs.getBigDecimal("Saldo"));
+				Cuenta cuenta = new Cuenta();
+				cuenta.setIdCuenta(rs.getInt("IdCuenta"));
+				cuenta.setNumeroCuenta(rs.getString("NumeroCuenta"));
+				cuenta.setCbu(rs.getString("Cbu"));
+				cuenta.setSaldo(rs.getBigDecimal("Saldo"));
 
-	            prestamo.setCuentaAsociada(cuenta);
-	        }
+				prestamo.setCuentaAsociada(cuenta);
+			}
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    } finally {
-	        try {
-	            if (rs != null) rs.close();
-	            if (ps != null) ps.close();
-	            if (cn != null) cn.close();
-	        } catch (Exception ex) {
-	            ex.printStackTrace();
-	        }
-	    }
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+				if (ps != null)
+					ps.close();
+				if (cn != null)
+					cn.close();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
 
-	    return prestamo;
+		return prestamo;
 	}
 
+	@Override
+	public boolean pagarCuotaConTransaccion(int idCuenta, int idPrestamo, Double monto) {
+		System.out.println(" Ejecutado: pagarCuotaConTransaccion");
 
+		Connection conn = null;
 
+		try {
+			conn = Conexion.getConexion().getSQLConexion();
+			conn.setAutoCommit(false);
 
-@Override
-public boolean pagarCuotaConTransaccion(int idCuenta, int idPrestamo, Double monto) {
-	
-	 System.out.println(" Ejecutado: pagarCuotaConTransaccion");
+			PreparedStatement stmtVerificar = conn
+					.prepareStatement("SELECT CantidadCuotas FROM Prestamo WHERE IdPrestamo = ?");
+			stmtVerificar.setInt(1, idPrestamo);
+			ResultSet rsVerificar = stmtVerificar.executeQuery();
 
-	    Connection conn = null;
+			if (rsVerificar.next()) {
+				int cuotasRestantes = rsVerificar.getInt("CantidadCuotas");
+				if (cuotasRestantes <= 0) {
+					System.out.println(
+							"[ERROR] El préstamo ya está completamente pagado. Cuotas restantes: " + cuotasRestantes);
+					conn.rollback();
+					return false;
+				}
+				System.out.println("[DEBUG] Cuotas restantes antes del pago: " + cuotasRestantes);
+			} else {
+				System.out.println("[ERROR] Préstamo no encontrado con ID: " + idPrestamo);
+				conn.rollback();
+				return false;
+			}
 
-	    try {
-	        conn = Conexion.getConexion().getSQLConexion();
-	        conn.setAutoCommit(false);
+			CuentaDao cuentaDao = new CuentaDaoImpl();
 
-	        // DAOs
-	        CuentaDao cuentaDao = new CuentaDaoImpl();
+			Cuenta cuenta = cuentaDao.buscarCuentaPorIdDao2(idCuenta, conn);
+			if (cuenta == null) {
+				System.out.println("Œ No se encontrÃ³ la cuenta con ID: " + idCuenta);
+				conn.rollback();
+				return false;
+			}
 
-	        // Buscar la cuenta
-	        Cuenta cuenta = cuentaDao.buscarCuentaPorIdDao2(idCuenta, conn);
-	        if (cuenta == null) {
-	            System.out.println("Œ No se encontrÃ³ la cuenta con ID: " + idCuenta);
-	            conn.rollback();
-	            return false;
-	        }
+			System.out.println("… Cuenta encontrada: ID = " + cuenta.getIdCuenta());
 
-	        System.out.println("… Cuenta encontrada: ID = " + cuenta.getIdCuenta());
+			BigDecimal montoPago = BigDecimal.valueOf(monto);
+			if (cuenta.getSaldo().compareTo(montoPago) < 0) {
+				System.out.println(
+						" Saldo insuficiente. Saldo actual: " + cuenta.getSaldo() + ", Monto requerido: " + montoPago);
+				conn.rollback();
+				return false;
+			}
 
-	        // Validar fondos suficientes
-	        BigDecimal montoPago = BigDecimal.valueOf(monto);
-	        if (cuenta.getSaldo().compareTo(montoPago) < 0) {
-	            System.out.println(" Saldo insuficiente. Saldo actual: " + cuenta.getSaldo() + ", Monto requerido: " + montoPago);
-	            conn.rollback();
-	            return false;
-	        }
+			BigDecimal nuevoSaldo = cuenta.getSaldo().subtract(montoPago);
+			cuentaDao.actualizarSaldo(idCuenta, nuevoSaldo, conn);
 
-	        // Descontar el saldo y actualizar
-	        BigDecimal nuevoSaldo = cuenta.getSaldo().subtract(montoPago);
-	        cuentaDao.actualizarSaldo(idCuenta, nuevoSaldo, conn);
+			Movimiento movimiento = new Movimiento();
+			movimiento.setCuenta(cuenta);
+			movimiento.setImporte(montoPago);
+			movimiento.setReferencia("Pago Prestamo");
+			movimiento.setFechaHora(LocalDateTime.now());
 
-	        // Crear el movimiento
-	        Movimiento movimiento = new Movimiento();
-	        movimiento.setCuenta(cuenta);
-	        movimiento.setImporte(montoPago);
-	        movimiento.setReferencia("Pago Prestamo");
-	        movimiento.setFechaHora(LocalDateTime.now());
+			TipoMovimiento tipo = new TipoMovimiento();
+			tipo.setIdTipoMovimiento(3);
+			movimiento.setTipoMovimiento(tipo);
 
-	        TipoMovimiento tipo = new TipoMovimiento();
-	        tipo.setIdTipoMovimiento(3); // Egreso
-	        movimiento.setTipoMovimiento(tipo);
+			MovimientoDao movimientoDao = new MovimientoDaoImpl();
+			boolean exitoMovimiento = movimientoDao.insertMovimientoTransaccion(movimiento, conn);
 
-	        MovimientoDao movimientoDao = new MovimientoDaoImpl();
-	        boolean exitoMovimiento = movimientoDao.insertMovimientoTransaccion(movimiento, conn);
+			if (!exitoMovimiento) {
+				System.out.println(" No se pudo registrar el movimiento");
+				conn.rollback();
+				return false;
+			}
 
-	        if (!exitoMovimiento) {
-	            System.out.println(" No se pudo registrar el movimiento");
-	            conn.rollback();
-	            return false;
-	        }
+			String sql1 = "UPDATE Prestamo SET CantidadCuotas = CantidadCuotas - 1 WHERE IdPrestamo = ? AND CantidadCuotas > 0";
+			try (PreparedStatement stmt1 = conn.prepareStatement(sql1)) {
+				stmt1.setInt(1, idPrestamo);
+				int filasAfectadas = stmt1.executeUpdate();
 
-	     //  Disminuir la cantidad de cuotas
-	        String sql1 = "UPDATE Prestamo SET CantidadCuotas = CantidadCuotas - 1 WHERE IdPrestamo = ?";
-	        try (PreparedStatement stmt1 = conn.prepareStatement(sql1)) {
-	            stmt1.setInt(1, idPrestamo);
-	            stmt1.executeUpdate();
-	        }
+				if (filasAfectadas == 0) {
+					System.out.println("[ERROR] No se pudo actualizar las cuotas. Posiblemente ya están en 0.");
+					conn.rollback();
+					return false;
+				}
 
-	        // Cambiar estado si ya no quedan cuotas por pagar
-	        String sql2 = "UPDATE Prestamo SET Estado = 0 WHERE IdPrestamo = ? AND CantidadCuotas <= 0";
-	        try (PreparedStatement stmt2 = conn.prepareStatement(sql2)) {
-	            stmt2.setInt(1, idPrestamo);
-	            stmt2.executeUpdate();
-	        }
+				System.out.println("[DEBUG] Cuotas actualizadas. Filas afectadas: " + filasAfectadas);
+			}
 
-	        // Si todo bien, confirmar transacc
-	        conn.commit();
-	        System.out.println("Cuota pagada correctamente. Transaccin confirmada.");
-	        return true;
+			conn.commit();
+			System.out.println("Cuota pagada correctamente. Transacción confirmada.");
+			return true;
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        try {
-	            if (conn != null) {
-	                System.out.println("Realizando rollback...");
-	                conn.rollback();
-	            }
-	        } catch (SQLException ex) {
-	            ex.printStackTrace();
-	        }
-	        return false;
+		} catch (Exception e) {
+			e.printStackTrace();
+			try {
+				if (conn != null) {
+					System.out.println("Realizando rollback...");
+					conn.rollback();
+				}
+			} catch (SQLException ex) {
+				ex.printStackTrace();
+			}
+			return false;
 
-	    } finally {
-	        try {
-	            if (conn != null) conn.close();
-	        } catch (SQLException e) {
-	            e.printStackTrace();
-	        }
-	    }
+		} finally {
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
 }
-
-
-
-	
-	
-
-	
-		
-		
-	
-}
-
-    
-    
-	
-	
-

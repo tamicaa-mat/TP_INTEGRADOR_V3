@@ -8,14 +8,12 @@ import dominio.Movimiento;
 
 public interface MovimientoDao {
 
-	  public List<Movimiento> listarMovimientos(int idCuenta, int idTipo);
+	public List<Movimiento> listarMovimientos(int idCuenta, int idTipo);
 
-	  boolean insertMovimiento(Movimiento movimiento);
-	
-	
-	  public List<Movimiento> obtenerMovimientosPorCliente(int idCliente);
+	boolean insertMovimiento(Movimiento movimiento);
+
+	public List<Movimiento> obtenerMovimientosPorCliente(int idCliente);
 
 	public boolean insertMovimientoTransaccion(Movimiento movimiento, Connection conn);
 
-	
 }

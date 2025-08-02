@@ -60,14 +60,12 @@ public class MovimientoDaoImpl implements MovimientoDao {
 		            movimiento.setTipoMovimiento(tm);
 		            movimiento.setCuenta(c);
 
-		            //  Depuración de cada movimiento
 		            System.out.println("Movimiento encontrado: " + movimiento.getFechaHora() + " - " + 
 		                               movimiento.getReferencia() + " - $" + movimiento.getImporte());
 
 		            listaMovimientos.add(movimiento);
 		        }
 
-		        //  Total
 		        System.out.println("Total movimientos encontrados para cliente " + idCliente + ": " + listaMovimientos.size());
 
 		    } catch (SQLException e) {
@@ -117,14 +115,9 @@ public class MovimientoDaoImpl implements MovimientoDao {
 				m.setReferencia(rs.getString("Referencia"));
 				m.setImporte(rs.getBigDecimal("Importe"));
 
-				
-				// 1. Crea un objeto Cuenta.
 				Cuenta c = new Cuenta();
-				// 2. Asígna el ID que obtienes del ResultSet.
 				c.setIdCuenta(rs.getInt("IdCuenta"));
-				// 3. Asigna el objeto Cuenta completo al Movimiento.
 				m.setCuenta(c);
-				
 
 				TipoMovimiento tm = new TipoMovimiento();
 			
@@ -214,7 +207,6 @@ public class MovimientoDaoImpl implements MovimientoDao {
 		try {
 			stmt = conn.prepareStatement(sql);
 
-			// Seteamos los valores en el PreparedStatement
 			stmt.setTimestamp(1, Timestamp.valueOf(movimiento.getFechaHora()));
 			stmt.setString(2, movimiento.getReferencia());
 			stmt.setBigDecimal(3, movimiento.getImporte());

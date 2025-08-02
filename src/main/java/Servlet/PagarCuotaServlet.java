@@ -15,67 +15,68 @@ import NegocioImpl.PrestamoNegocioImpl;
 import daoImpl.PrestamoDaoImpl;
 
 ;
-/**
- * Servlet implementation class PagarCuotaServlet
- */
+
 @WebServlet("/PagarCuotaServlet")
 public class PagarCuotaServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public PagarCuotaServlet() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		 System.out.println("Servlet ejecutado: PagarCuotaServlet");
+	public PagarCuotaServlet() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		System.out.println("Servlet ejecutado: PagarCuotaServlet");
 		HttpSession session = request.getSession();
-		    Cliente cliente = (Cliente) session.getAttribute("clienteLogueado");
+		Cliente cliente = (Cliente) session.getAttribute("clienteLogueado");
 
-		    if (cliente == null) {
-		        response.sendRedirect("login.jsp?mensaje=Debe iniciar sesión");
-		        return;
-		    }
+		if (cliente == null) {
+			response.sendRedirect("login.jsp?mensaje=Debe iniciar sesión");
+			return;
+		}
 
-		    int idCuenta = Integer.parseInt(request.getParameter("idCuenta"));
-		    int idPrestamo = Integer.parseInt(request.getParameter("idPrestamo"));
-		    double monto = Double.parseDouble(request.getParameter("montoPago"));
+		int idCuenta = Integer.parseInt(request.getParameter("idCuenta"));
+		int idPrestamo = Integer.parseInt(request.getParameter("idPrestamo"));
+		double monto = Double.parseDouble(request.getParameter("montoPago"));
 
-		    
+		PrestamoNegocio prestamoNegocio = new PrestamoNegocioImpl(new PrestamoDaoImpl());
 
-		    
-		    PrestamoNegocio prestamoNegocio = new PrestamoNegocioImpl(new PrestamoDaoImpl());
+		Prestamo prestamoAntesPago = prestamoNegocio.obtenerPrestamoPorId(idPrestamo);
 
-		    boolean exito = prestamoNegocio.pagarCuota(idCuenta, idPrestamo, monto);
-		    if (exito) {
-		        Prestamo prestamoActualizado = prestamoNegocio.obtenerPrestamoPorId(idPrestamo);
-		        request.setAttribute("prestamo", prestamoActualizado);
-		        request.setAttribute("exito", true);
-		        request.getRequestDispatcher("CLIENTEpagoPrestamos.jsp").forward(request, response);
-		    } else {
-		        request.setAttribute("error", "Saldo insuficiente o error al procesar el pago.");
-		        request.getRequestDispatcher("CLIENTEpagoPrestamos.jsp").forward(request, response);
-		    }
+		if (prestamoAntesPago == null) {
+			request.setAttribute("error", "Préstamo no encontrado.");
+			request.getRequestDispatcher("CLIENTEpagoPrestamos.jsp").forward(request, response);
+			return;
+		}
 
+		if (prestamoAntesPago.getCantidadCuotas() <= 0) {
+			request.setAttribute("error", "Este préstamo ya está completamente pagado. No hay cuotas pendientes.");
+			Prestamo prestamoActualizado = prestamoNegocio.obtenerPrestamoPorId(idPrestamo);
+			request.setAttribute("prestamo", prestamoActualizado);
+			request.getRequestDispatcher("CLIENTEpagoPrestamos.jsp").forward(request, response);
+			return;
+		}
 
-}
-	
-	
-	
-	
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		boolean exito = prestamoNegocio.pagarCuota(idCuenta, idPrestamo, monto);
+
+		if (exito) {
+			Prestamo prestamoActualizado = prestamoNegocio.obtenerPrestamoPorId(idPrestamo);
+			request.setAttribute("prestamo", prestamoActualizado);
+			request.setAttribute("exito", true);
+			request.getRequestDispatcher("CLIENTEpagoPrestamos.jsp").forward(request, response);
+		} else {
+			request.setAttribute("error", "Saldo insuficiente o error al procesar el pago.");
+			request.getRequestDispatcher("CLIENTEpagoPrestamos.jsp").forward(request, response);
+		}
+
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
-	
-	
-	
-	
+
 }

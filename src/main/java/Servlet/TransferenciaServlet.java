@@ -24,87 +24,111 @@ import excepciones.TransferenciaInvalidaException;
 
 @WebServlet("/TransferenciaServlet")
 public class TransferenciaServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    public TransferenciaServlet() {
-        super();
-    }
+	public TransferenciaServlet() {
+		super();
+	}
 
-    //  GET: Carga el formulario
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        System.out.println("GET TransferenciaServlet ejecutado");
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		System.out.println("GET TransferenciaServlet ejecutado");
 
-        HttpSession session = request.getSession();
-        Cliente clienteLogueado = (Cliente) session.getAttribute("clienteLogueado");
+		HttpSession session = request.getSession();
+		Cliente clienteLogueado = (Cliente) session.getAttribute("clienteLogueado");
 
-        if (clienteLogueado == null) {
-            response.sendRedirect("login.jsp?mensaje=Debe iniciar sesión");
-            return;
-        }
+		if (clienteLogueado == null) {
+			response.sendRedirect("login.jsp?mensaje=Debe iniciar sesión");
+			return;
+		}
 
-        CuentaNegocio cuentaNegocio = new CuentaNegocioImpl(new CuentaDaoImpl());
-        List<Cuenta> cuentas = cuentaNegocio.getCuentasPorCliente(clienteLogueado);
-        request.setAttribute("cuentas", cuentas);
+		CuentaNegocio cuentaNegocio = new CuentaNegocioImpl(new CuentaDaoImpl());
+		List<Cuenta> cuentas = cuentaNegocio.getCuentasPorCliente(clienteLogueado);
+		request.setAttribute("cuentas", cuentas);
 
-        request.getRequestDispatcher("ClienteNuevaTransferencia.jsp").forward(request, response);
-    }
+		request.getRequestDispatcher("ClienteNuevaTransferencia.jsp").forward(request, response);
+	}
 
-    //  POST: Procesa la transferencia
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        System.out.println("POST TransferenciaServlet ejecutado");
+	@Override
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		System.out.println("POST TransferenciaServlet ejecutado");
 
-        HttpSession session = request.getSession();
-        Cliente clienteLogueado = (Cliente) session.getAttribute("clienteLogueado");
+		HttpSession session = request.getSession();
+		Cliente clienteLogueado = (Cliente) session.getAttribute("clienteLogueado");
 
-        if (clienteLogueado == null) {
-            response.sendRedirect("login.jsp?mensaje=Debe iniciar sesión");
-            return;
-        }
+		if (clienteLogueado == null) {
+			response.sendRedirect("login.jsp?mensaje=Debe iniciar sesión");
+			return;
+		}
 
-        CuentaNegocio cuentaNegocio = new CuentaNegocioImpl(new CuentaDaoImpl());
-        List<Cuenta> cuentas = cuentaNegocio.getCuentasPorCliente(clienteLogueado);
-        request.setAttribute("cuentas", cuentas);
+		CuentaNegocio cuentaNegocio = new CuentaNegocioImpl(new CuentaDaoImpl());
+		List<Cuenta> cuentas = cuentaNegocio.getCuentasPorCliente(clienteLogueado);
+		request.setAttribute("cuentas", cuentas);
 
-        // Leer parámetros
-        String numeroCuentaOrigenStr = request.getParameter("idCuentaOrigen");
-        String numeroCuentaDestino = request.getParameter("numeroCuentaDestino");
-        String montoStr = request.getParameter("monto");
+		String numeroCuentaOrigenStr = request.getParameter("idCuentaOrigen");
+		String numeroCuentaDestino = request.getParameter("numeroCuentaDestino");
+		String montoStr = request.getParameter("monto");
 
-        if (numeroCuentaOrigenStr != null && montoStr != null && numeroCuentaDestino != null &&
-            !numeroCuentaOrigenStr.isEmpty() && !montoStr.isEmpty() && !numeroCuentaDestino.isEmpty()) {
-            
-            try {
-               
-                BigDecimal monto = new BigDecimal(montoStr);
+		if (numeroCuentaOrigenStr != null && montoStr != null && numeroCuentaDestino != null
+				&& !numeroCuentaOrigenStr.isEmpty() && !montoStr.isEmpty() && !numeroCuentaDestino.isEmpty()) {
 
-                TransferenciaNegocio transferenciaNeg = new TransferenciaNegocioImpl(new TransferenciaDaoImpl());
+			try {
+				boolean esCuentaPropia = false;
+				for (Cuenta cuenta : cuentas) {
+					if (cuenta.getNumeroCuenta().equals(numeroCuentaDestino)) {
+						esCuentaPropia = true;
+						break;
+					}
+				}
 
-                // Ejecutar transferencia
-                transferenciaNeg.realizarTransferencia(numeroCuentaOrigenStr, numeroCuentaDestino, monto);
-                request.setAttribute("mensajeExito", "Transferencia realizada correctamente.");
+				if (esCuentaPropia) {
+					request.setAttribute("mensajeError", "No puede realizar transferencias a sus propias cuentas.");
+					request.getRequestDispatcher("ClienteNuevaTransferencia.jsp").forward(request, response);
+					return;
+				}
 
-                //request.setAttribute("numeroCuentaDestino",numeroCuentaDestino); no tengo en transferencia numero cuenta, tengo solo el id
-                //request.setAttribute("numeroCuentaOrigen",numeroCuentaOrigenStr);
-                
-                
-                
-                
-                // Mostrar historial
-                List<Transferencia> transferencias = transferenciaNeg.listarTransferenciasPorCuenta(numeroCuentaOrigenStr);
-                request.setAttribute("transferencias", transferencias);
+				if (numeroCuentaOrigenStr.equals(numeroCuentaDestino)) {
+					request.setAttribute("mensajeError", "La cuenta de origen y destino no pueden ser la misma.");
+					request.getRequestDispatcher("ClienteNuevaTransferencia.jsp").forward(request, response);
+					return;
+				}
 
-            } catch (TransferenciaInvalidaException e) {
-                request.setAttribute("mensajeError", e.getMessage());
-            } catch (NumberFormatException e) {
-                request.setAttribute("mensajeError", "Formato de número inválido.");
-            }
-        } else {
-            request.setAttribute("mensajeError", "Todos los campos son obligatorios.");
-        }
+				BigDecimal monto = new BigDecimal(montoStr);
 
-        // Volver al JSP
-        request.getRequestDispatcher("ClienteNuevaTransferencia.jsp").forward(request, response);
-    }
+				TransferenciaNegocio transferenciaNeg = new TransferenciaNegocioImpl(new TransferenciaDaoImpl());
+
+				clienteLogueado.setCuentas(cuentas);
+
+				System.out.println("[DEBUG] Ejecutando transferencia desde servlet");
+
+				transferenciaNeg.realizarTransferencia(numeroCuentaOrigenStr, numeroCuentaDestino, monto,
+						clienteLogueado);
+
+				System.out.println("[DEBUG] Transferencia ejecutada sin excepciones");
+
+				request.setAttribute("mensajeExito", "Transferencia realizada correctamente.");
+
+				List<Transferencia> transferencias = transferenciaNeg
+						.listarTransferenciasPorCuenta(numeroCuentaOrigenStr);
+				request.setAttribute("transferencias", transferencias);
+
+			} catch (TransferenciaInvalidaException e) {
+				System.out.println("[ERROR] TransferenciaInvalidaException: " + e.getMessage());
+				request.setAttribute("mensajeError", e.getMessage());
+			} catch (NumberFormatException e) {
+				System.out.println("[ERROR] NumberFormatException: " + e.getMessage());
+				request.setAttribute("mensajeError", "Formato de número inválido.");
+			} catch (Exception e) {
+				System.out.println("[ERROR] Exception general: " + e.getMessage());
+				e.printStackTrace();
+				request.setAttribute("mensajeError", "Error interno del sistema: " + e.getMessage());
+			}
+		} else {
+			request.setAttribute("mensajeError", "Todos los campos son obligatorios.");
+		}
+
+		request.getRequestDispatcher("ClienteNuevaTransferencia.jsp").forward(request, response);
+	}
 }

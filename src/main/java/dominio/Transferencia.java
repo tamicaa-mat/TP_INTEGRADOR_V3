@@ -8,13 +8,11 @@ public class Transferencia {
 	private int idCuentaOrigen;
 	private int idCuentaDestino;
 	private double Monto;
-	
-	
+
 	public Transferencia() {
-		
-		
+
 	}
-	
+
 	public Transferencia(int idTransferencia, int idCuentaOrigen, int idCuentaDestino, double monto) {
 		super();
 		this.idTransferencia = idTransferencia;
@@ -60,10 +58,5 @@ public class Transferencia {
 		return "Transferencia [idTransferencia=" + idTransferencia + ", idCuentaOrigen=" + idCuentaOrigen
 				+ ", idCuentaDestino=" + idCuentaDestino + ", Monto=" + Monto + "]";
 	}
-	
-	
-	
-	
-	
-	
+
 }

@@ -8,14 +8,14 @@ import Negocio.ProvinciaNegocio;
 
 public class ProvinciaNegocioImpl implements ProvinciaNegocio {
 
-    private ProvinciaDao provinciaDao;
+	private ProvinciaDao provinciaDao;
 
-    public ProvinciaNegocioImpl() {
-        this.provinciaDao = new ProvinciaDaoImpl();
-    }
+	public ProvinciaNegocioImpl() {
+		this.provinciaDao = new ProvinciaDaoImpl();
+	}
 
-    @Override
-    public ArrayList<Provincia> leerTodasLasProvincias() {
-        return provinciaDao.leerTodasLasProvincias();
-    }
+	@Override
+	public ArrayList<Provincia> leerTodasLasProvincias() {
+		return provinciaDao.leerTodasLasProvincias();
+	}
 }

@@ -20,51 +20,47 @@ import NegocioImpl.UsuarioNegocioImpl;
 
 @WebServlet("/LoginServlet")
 public class LoginServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    public LoginServlet() {
-        super();
-    }
+	public LoginServlet() {
+		super();
+	}
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String user = request.getParameter("usuario");
-        String pass = request.getParameter("contrasena");
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		String user = request.getParameter("usuario");
+		String pass = request.getParameter("contrasena");
 
-        UsuarioNegocio usuarioNegocio = new UsuarioNegocioImpl();
-        Usuario usuario = null;
+		UsuarioNegocio usuarioNegocio = new UsuarioNegocioImpl();
+		Usuario usuario = null;
 
-        try {
-            usuario = usuarioNegocio.login(user, pass);
+		try {
+			usuario = usuarioNegocio.login(user, pass);
 
-            HttpSession session = request.getSession();
-            session.setAttribute("usuarioLogueado", usuario);
+			HttpSession session = request.getSession();
+			session.setAttribute("usuarioLogueado", usuario);
 
-            if (usuario.getTipoUsuario().getDescripcion().equalsIgnoreCase("Cliente")) {
-                ClienteDao clienteDao = new ClienteDaoImpl();
-                Cliente cliente = clienteDao.obtenerClientePorUsuario(usuario.getIdUsuario());
-                session.setAttribute("clienteLogueado", cliente);
-                
-                RequestDispatcher rd = request.getRequestDispatcher("/clienteBienvenida.jsp");
-                rd.forward(request, response);
-                
-            }
-            else if(usuario.getTipoUsuario().getDescripcion().equalsIgnoreCase("Administrador")) {
-            	
-            	 RequestDispatcher rd = request.getRequestDispatcher("/adminBienvenida.jsp");
-                 rd.forward(request, response);
-            }
-            else {
-            	response.sendRedirect("masterPage.jsp");
-            }
+			if (usuario.getTipoUsuario().getDescripcion().equalsIgnoreCase("Cliente")) {
+				ClienteDao clienteDao = new ClienteDaoImpl();
+				Cliente cliente = clienteDao.obtenerClientePorUsuario(usuario.getIdUsuario());
+				session.setAttribute("clienteLogueado", cliente);
 
-          
+				RequestDispatcher rd = request.getRequestDispatcher("/clienteBienvenida.jsp");
+				rd.forward(request, response);
 
-        } catch (UsuarioInexistenteException | UsuarioInactivoException | ClaveIncorrectaException e) {
-            request.setAttribute("errorLogin", e.getMessage());
-            RequestDispatcher rd = request.getRequestDispatcher("/login.jsp");
-            rd.forward(request, response);
-        }
-    }
+			} else if (usuario.getTipoUsuario().getDescripcion().equalsIgnoreCase("Administrador")) {
 
+				RequestDispatcher rd = request.getRequestDispatcher("/adminBienvenida.jsp");
+				rd.forward(request, response);
+			} else {
+				response.sendRedirect("masterPage.jsp");
+			}
+
+		} catch (UsuarioInexistenteException | UsuarioInactivoException | ClaveIncorrectaException e) {
+			request.setAttribute("errorLogin", e.getMessage());
+			RequestDispatcher rd = request.getRequestDispatcher("/login.jsp");
+			rd.forward(request, response);
+		}
+	}
 
 }

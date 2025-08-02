@@ -9,21 +9,20 @@ import Negocio.LocalidadNegocio;
 
 public class LocalidadNegocioImpl implements LocalidadNegocio {
 
-    private LocalidadDao localidadDao;
+	private LocalidadDao localidadDao;
 
-    public LocalidadNegocioImpl() {
-        this.localidadDao = new LocalidadDaoImpl();
-    }
+	public LocalidadNegocioImpl() {
+		this.localidadDao = new LocalidadDaoImpl();
+	}
 
-    @Override
-    public ArrayList<Localidad> leerTodasLasLocalidades() {
-        return localidadDao.leerTodasLasLocalidades();
-    }
-    
-    
-    @Override
-    public ArrayList<Localidad> leerLocalidadesPorProvincia(int idProvincia) {
-        return localidadDao.obtenerLocalidadesPorProvincia(idProvincia);
-    }
+	@Override
+	public ArrayList<Localidad> leerTodasLasLocalidades() {
+		return localidadDao.leerTodasLasLocalidades();
+	}
+
+	@Override
+	public ArrayList<Localidad> leerLocalidadesPorProvincia(int idProvincia) {
+		return localidadDao.obtenerLocalidadesPorProvincia(idProvincia);
+	}
 
 }

@@ -52,10 +52,10 @@
 </c:if>
 
 
-    <form action="TransferenciaServlet" method="post" class="mb-5">
+    <form action="TransferenciaServlet" method="post" class="mb-5" onsubmit="return validarTransferencia()">
         <div class="mb-3">
             <label for="cuentaOrigen" class="form-label">Cuenta de Origen:</label>
-        <select id="cuentaOrigen" name="idCuentaOrigen" required>
+        <select id="cuentaOrigen" name="idCuentaOrigen" required onchange="actualizarValidacion()">
     <option value="" disabled selected>Seleccione una cuenta</option>
     <c:forEach var="cuenta" items="${cuentas}">
         <option value="${cuenta.numeroCuenta}">
@@ -68,7 +68,10 @@
 
         <div class="mb-3">
             <label for="cuentaDestino" class="form-label">Cuenta de Destino:</label>
-            <input type="text" class="form-control" id="cuentaDestino" name="numeroCuentaDestino" required>
+            <input type="text" class="form-control" id="cuentaDestino" name="numeroCuentaDestino" required onblur="actualizarValidacion()">
+            <div id="mensajeValidacion" class="text-danger mt-1" style="display: none;">
+                ⚠️ No puede transferir a sus propias cuentas
+            </div>
         </div>
 
         <div class="mb-3">
@@ -76,7 +79,7 @@
             <input type="number" step="0.01" class="form-control" id="monto" name="monto" required>
         </div>
 
-        <button type="submit" class="btn btn-info">Realizar Transferencia</button>
+        <button type="submit" class="btn btn-info" id="btnTransferir">Realizar Transferencia</button>
     </form>
 
     <h4 class="mb-3">Historial de Transferencias</h4>
@@ -105,6 +108,54 @@
     
 </div>
 
+<script>
+// Lista de cuentas propias del cliente (generada desde el servidor)
+var cuentasPropias = [
+    <c:forEach var="cuenta" items="${cuentas}" varStatus="status">
+        "${cuenta.numeroCuenta}"<c:if test="${!status.last}">,</c:if>
+    </c:forEach>
+];
+
+function actualizarValidacion() {
+    var cuentaOrigen = document.getElementById('cuentaOrigen').value;
+    var cuentaDestino = document.getElementById('cuentaDestino').value;
+    var mensaje = document.getElementById('mensajeValidacion');
+    var boton = document.getElementById('btnTransferir');
+    
+    // Verificar si la cuenta destino es una de las propias
+    var esTransferenciaPropia = cuentasPropias.includes(cuentaDestino);
+    
+    if (esTransferenciaPropia && cuentaDestino !== '') {
+        mensaje.style.display = 'block';
+        boton.disabled = true;
+        boton.classList.add('btn-secondary');
+        boton.classList.remove('btn-info');
+    } else {
+        mensaje.style.display = 'none';
+        boton.disabled = false;
+        boton.classList.remove('btn-secondary');
+        boton.classList.add('btn-info');
+    }
+}
+
+function validarTransferencia() {
+    var cuentaOrigen = document.getElementById('cuentaOrigen').value;
+    var cuentaDestino = document.getElementById('cuentaDestino').value;
+    
+    // Validación final antes del envío
+    if (cuentasPropias.includes(cuentaDestino)) {
+        alert('No puede realizar transferencias a sus propias cuentas.');
+        return false;
+    }
+    
+    if (cuentaOrigen === cuentaDestino) {
+        alert('La cuenta de origen y destino no pueden ser la misma.');
+        return false;
+    }
+    
+    return true;
+}
+</script>
 
 </body>
 </html>

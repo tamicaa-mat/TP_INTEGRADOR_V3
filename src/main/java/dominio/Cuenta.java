@@ -7,117 +7,109 @@ import java.time.format.DateTimeFormatter;
 
 public class Cuenta {
 
-	    private int idCuenta;
-	    Cliente cliente;
-	    int IdCliente;
-	    private LocalDate fechaCreacion;
-	    private TipoCuenta tipoCuenta; // ÚNICO atributo para el tipo de cuenta
-	    private String numeroCuenta;
-	    private String cbu;
-	    private BigDecimal saldo; // Usar BigDecimal para dinero por precisión
-	    private boolean estado; // Coincide con 'Estado' en tu DDL actual
+	private int idCuenta;
+	Cliente cliente;
+	int IdCliente;
+	private LocalDate fechaCreacion;
+	private TipoCuenta tipoCuenta; // ÚNICO atributo para el tipo de cuenta
+	private String numeroCuenta;
+	private String cbu;
+	private BigDecimal saldo; // Usar BigDecimal para dinero por precisión
+	private boolean estado; // Coincide con 'Estado' en tu DDL actual
 
-	    public Cuenta() {
-	        // Constructor vacío
-	    }
+	public Cuenta() {
+		// Constructor vacío
+	}
 
-		public int getIdCuenta() {
-			return idCuenta;
-		}
+	public int getIdCuenta() {
+		return idCuenta;
+	}
 
-		public void setIdCuenta(int idCuenta) {
-			this.idCuenta = idCuenta;
-		}
+	public void setIdCuenta(int idCuenta) {
+		this.idCuenta = idCuenta;
+	}
 
-		public Cliente getCliente() {
-			return cliente;
-		}
+	public Cliente getCliente() {
+		return cliente;
+	}
 
-		public void setCliente(Cliente cliente) {
-			this.cliente = cliente;
-		}
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
+	}
 
-		public int getIdCliente() {
-			return IdCliente;
-		}
+	public int getIdCliente() {
+		return IdCliente;
+	}
 
-		public void setIdCliente(int idCliente) {
-			IdCliente = idCliente;
-		}
+	public void setIdCliente(int idCliente) {
+		IdCliente = idCliente;
+	}
 
-		public LocalDate getFechaCreacion() {
-			return fechaCreacion;
-		}
+	public LocalDate getFechaCreacion() {
+		return fechaCreacion;
+	}
 
-		public void setFechaCreacion(LocalDate fechaCreacion) {
-			this.fechaCreacion = fechaCreacion;
-		}
+	public void setFechaCreacion(LocalDate fechaCreacion) {
+		this.fechaCreacion = fechaCreacion;
+	}
 
-		public TipoCuenta getTipoCuenta() {
-			return tipoCuenta;
-		}
+	public TipoCuenta getTipoCuenta() {
+		return tipoCuenta;
+	}
 
-		public void setTipoCuenta(TipoCuenta tipoCuenta) {
-			this.tipoCuenta = tipoCuenta;
-		}
+	public void setTipoCuenta(TipoCuenta tipoCuenta) {
+		this.tipoCuenta = tipoCuenta;
+	}
 
-		public TipoCuenta getTipoCuentaObjeto() {
-			return tipoCuenta;
-		}
+	public TipoCuenta getTipoCuentaObjeto() {
+		return tipoCuenta;
+	}
 
-		public String getFechaCreacionFormateada() {
-		    return fechaCreacion != null ? fechaCreacion.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "";
-		}
-		
-		
-		
-		public void setTipoCuentaObjeto(TipoCuenta tipoCuenta) {
-			this.tipoCuenta = tipoCuenta;
-		}
+	public String getFechaCreacionFormateada() {
+		return fechaCreacion != null ? fechaCreacion.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "";
+	}
 
-		public String getNumeroCuenta() {
-			return numeroCuenta;
-		}
+	public void setTipoCuentaObjeto(TipoCuenta tipoCuenta) {
+		this.tipoCuenta = tipoCuenta;
+	}
 
-		public void setNumeroCuenta(String numeroCuenta) {
-			this.numeroCuenta = numeroCuenta;
-		}
+	public String getNumeroCuenta() {
+		return numeroCuenta;
+	}
 
-		public String getCbu() {
-			return cbu;
-		}
+	public void setNumeroCuenta(String numeroCuenta) {
+		this.numeroCuenta = numeroCuenta;
+	}
 
-		public void setCbu(String cbu) {
-			this.cbu = cbu;
-		}
+	public String getCbu() {
+		return cbu;
+	}
 
-		public BigDecimal getSaldo() {
-			return saldo;
-		}
+	public void setCbu(String cbu) {
+		this.cbu = cbu;
+	}
 
-		public void setSaldo(BigDecimal d) {
-			this.saldo = d;
-		}
+	public BigDecimal getSaldo() {
+		return saldo;
+	}
 
-		public boolean isEstado() {
-			return estado;
-		}
+	public void setSaldo(BigDecimal d) {
+		this.saldo = d;
+	}
 
-		public void setEstado(boolean estado) {
-			this.estado = estado;
-		}
+	public boolean isEstado() {
+		return estado;
+	}
 
-		@Override
-		public String toString() {
-			return "Cuenta [idCuenta=" + idCuenta + ", cliente=" + cliente + ", IdCliente=" + IdCliente
-					+ ", fechaCreacion=" + fechaCreacion + ", tipoCuenta=" + tipoCuenta + ", tipoCuentaObjeto="
-					+ tipoCuenta + ", numeroCuenta=" + numeroCuenta + ", cbu=" + cbu + ", saldo=" + saldo
-					+ ", estado=" + estado + "]";
-		}
+	public void setEstado(boolean estado) {
+		this.estado = estado;
+	}
 
-	
-	
-	
-	
-	
+	@Override
+	public String toString() {
+		return "Cuenta [idCuenta=" + idCuenta + ", cliente=" + cliente + ", IdCliente=" + IdCliente + ", fechaCreacion="
+				+ fechaCreacion + ", tipoCuenta=" + tipoCuenta + ", tipoCuentaObjeto=" + tipoCuenta + ", numeroCuenta="
+				+ numeroCuenta + ", cbu=" + cbu + ", saldo=" + saldo + ", estado=" + estado + "]";
+	}
+
 }

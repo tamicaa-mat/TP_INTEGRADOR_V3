@@ -1,33 +1,33 @@
 package dao;
 
-import java.util.ArrayList; 
+import java.util.ArrayList;
 import dominio.Cliente;
 
 public interface ClienteDao {
-    
 
-     public boolean insertarCliente(Cliente cliente);
-   
-     public boolean bajaLogicaCliente(String dni);
-     public boolean altaLogicaCliente(String dni);
+	public boolean insertarCliente(Cliente cliente);
 
-   public  boolean actualizarCliente(Cliente cliente);
-    
-   public  Cliente obtenerClientePorDni(String dni);
-     
-   public  Cliente obtenerClientePorUsuario(int idUsuario);
-    
-    /// probandooooo
-     public Cliente getClienteConCuentasPorUsuario(int idUsuario);
-     
-     public Cliente obtenerClientePorDniSinFiltro(String dni); // Para buscar sin importar estado
+	public boolean bajaLogicaCliente(String dni);
 
-     public ArrayList<Cliente> leerTodosLosClientes();
-     public ArrayList<Cliente> leerTodosLosClientesActivos(); // Para ver solo activos (Estado = 1)
-     public ArrayList<Cliente> leerTodosLosClientesInactivos();
+	public boolean altaLogicaCliente(String dni);
 
-     public boolean existeDni(String dni);
-     
-     // Nuevo método para validar email único
-    public boolean existeEmail(String email);
+	public boolean actualizarCliente(Cliente cliente);
+
+	public Cliente obtenerClientePorDni(String dni);
+
+	public Cliente obtenerClientePorUsuario(int idUsuario);
+
+	public Cliente getClienteConCuentasPorUsuario(int idUsuario);
+
+	public Cliente obtenerClientePorDniSinFiltro(String dni);
+
+	public ArrayList<Cliente> leerTodosLosClientes();
+
+	public ArrayList<Cliente> leerTodosLosClientesActivos();
+
+	public ArrayList<Cliente> leerTodosLosClientesInactivos();
+
+	public boolean existeDni(String dni);
+
+	public boolean existeEmail(String email);
 }

@@ -1,4 +1,3 @@
-
 DROP DATABASE IF EXISTS BancoTpIntegrador3;
 CREATE DATABASE BancoTpIntegrador3;
 USE BancoTpIntegrador3;
@@ -221,28 +220,7 @@ INSERT INTO Cuenta (IdCliente, FechaCreacion, IdTipoCuenta, NumeroCuenta, Cbu, S
 INSERT INTO TipoMovimiento (Descripcion) VALUES 
 ('Alta Cuenta'), ('Alta Prestamo'), ('Pago Prestamo'), ('Transferencia');
 
-
--- TRIGGER 
-
-
-
-DELIMITER //
-
-CREATE DEFINER=`root`@`localhost` TRIGGER cliente_BEFORE_INSERT
-BEFORE INSERT ON Cliente
-FOR EACH ROW
-BEGIN
-    DECLARE vIdUsuario INT;
-
-    IF NEW.IdUsuario IS NULL THEN
-        INSERT INTO Usuario (NombreUsuario, Password, IdTipoUsuario, Estado)
-        VALUES (NULL, NULL, 2, 1);
-
-        SET vIdUsuario = LAST_INSERT_ID();
-        SET NEW.IdUsuario = vIdUsuario;
-    END IF;
-END;
-//
-
-DELIMITER ;
+-- Script para limpiar usuarios huérfanos si ya tienes algunos en la BD
+-- Ejecutar SOLO si ya hay usuarios con NombreUsuario y Password NULL
+-- DELETE FROM Usuario WHERE NombreUsuario IS NULL AND Password IS NULL;
 

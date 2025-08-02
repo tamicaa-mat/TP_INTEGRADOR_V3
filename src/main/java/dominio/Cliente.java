@@ -4,168 +4,161 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List; // Importar para FechaNacimiento
 
-
 public class Cliente {
-    private int idCliente;
-    private String dni;
-    private String cuil;
-    private String nombre;
-    private String apellido;
-    private String sexo;
-    private String nacionalidad;
-    private LocalDate fechaNacimiento;
-    private String direccion;
-    private String correoElectronico; 
-    private String telefono; 
-    private Localidad localidad; 
-    private Usuario usuario;
-    private boolean estado; 
+	private int idCliente;
+	private String dni;
+	private String cuil;
+	private String nombre;
+	private String apellido;
+	private String sexo;
+	private String nacionalidad;
+	private LocalDate fechaNacimiento;
+	private String direccion;
+	private String correoElectronico;
+	private String telefono;
+	private Localidad localidad;
+	private Usuario usuario;
+	private boolean estado;
 
-    private List<Cuenta> cuentas = new ArrayList<>();
-    
-    
-    public Cliente() {
-        // Constructor vacío
-    	
-    	
-    	
-    	
-    }
+	private List<Cuenta> cuentas = new ArrayList<>();
 
-    public Cliente(int idCliente, String dni, String cuil, String nombre, String apellido, String sexo,
-                   String nacionalidad, LocalDate fechaNacimiento, String direccion, Localidad localidad,
-                   String correoElectronico, String telefono, Usuario usuario, boolean estado) {
-        this.idCliente = idCliente;
-        this.dni = dni;
-        this.cuil = cuil;
-        this.nombre = nombre;
-        this.apellido = apellido;
-        this.sexo = sexo;
-        this.nacionalidad = nacionalidad;
-        this.fechaNacimiento = fechaNacimiento;
-        this.direccion = direccion;
-        this.localidad = localidad;
-        this.correoElectronico = correoElectronico;
-        this.telefono = telefono;
-        this.usuario = usuario;
-        this.estado = estado;
-    }
+	public Cliente() {
+		// Constructor vacío
 
-    // Getters
-    public int getIdCliente() {
-        return idCliente;
-    }
+	}
 
-    public String getDni() {
-        return dni;
-    }
+	public Cliente(int idCliente, String dni, String cuil, String nombre, String apellido, String sexo,
+			String nacionalidad, LocalDate fechaNacimiento, String direccion, Localidad localidad,
+			String correoElectronico, String telefono, Usuario usuario, boolean estado) {
+		this.idCliente = idCliente;
+		this.dni = dni;
+		this.cuil = cuil;
+		this.nombre = nombre;
+		this.apellido = apellido;
+		this.sexo = sexo;
+		this.nacionalidad = nacionalidad;
+		this.fechaNacimiento = fechaNacimiento;
+		this.direccion = direccion;
+		this.localidad = localidad;
+		this.correoElectronico = correoElectronico;
+		this.telefono = telefono;
+		this.usuario = usuario;
+		this.estado = estado;
+	}
 
-    public String getCuil() {
-        return cuil;
-    }
+	// Getters
+	public int getIdCliente() {
+		return idCliente;
+	}
 
-    public String getNombre() {
-        return nombre;
-    }
+	public String getDni() {
+		return dni;
+	}
 
-    public String getApellido() {
-        return apellido;
-    }
+	public String getCuil() {
+		return cuil;
+	}
 
-    public String getSexo() {
-        return sexo;
-    }
+	public String getNombre() {
+		return nombre;
+	}
 
-    public String getNacionalidad() {
-        return nacionalidad;
-    }
+	public String getApellido() {
+		return apellido;
+	}
 
-    public LocalDate getFechaNacimiento() {
-        return fechaNacimiento;
-    }
+	public String getSexo() {
+		return sexo;
+	}
 
-    public String getDireccion() {
-        return direccion;
-    }
+	public String getNacionalidad() {
+		return nacionalidad;
+	}
 
-    public Localidad getLocalidad() {
-        return localidad;
-    }
+	public LocalDate getFechaNacimiento() {
+		return fechaNacimiento;
+	}
 
-    public String getCorreoElectronico() {
-        return correoElectronico;
-    }
+	public String getDireccion() {
+		return direccion;
+	}
 
-    public String getTelefono() {
-        return telefono;
-    }
+	public Localidad getLocalidad() {
+		return localidad;
+	}
 
-    public Usuario getUsuario() {
-        return usuario;
-    }
+	public String getCorreoElectronico() {
+		return correoElectronico;
+	}
 
-    public boolean isEstado() {
-        return estado;
-    }
+	public String getTelefono() {
+		return telefono;
+	}
 
-    // Setters
-    public void setIdCliente(int idCliente) {
-        this.idCliente = idCliente;
-    }
+	public Usuario getUsuario() {
+		return usuario;
+	}
 
-    public void setDni(String dni) {
-        this.dni = dni;
-    }
+	public boolean isEstado() {
+		return estado;
+	}
 
-    public void setCuil(String cuil) {
-        this.cuil = cuil;
-    }
+	// Setters
+	public void setIdCliente(int idCliente) {
+		this.idCliente = idCliente;
+	}
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
+	public void setDni(String dni) {
+		this.dni = dni;
+	}
 
-    public void setApellido(String apellido) {
-        this.apellido = apellido;
-    }
+	public void setCuil(String cuil) {
+		this.cuil = cuil;
+	}
 
-    public void setSexo(String sexo) {
-        this.sexo = sexo;
-    }
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
 
-    public void setNacionalidad(String nacionalidad) {
-        this.nacionalidad = nacionalidad;
-    }
+	public void setApellido(String apellido) {
+		this.apellido = apellido;
+	}
 
-    public void setFechaNacimiento(LocalDate fechaNacimiento) {
-        this.fechaNacimiento = fechaNacimiento;
-    }
+	public void setSexo(String sexo) {
+		this.sexo = sexo;
+	}
 
-    public void setDireccion(String direccion) {
-        this.direccion = direccion;
-    }
+	public void setNacionalidad(String nacionalidad) {
+		this.nacionalidad = nacionalidad;
+	}
 
-    public void setLocalidad(Localidad localidad) {
-        this.localidad = localidad;
-    }
+	public void setFechaNacimiento(LocalDate fechaNacimiento) {
+		this.fechaNacimiento = fechaNacimiento;
+	}
 
-    public void setCorreoElectronico(String correoElectronico) {
-        this.correoElectronico = correoElectronico;
-    }
+	public void setDireccion(String direccion) {
+		this.direccion = direccion;
+	}
 
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
-    }
+	public void setLocalidad(Localidad localidad) {
+		this.localidad = localidad;
+	}
 
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-    }
+	public void setCorreoElectronico(String correoElectronico) {
+		this.correoElectronico = correoElectronico;
+	}
 
-    public void setEstado(boolean estado) {
-        this.estado = estado;
-    }
+	public void setTelefono(String telefono) {
+		this.telefono = telefono;
+	}
 
-  
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
+	}
+
+	public void setEstado(boolean estado) {
+		this.estado = estado;
+	}
 
 	@Override
 	public String toString() {
@@ -184,5 +177,4 @@ public class Cliente {
 		this.cuentas = cuentas;
 	}
 
-	
 }

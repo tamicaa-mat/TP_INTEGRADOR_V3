@@ -8,20 +8,26 @@ import excepciones.UsuarioInactivoException;
 import excepciones.UsuarioInexistenteException;
 
 public interface UsuarioNegocio {
-    public Usuario obtenerUsuario(String username, String password);
-    public boolean actualizarPassword(int idUsuario, String nuevaPassword);
-    public boolean altaLogicaUsuario ( int idUsuario);
-    public boolean bajaLogicaUsuario(int idUsuario); 
-    public boolean insertarUsuario(Usuario usuario, String dniCliente);
-    public ArrayList<Usuario> leerTodosLosUsuarios();
-    Usuario login(String username, String password) throws UsuarioInexistenteException, ClaveIncorrectaException, UsuarioInactivoException;
+	public Usuario obtenerUsuario(String username, String password);
 
-    
-    
-    public boolean resetearPasswordUsuario(int idUsuario);
-    public boolean cambiarEstadoUsuario(int idUsuario, boolean nuevoEstado);
-    
-    // Nuevos métodos para validaciones
-    public boolean existeUsuario(String nombreUsuario);
-    public boolean clienteTieneUsuario(String dniCliente);
+	public boolean actualizarPassword(int idUsuario, String nuevaPassword);
+
+	public boolean altaLogicaUsuario(int idUsuario);
+
+	public boolean bajaLogicaUsuario(int idUsuario);
+
+	public boolean insertarUsuario(Usuario usuario, String dniCliente);
+
+	public ArrayList<Usuario> leerTodosLosUsuarios();
+
+	Usuario login(String username, String password)
+			throws UsuarioInexistenteException, ClaveIncorrectaException, UsuarioInactivoException;
+
+	public boolean resetearPasswordUsuario(int idUsuario);
+
+	public boolean cambiarEstadoUsuario(int idUsuario, boolean nuevoEstado);
+
+	public boolean existeUsuario(String nombreUsuario);
+
+	public boolean clienteTieneUsuario(String dniCliente);
 }

@@ -2,6 +2,9 @@ package Servlet;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -17,10 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-
-
 import Negocio.ClienteNegocio;
-
 
 import Negocio.MovimientoNegocio;
 import Negocio.CuentaNegocio;
@@ -38,206 +38,289 @@ import dominio.TipoMovimiento;
 
 @WebServlet("/CuentaServlet")
 public class CuentaServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    public CuentaServlet() {
-        super();
-    }
+	public CuentaServlet() {
+		super();
+	}
 
-  
-    
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	 String action = request.getParameter("action");
-    	    HttpSession session = request.getSession();
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		String action = request.getParameter("action");
+		HttpSession session = request.getSession();
 
-    	    // Acción: Reporte de cuentas creadas entre fechas
-    	    if (action != null && action.equals("reporteCuentas")) {
-    	        String fechaDesdeStr = request.getParameter("fechaInicio");
-    	        String fechaHastaStr = request.getParameter("fechaFin");
+		if (action != null && action.equals("reporteCuentas")) {
+			String fechaDesdeStr = request.getParameter("fechaInicio");
+			String fechaHastaStr = request.getParameter("fechaFin");
 
-    	        try {
-    	            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-    	            Date fechaDesde = sdf.parse(fechaDesdeStr);
-    	            Date fechaHasta = sdf.parse(fechaHastaStr);
+			try {
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+				Date fechaDesde = sdf.parse(fechaDesdeStr);
+				Date fechaHasta = sdf.parse(fechaHastaStr);
 
-    	            CuentaNegocio cuentaNegocio = new CuentaNegocioImpl(new CuentaDaoImpl());
-    	            int totalCuentas = cuentaNegocio.contarCuentasCreadasEntreFechas(fechaDesde, fechaHasta);
-    	            double saldoTotal = cuentaNegocio.obtenerSaldoTotalCuentasCreadasEntreFechas(fechaDesde, fechaHasta);
+				System.out.println("[DEBUG] Fecha desde: " + fechaDesde);
+				System.out.println("[DEBUG] Fecha hasta: " + fechaHasta);
 
-    	            request.setAttribute("totalCuentas", totalCuentas);
-    	            request.setAttribute("saldoTotalCuentas", saldoTotal);
-    	            request.setAttribute("fechaDesde", fechaDesdeStr);
-    	            request.setAttribute("fechaHasta", fechaHastaStr);
+				CuentaNegocio cuentaNegocio = new CuentaNegocioImpl(new CuentaDaoImpl());
+				int totalCuentas = cuentaNegocio.contarCuentasCreadasEntreFechas(fechaDesde, fechaHasta);
+				double saldoTotal = cuentaNegocio.obtenerSaldoTotalCuentasCreadasEntreFechas(fechaDesde, fechaHasta);
 
-    	            RequestDispatcher rd = request.getRequestDispatcher("/AdministradorReportes.jsp");
-    	            rd.forward(request, response);
-    	            return;
+				System.out.println("[DEBUG] Total cuentas encontradas: " + totalCuentas);
+				System.out.println("[DEBUG] Saldo total: " + saldoTotal);
 
-    	        } catch (ParseException e) {
-    	            request.setAttribute("error", "Formato de fecha inválido");
-    	            RequestDispatcher rd = request.getRequestDispatcher("/AdministradorReportes.jsp");
-    	            rd.forward(request, response);
-    	            return;
-    	        }
-    	    }
+				request.setAttribute("totalCuentas", totalCuentas);
+				request.setAttribute("saldoTotalCuentas", saldoTotal);
+				request.setAttribute("fechaDesde", fechaDesdeStr);
+				request.setAttribute("fechaHasta", fechaHastaStr);
 
-    	    // Acción: Listar cuentas de un cliente por DNI
-    	    if (action != null && action.equals("listar")) {
-    	        String dniCliente = request.getParameter("dni");
+				RequestDispatcher rd = request.getRequestDispatcher("/AdministradorReportes.jsp");
+				rd.forward(request, response);
+				return;
 
-    	        CuentaNegocioImpl cuentaNegocio = new CuentaNegocioImpl(new CuentaDaoImpl());
-    	        ClienteNegocioImpl clienteNegocio = new ClienteNegocioImpl(new ClienteDaoImpl());
+			} catch (ParseException e) {
+				request.setAttribute("error", "Formato de fecha inválido");
+				RequestDispatcher rd = request.getRequestDispatcher("/AdministradorReportes.jsp");
+				rd.forward(request, response);
+				return;
+			}
+		}
 
-    	        //   el cliente por DNI (no desde sesión)
-    	        Cliente cliente = clienteNegocio.obtenerClientePorDni(dniCliente);
+		if (action != null && action.equals("listar")) {
+			String dniCliente = request.getParameter("dni");
 
-    	        if (cliente == null) {
-    	            request.setAttribute("errorLimiteCuentas", "No se encontró el cliente con DNI: " + dniCliente);
-    	            request.getRequestDispatcher("/AdministradorListaCuentas.jsp").forward(request, response);
-    	            return;
-    	        }
+			System.out.println("[DEBUG] Listando cuentas para DNI: " + dniCliente);
 
-    	        //  cuentas del cliente
-    	        ArrayList<Cuenta> listaCuentas = (ArrayList<Cuenta>) cuentaNegocio.obtenerCuentasPorIdCliente(cliente.getIdCliente(), cliente);
+			CuentaNegocioImpl cuentaNegocio = new CuentaNegocioImpl(new CuentaDaoImpl());
+			ClienteNegocioImpl clienteNegocio = new ClienteNegocioImpl(new ClienteDaoImpl());
 
-    	        request.setAttribute("listaCuentas", listaCuentas);
-    	        request.setAttribute("dniCliente", dniCliente);
+			Cliente cliente = clienteNegocio.obtenerClientePorDni(dniCliente);
 
-    	        RequestDispatcher rd = request.getRequestDispatcher("/AdministradorListaCuentas.jsp");
-    	        rd.forward(request, response);
-    	    }
-    	     if (action != null && action.equals("eliminar")) {
-    	    	
-    	    	 
-    	        try {
-    	            int idCuenta = Integer.parseInt(request.getParameter("idCuenta"));
-    	            String dniCliente = request.getParameter("dniCliente");
+			if (cliente == null) {
+				System.out.println("[ERROR] No se encontró cliente con DNI: " + dniCliente);
+				request.setAttribute("errorLimiteCuentas", "No se encontró el cliente con DNI: " + dniCliente);
+				request.getRequestDispatcher("/AdministradorListaCuentas.jsp").forward(request, response);
+				return;
+			}
 
-    	            CuentaNegocio cuentaNegocio = new CuentaNegocioImpl(new CuentaDaoImpl());
-    	            System.out.println("Entró al action eliminar");
-       	    	    System.out.println("ID cuenta a eliminar: " + idCuenta);
-       	    	    System.out.println("DNI cliente: " + dniCliente);
-       	    	
-    	            boolean exito = cuentaNegocio.darDeBajaLogicaCuentas(idCuenta);
-    	            System.out.println("Resultado baja lógica: " + exito);
+			System.out.println("[DEBUG] Cliente encontrado: " + cliente.getNombre() + " " + cliente.getApellido());
 
-    	            if (exito) {
-    	                request.setAttribute("mensajeExitoCuenta", "Cuenta eliminada correctamente.");
-    	            } else {
-    	                request.setAttribute("errorLimiteCuentas", "No se pudo eliminar la cuenta.");
-    	            }
+			ArrayList<Cuenta> listaCuentas = (ArrayList<Cuenta>) cuentaNegocio
+					.obtenerCuentasPorIdCliente(cliente.getIdCliente(), cliente);
 
-    	            ClienteNegocioImpl clienteNegocio = new ClienteNegocioImpl(new ClienteDaoImpl());
-    	            Cliente cliente = clienteNegocio.obtenerClientePorDni(dniCliente);
-    	            ArrayList<Cuenta> listaCuentas = (ArrayList<Cuenta>) cuentaNegocio.obtenerCuentasPorIdCliente(cliente.getIdCliente(), cliente);
+			System.out.println("[DEBUG] Cuentas obtenidas: " + (listaCuentas != null ? listaCuentas.size() : 0));
 
-    	            request.setAttribute("listaCuentas", listaCuentas);
-    	            request.setAttribute("dniCliente", dniCliente);
+			request.setAttribute("listaCuentas", listaCuentas);
+			request.setAttribute("dniCliente", dniCliente);
 
-    	            RequestDispatcher rd = request.getRequestDispatcher("/AdministradorListaCuentas.jsp");
-    	            rd.forward(request, response);
-    	            return;
+			RequestDispatcher rd = request.getRequestDispatcher("/AdministradorListaCuentas.jsp");
+			rd.forward(request, response);
+		} else if ("eliminar".equals(action)) {
+			String idCuentaStr = request.getParameter("idCuenta");
+			String dni = request.getParameter("dni");
 
-    	        } catch (Exception e) {
-    	            e.printStackTrace(); // Mostralo en consola
-    	            response.getWriter().write("Error al eliminar la cuenta: " + e.getMessage());
-    	            return;
-    	        }
-    	        
-    	    }
-    	    
-    	    
-    	    
-    }
+			System.out.println("[DEBUG] Eliminando cuenta - ID: " + idCuentaStr + ", DNI: " + dni);
 
+			if (idCuentaStr != null && dni != null && !dni.trim().isEmpty()) {
+				try {
+					int idCuenta = Integer.parseInt(idCuentaStr);
+					Connection conexion = null;
+					boolean eliminada = false;
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String action = request.getParameter("action");
+					try {
+						conexion = daoImpl.Conexion.getConexion().getSQLConexion();
+						conexion.setAutoCommit(false);
 
-        // Es una buena práctica declarar las interfaces, no las implementaciones
-        CuentaNegocio cuentaNegocio = new CuentaNegocioImpl(new CuentaDaoImpl());
-        ClienteNegocio clienteNegocio = new ClienteNegocioImpl(new ClienteDaoImpl());
+						System.out.println("[DEBUG] Iniciando eliminación de cuenta ID: " + idCuenta);
 
-        if ("agregar".equals(action)) {
-            String dniCliente = request.getParameter("dniCliente");
-            int idTipoCuenta = Integer.parseInt(request.getParameter("idTipoCuenta"));
+						PreparedStatement stmtVerificar = conexion.prepareStatement(
+								"SELECT IdCuenta, NumeroCuenta, Saldo FROM Cuenta WHERE IdCuenta = ?");
+						stmtVerificar.setInt(1, idCuenta);
+						java.sql.ResultSet rsVerificar = stmtVerificar.executeQuery();
 
-            // 1. Buscamos el objeto Cliente completo
-            Cliente cliente = clienteNegocio.obtenerClientePorDni(dniCliente);
+						if (rsVerificar.next()) {
+							System.out.println("[DEBUG] Cuenta encontrada - ID: " + rsVerificar.getInt("IdCuenta")
+									+ ", Número: " + rsVerificar.getString("NumeroCuenta") + ", Saldo: "
+									+ rsVerificar.getBigDecimal("Saldo"));
+						} else {
+							System.out.println("[ERROR] No se encontró cuenta con ID: " + idCuenta);
+							conexion.rollback();
+							request.getSession().setAttribute("mensaje", "Error: La cuenta no existe.");
+							response.sendRedirect("CuentaServlet?action=listar&dni=" + dni);
+							return;
+						}
 
-            if (cliente == null) {
-                request.setAttribute("errorLimiteCuentas", "No se encontró el cliente con DNI: " + dniCliente);
-                request.getRequestDispatcher("/AdministradorListaCuentas.jsp").forward(request, response);
-                return;
-            }
+						PreparedStatement stmtMovimientos = conexion
+								.prepareStatement("DELETE FROM Movimiento WHERE IdCuenta = ?");
+						stmtMovimientos.setInt(1, idCuenta);
+						int movimientosEliminados = stmtMovimientos.executeUpdate();
+						System.out.println("[DEBUG] Movimientos eliminados: " + movimientosEliminados);
 
-            // 2. Creamos la nueva cuenta
-            String numeroCuenta = cuentaNegocio.generarNumeroCuenta(cliente.getDni());
-            String cbu = cuentaNegocio.generarNumeroCbu(numeroCuenta);
-            
-            Cuenta nuevaCuenta = new Cuenta();
-            
-            // --- CORRECCIONES APLICADAS AQUÍ ---
-            // Asignamos el objeto Cliente completo, no solo el ID.
-            nuevaCuenta.setCliente(cliente); 
-            
-            // Creamos un objeto TipoCuenta y se lo asignamos.
-            TipoCuenta tipoCuenta = new TipoCuenta();
-            tipoCuenta.setIdTipoCuenta(idTipoCuenta);
-            nuevaCuenta.setTipoCuentaObjeto(tipoCuenta);
-            // --- FIN CORRECCIONES ---
-            
-            nuevaCuenta.setNumeroCuenta(numeroCuenta);
-            nuevaCuenta.setCbu(cbu);
-            nuevaCuenta.setFechaCreacion(LocalDate.now());
-            nuevaCuenta.setSaldo(new BigDecimal("10000.0"));
-            nuevaCuenta.setEstado(true);
+						PreparedStatement stmtTransferencias = conexion.prepareStatement(
+								"DELETE FROM Transferencia WHERE IdCuentaOrigen = ? OR IdCuentaDestino = ?");
+						stmtTransferencias.setInt(1, idCuenta);
+						stmtTransferencias.setInt(2, idCuenta);
+						int transferenciasEliminadas = stmtTransferencias.executeUpdate();
+						System.out.println("[DEBUG] Transferencias eliminadas: " + transferenciasEliminadas);
 
-            // 3. Intentamos agregar la cuenta en la base de datos
-            boolean seAgrego = cuentaNegocio.agregarCuenta(nuevaCuenta, cliente);
-            
-            if (!seAgrego) {
-                // Manejo de error si el cliente ya tiene 3 cuentas
-                request.setAttribute("errorLimiteCuentas", "⚠️ El cliente ya tiene 3 cuentas activas.");
-            } else {
-                // 4. Si la cuenta se agregó, creamos el movimiento inicial
-                request.setAttribute("mensajeExitoCuenta", "✅ Cuenta creada con éxito. Número: " + numeroCuenta);
+						PreparedStatement stmtVerificarPrestamos = conexion.prepareStatement(
+								"SELECT COUNT(*) as total FROM Prestamo WHERE IdCuentaAsociada = ? AND Estado = 1 AND CantidadCuotas > 0");
+						stmtVerificarPrestamos.setInt(1, idCuenta);
+						java.sql.ResultSet rsPrestamos = stmtVerificarPrestamos.executeQuery();
+						rsPrestamos.next();
+						int totalPrestamos = rsPrestamos.getInt("total");
+						System.out.println(
+								"[DEBUG] Préstamos APROBADOS CON CUOTAS PENDIENTES encontrados: " + totalPrestamos);
 
-                // Obtenemos el ID de la cuenta que acabamos de insertar
-                int idCuentaNueva = cuentaNegocio.obtenerIdCuentaPorNumero(numeroCuenta); 
-                
-                // Creamos el objeto Cuenta que irá dentro del Movimiento
-                Cuenta cuentaDelMovimiento = new Cuenta();
-                cuentaDelMovimiento.setIdCuenta(idCuentaNueva);
+						if (totalPrestamos > 0) {
+							System.out.println(
+									"[ERROR] La cuenta tiene préstamos aprobados con cuotas pendientes, no se puede eliminar");
+							conexion.rollback();
+							request.getSession().setAttribute("mensaje",
+									"Error: No se puede eliminar la cuenta porque tiene préstamos activos con cuotas pendientes.");
+							response.sendRedirect("CuentaServlet?action=listar&dni=" + dni);
+							return;
+						}
 
-                // Creamos el objeto TipoMovimiento
-                TipoMovimiento tipoMovimientoAlta = new TipoMovimiento();
-                tipoMovimientoAlta.setIdTipoMovimiento(1); // ID 1 = Alta de Cuenta
+						PreparedStatement stmtEliminarPrestamosNoActivos = conexion.prepareStatement(
+								"UPDATE Prestamo SET IdCuentaAsociada = NULL WHERE IdCuentaAsociada = ? AND (Estado IN (0, 2) OR (Estado = 1 AND CantidadCuotas = 0))");
+						stmtEliminarPrestamosNoActivos.setInt(1, idCuenta);
+						int prestamosActualizados = stmtEliminarPrestamosNoActivos.executeUpdate();
+						System.out.println("[DEBUG] Préstamos no activos desvinculados: " + prestamosActualizados);
 
-                // Creamos el objeto Movimiento y le asignamos los objetos completos
-                Movimiento movimientoInicial = new Movimiento();
-                movimientoInicial.setFechaHora(LocalDateTime.now());
-                movimientoInicial.setReferencia("Apertura de cuenta");
-                movimientoInicial.setImporte(new BigDecimal("10000.0")); 
-                movimientoInicial.setCuenta(cuentaDelMovimiento); // <-- Se asigna el objeto
-                movimientoInicial.setTipoMovimiento(tipoMovimientoAlta); // <-- Se asigna el objeto
+						PreparedStatement stmtEliminarCuotas = conexion.prepareStatement(
+								"DELETE FROM Cuota WHERE IdPrestamo IN (SELECT IdPrestamo FROM Prestamo WHERE IdCuentaAsociada = ?)");
+						stmtEliminarCuotas.setInt(1, idCuenta);
+						int cuotasEliminadas = stmtEliminarCuotas.executeUpdate();
+						System.out.println("[DEBUG] Cuotas eliminadas: " + cuotasEliminadas);
 
-                // Guardamos el movimiento
-                MovimientoNegocio movimientoNegocio = new MovimientoNegocioImpl(new MovimientoDaoImpl());
-                movimientoNegocio.crearMovimiento(movimientoInicial); // Suponiendo que este método existe
-            }
+						PreparedStatement stmtCuenta = conexion
+								.prepareStatement("DELETE FROM Cuenta WHERE IdCuenta = ?");
+						stmtCuenta.setInt(1, idCuenta);
+						int cuentasEliminadas = stmtCuenta.executeUpdate();
+						System.out.println("[DEBUG] Cuentas eliminadas: " + cuentasEliminadas);
 
-            // 5. Volvemos a cargar la lista de cuentas y reenviamos al JSP
-            ArrayList<Cuenta> listaCuentas = (ArrayList<Cuenta>) cuentaNegocio.obtenerCuentasPorIdCliente(cliente.getIdCliente(), cliente);
-            request.setAttribute("listaCuentas", listaCuentas);
-            request.setAttribute("dniCliente", dniCliente);
+						if (cuentasEliminadas > 0) {
+							conexion.commit();
+							eliminada = true;
+							System.out.println("[DEBUG] Eliminación física completada con éxito");
+						} else {
+							conexion.rollback();
+							System.out.println("[DEBUG] No se encontró la cuenta para eliminar");
+						}
 
-            RequestDispatcher rd = request.getRequestDispatcher("/AdministradorListaCuentas.jsp");
-            rd.forward(request, response);
-        }
-    }
+					} catch (SQLException e) {
+						System.out.println("[ERROR] Error en eliminación física: " + e.getMessage());
+						e.printStackTrace();
+						if (conexion != null) {
+							try {
+								conexion.rollback();
+							} catch (SQLException ex) {
+								ex.printStackTrace();
+							}
+						}
+					} finally {
+						if (conexion != null) {
+							try {
+								conexion.setAutoCommit(true);
+							} catch (SQLException e) {
+								e.printStackTrace();
+							}
+						}
+					}
 
-    
-    
+					System.out.println("[DEBUG] Resultado eliminación: " + eliminada);
+
+					if (eliminada) {
+						request.getSession().setAttribute("mensaje",
+								"Cuenta eliminada permanentemente de la base de datos.");
+					} else {
+						request.getSession().setAttribute("mensaje", "Error: No se pudo eliminar la cuenta.");
+					}
+				} catch (NumberFormatException e) {
+					request.getSession().setAttribute("mensaje", "Error: ID de cuenta inválido.");
+					System.out.println("[ERROR] NumberFormatException: " + e.getMessage());
+				}
+
+				response.sendRedirect("CuentaServlet?action=listar&dni=" + dni);
+			} else {
+				System.out.println("[ERROR] Faltan parámetros - DNI: " + dni + ", ID: " + idCuentaStr);
+				request.getSession().setAttribute("mensaje", "Error: Faltan parámetros necesarios.");
+				response.sendRedirect("ClienteServlet");
+			}
+			return;
+		}
+
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		String action = request.getParameter("action");
+
+		CuentaNegocio cuentaNegocio = new CuentaNegocioImpl(new CuentaDaoImpl());
+		ClienteNegocio clienteNegocio = new ClienteNegocioImpl(new ClienteDaoImpl());
+
+		if ("agregar".equals(action)) {
+			String dniCliente = request.getParameter("dniCliente");
+			int idTipoCuenta = Integer.parseInt(request.getParameter("idTipoCuenta"));
+
+			Cliente cliente = clienteNegocio.obtenerClientePorDni(dniCliente);
+
+			if (cliente == null) {
+				request.setAttribute("errorLimiteCuentas", "No se encontró el cliente con DNI: " + dniCliente);
+				request.getRequestDispatcher("/AdministradorListaCuentas.jsp").forward(request, response);
+				return;
+			}
+
+			String numeroCuenta = cuentaNegocio.generarNumeroCuenta(cliente.getDni());
+			String cbu = cuentaNegocio.generarNumeroCbu(numeroCuenta);
+
+			Cuenta nuevaCuenta = new Cuenta();
+
+			nuevaCuenta.setCliente(cliente);
+
+			TipoCuenta tipoCuenta = new TipoCuenta();
+			tipoCuenta.setIdTipoCuenta(idTipoCuenta);
+			nuevaCuenta.setTipoCuentaObjeto(tipoCuenta);
+
+			nuevaCuenta.setNumeroCuenta(numeroCuenta);
+			nuevaCuenta.setCbu(cbu);
+			nuevaCuenta.setFechaCreacion(LocalDate.now());
+			nuevaCuenta.setSaldo(new BigDecimal("10000.0"));
+			nuevaCuenta.setEstado(true);
+
+			boolean seAgrego = cuentaNegocio.agregarCuenta(nuevaCuenta, cliente);
+
+			if (!seAgrego) {
+				request.setAttribute("errorLimiteCuentas", "⚠️ El cliente ya tiene 3 cuentas activas.");
+			} else {
+				request.setAttribute("mensajeExitoCuenta", "✅ Cuenta creada con éxito. Número: " + numeroCuenta);
+
+				int idCuentaNueva = cuentaNegocio.obtenerIdCuentaPorNumero(numeroCuenta);
+
+				Cuenta cuentaDelMovimiento = new Cuenta();
+				cuentaDelMovimiento.setIdCuenta(idCuentaNueva);
+
+				TipoMovimiento tipoMovimientoAlta = new TipoMovimiento();
+				tipoMovimientoAlta.setIdTipoMovimiento(1); 
+				Movimiento movimientoInicial = new Movimiento();
+				movimientoInicial.setFechaHora(LocalDateTime.now());
+				movimientoInicial.setReferencia("Apertura de cuenta");
+				movimientoInicial.setImporte(new BigDecimal("10000.0"));
+				movimientoInicial.setCuenta(cuentaDelMovimiento);
+				movimientoInicial.setTipoMovimiento(tipoMovimientoAlta);
+
+				MovimientoNegocio movimientoNegocio = new MovimientoNegocioImpl(new MovimientoDaoImpl());
+				movimientoNegocio.crearMovimiento(movimientoInicial);
+			}
+
+			ArrayList<Cuenta> listaCuentas = (ArrayList<Cuenta>) cuentaNegocio
+					.obtenerCuentasPorIdCliente(cliente.getIdCliente(), cliente);
+			request.setAttribute("listaCuentas", listaCuentas);
+			request.setAttribute("dniCliente", dniCliente);
+
+			RequestDispatcher rd = request.getRequestDispatcher("/AdministradorListaCuentas.jsp");
+			rd.forward(request, response);
+		}
+	}
+
 }
-    
