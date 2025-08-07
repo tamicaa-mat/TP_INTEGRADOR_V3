@@ -35,6 +35,36 @@ public class PrestamoDaoImpl implements PrestamoDao {
 	private static final String SUMAR_PRESTAMOS_FECHA = "SELECT SUM(ImportePedido) AS Total FROM Prestamo WHERE FechaAlta BETWEEN ? AND ? AND Estado = 1";
 	private static final String CONTAR_PRESTAMOS_FECHA = "SELECT COUNT(*) AS Cantidad FROM Prestamo WHERE FechaAlta BETWEEN ? AND ? AND Estado = 1";
 
+	
+	
+	private static final String TIENE_PRESTAMOS_ACTIVOS = 
+	        "SELECT COUNT(*) AS total FROM Prestamo WHERE IdCliente = ? AND Estado = 1 AND CantidadCuotas > 0";
+	
+	
+	@Override
+    public boolean tienePrestamosActivos(int idCliente) {
+        int total = 0;
+        try (Connection conn = Conexion.getConexion().getSQLConexion();
+             PreparedStatement stmt = conn.prepareStatement(TIENE_PRESTAMOS_ACTIVOS)) {
+            
+            stmt.setInt(1, idCliente);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    total = rs.getInt("total");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        // Si el total es mayor a 0, significa que tiene préstamos activos.
+        return total > 0;
+    }
+	
+	
+	
+	
+	
+	
 	public boolean insert(Prestamo prestamo) {
 
 		try (Connection conn = Conexion.getConexion().getSQLConexion()) {

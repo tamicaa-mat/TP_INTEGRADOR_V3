@@ -36,10 +36,24 @@ public interface CuentaNegocio {
 	public Cuenta buscarCuentaPorId(int idCuenta);
 
 	boolean actualizarSaldo(int idCuenta, double nuevoSaldo);
+	
+	
+	
+	
+	
 
-	public boolean eliminarCuentaFisicamente(int idCuenta);
+//	public boolean eliminarCuentaFisicamente(int idCuenta);
 
+	
+	
+	
+	
+	
+	
 	public boolean bajaLogicaCuenta(int idCuenta);
+	
+	
+	
 
 	public boolean cuentaPerteneceACliente(String numeroCuenta, int idCliente);
 }

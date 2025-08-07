@@ -5,16 +5,33 @@ import java.util.List;
 
 import Negocio.PrestamoNegocio;
 import dao.PrestamoDao;
+import daoImpl.PrestamoDaoImpl;
 import dominio.Prestamo;
 import dominio.Usuario;
 
 public class PrestamoNegocioImpl implements PrestamoNegocio {
 
-	private PrestamoDao prestamoDao;
+	//private PrestamoDao prestamoDao;
+    private PrestamoDao prestamoDao = new PrestamoDaoImpl();
+    
+    
+
+	
+	
+	@Override
+    public boolean clienteTienePrestamosActivos(int idCliente) {
+        return prestamoDao.tienePrestamosActivos(idCliente);
+    }
+	
 
 	public PrestamoNegocioImpl(PrestamoDao prestamoDao) {
 		this.prestamoDao = prestamoDao;
 	}
+
+	public PrestamoNegocioImpl() {
+		// TODO Auto-generated constructor stub
+	}
+
 
 	public boolean solicitarPrestamo(Usuario usuario, Prestamo prestamo) {
 		if (usuario != null && prestamo != null) {

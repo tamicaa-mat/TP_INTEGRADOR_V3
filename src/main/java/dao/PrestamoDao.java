@@ -29,5 +29,8 @@ public interface PrestamoDao {
 	Prestamo getPrestamoPorIdPrestamo(int idPrestamo);
 
 	boolean pagarCuotaConTransaccion(int idCuenta, int idPrestamo, Double monto);
+	
+	
+	boolean tienePrestamosActivos(int idCliente);
 
 }

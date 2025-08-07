@@ -29,7 +29,7 @@
 												"url" : "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
 											},
 											"columnDefs" : [ {
-												"targets" : [ 6 ],
+												"targets" : [ 1 ],
 												"orderable" : false,
 												"searchable" : false
 											} // columna Acciones sin orden ni búsqueda

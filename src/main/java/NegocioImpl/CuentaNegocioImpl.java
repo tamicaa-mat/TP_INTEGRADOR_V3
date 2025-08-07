@@ -1,15 +1,11 @@
 package NegocioImpl;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import dao.CuentaDao;
-import daoImpl.Conexion;
+
 import daoImpl.CuentaDaoImpl;
 import dominio.Cliente;
 import dominio.Cuenta;
@@ -158,6 +154,11 @@ public class CuentaNegocioImpl implements CuentaNegocio {
 		return false;
 	}
 
+	
+	
+	
+	/*
+	
 	@Override
 	public boolean eliminarCuentaFisicamente(int idCuenta) {
 		System.out.println("[DEBUG] Eliminando físicamente cuenta ID: " + idCuenta);
@@ -228,6 +229,12 @@ public class CuentaNegocioImpl implements CuentaNegocio {
 		return exito;
 	}
 
+	*/
+	
+	
+	
+	
+	
 	@Override
 	public boolean bajaLogicaCuenta(int idCuenta) {
 		System.out.println("[DEBUG] CuentaNegocioImpl.bajaLogicaCuenta - ID: " + idCuenta);

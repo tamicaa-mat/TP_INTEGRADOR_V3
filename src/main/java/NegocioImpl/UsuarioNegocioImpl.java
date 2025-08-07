@@ -4,19 +4,30 @@ import dao.UsuarioDao;
 import dao.ClienteDao;
 import daoImpl.UsuarioDaoImpl;
 import daoImpl.ClienteDaoImpl;
+import dominio.Cliente;
 import dominio.Usuario;
 import excepciones.ClaveIncorrectaException;
+import excepciones.OperacionInvalidaException;
 import excepciones.UsuarioInactivoException;
 import excepciones.UsuarioInexistenteException;
+import Negocio.ClienteNegocio;
+import Negocio.PrestamoNegocio;
 
 import java.util.ArrayList;
 
 import Negocio.UsuarioNegocio;
 
+
 public class UsuarioNegocioImpl implements UsuarioNegocio {
 
 	private UsuarioDao usuarioDao = new UsuarioDaoImpl();
 	private ClienteDao clienteDao = new ClienteDaoImpl();
+    private ClienteNegocio clienteNegocio = new ClienteNegocioImpl();
+    
+    
+    private PrestamoNegocio prestamoNegocio = new PrestamoNegocioImpl();
+    
+
 
 	public UsuarioNegocioImpl() {
 		this.usuarioDao = new UsuarioDaoImpl();
@@ -73,11 +84,46 @@ public class UsuarioNegocioImpl implements UsuarioNegocio {
 		return usuario;
 	}
 
+	
+	
+	
+	
+	
+	
+	
+	
 	@Override
-	public boolean cambiarEstadoUsuario(int idUsuario, boolean nuevoEstado) {
-		return usuarioDao.cambiarEstado(idUsuario, nuevoEstado);
+	public boolean cambiarEstadoUsuario(int idUsuario, boolean nuevoEstado) throws OperacionInvalidaException {
+		
+        if (!nuevoEstado) { 
+            Cliente clienteAsociado = clienteDao.obtenerClientePorUsuario(idUsuario);
+            
+            if (clienteAsociado != null) {
+               
+                // Verifica si cliente tiene prestamos activos.
+                if (prestamoNegocio.clienteTienePrestamosActivos(clienteAsociado.getIdCliente())) {
+                    // Si tiene, lanzamos una excepción para detener el proceso.
+                    throw new OperacionInvalidaException("No se puede desactivar: el cliente tiene préstamos vigentes.");
+                }
+                
+                // Si no tiene préstamos, procedemos con la baja en cascada como antes.
+                clienteNegocio.bajaLogicaCliente(clienteAsociado.getDni());
+            }
+        }
+        
+        // Finalmente, cambiamos el estado del usuario.
+        return usuarioDao.cambiarEstado(idUsuario, nuevoEstado);
 	}
 
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	@Override
 	public boolean resetearPasswordUsuario(int idUsuario) {
 		String nuevaPassword = "nuevoPass123";

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import dominio.Usuario;
 import excepciones.ClaveIncorrectaException;
+import excepciones.OperacionInvalidaException;
 import excepciones.UsuarioInactivoException;
 import excepciones.UsuarioInexistenteException;
 
@@ -25,7 +26,8 @@ public interface UsuarioNegocio {
 
 	public boolean resetearPasswordUsuario(int idUsuario);
 
-	public boolean cambiarEstadoUsuario(int idUsuario, boolean nuevoEstado);
+    boolean cambiarEstadoUsuario(int idUsuario, boolean nuevoEstado) throws OperacionInvalidaException;
+
 
 	public boolean existeUsuario(String nombreUsuario);
 

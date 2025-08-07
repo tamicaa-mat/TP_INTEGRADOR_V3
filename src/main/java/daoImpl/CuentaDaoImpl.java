@@ -17,6 +17,10 @@ import dominio.TipoCuenta;
 
 public class CuentaDaoImpl implements CuentaDao {
 
+	
+	
+	
+	
 	private static final String INSERT_CUENTA = "INSERT INTO Cuenta (IdCliente, FechaCreacion, IdTipoCuenta, NumeroCuenta, Cbu, Saldo, Estado) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
 	private static final String COUNT_CUENTAS_POR_DNI = "SELECT COUNT(*) AS total FROM Cuenta c JOIN Cliente cl ON c.IdCliente = cl.IdCliente WHERE cl.DNI = ? AND c.Estado = 1";
@@ -55,6 +59,31 @@ public class CuentaDaoImpl implements CuentaDao {
 			+ "JOIN Cliente cl ON c.IdCliente = cl.IdCliente "
 			+ "JOIN TipoCuenta tc ON c.IdTipoCuenta = tc.IdTipoCuenta " + "WHERE c.IdCliente = ? AND c.Estado = 1";
 
+	
+    private static final String CAMBIAR_ESTADO_CUENTAS_POR_CLIENTE = "UPDATE Cuenta SET Estado = ? WHERE IdCliente = ?";
+
+    
+    @Override
+    public boolean cambiarEstadoCuentasPorCliente(int idCliente, boolean nuevoEstado) {
+        // Este método no necesita manejar transacciones complejas, puede ser simple.
+        try (Connection conn = Conexion.getConexion().getSQLConexion();
+             PreparedStatement stmt = conn.prepareStatement(CAMBIAR_ESTADO_CUENTAS_POR_CLIENTE)) {
+            
+            stmt.setBoolean(1, nuevoEstado);
+            stmt.setInt(2, idCliente);
+            
+            stmt.executeUpdate(); // Ejecutamos la actualización
+            return true; // Asumimos éxito si no hay excepción
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    
+    
+	
 	public Cuenta obtenerPorId(int idCuenta) {
 		Connection conexion = null;
 		PreparedStatement mensajero = null;

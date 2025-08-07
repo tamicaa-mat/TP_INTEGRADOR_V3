@@ -51,10 +51,13 @@
 
 						<div class="d-flex justify-content-center gap-2">
 							<button type="submit" class="btn btn-secondary btn-sm w-50">Crear
-								Usuario y Finalizar</button>
+								Usuario y Finalizar
+							</button>
+							
 							<a href="ClienteServlet?Action=mostrarFormulario"
 								class="btn btn-outline-secondary btn-sm w-50">Cancelar y
-								Volver</a>
+								Volver
+							</a>
 						</div>
 
 					</form>

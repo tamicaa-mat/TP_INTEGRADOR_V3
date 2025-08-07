@@ -16,13 +16,24 @@
 	<main class="container py-5">
 		<h4 class="text-center mb-4">Gestión de Usuarios del Sistema</h4>
 
-		<%-- Mostramos el mensaje de éxito si existe en la sesión --%>
+		
 		<c:if test="${not empty sessionScope.mensajeUsuario}">
 			<div class="alert alert-success" role="alert">
 				${sessionScope.mensajeUsuario}</div>
-			<%-- Eliminamos el mensaje para que no se muestre de nuevo --%>
+			
 			<c:remove var="mensajeUsuario" scope="session" />
 		</c:if>
+		
+		
+		<c:if test="${not empty sessionScope.errorUsuario}">
+		    <div class="alert alert-danger" role="alert">
+		        ${sessionScope.errorUsuario}
+		    </div>
+		    <c:remove var="errorUsuario" scope="session" />
+		</c:if>
+		
+		
+		
 
 		<div class="table-responsive">
 			<table

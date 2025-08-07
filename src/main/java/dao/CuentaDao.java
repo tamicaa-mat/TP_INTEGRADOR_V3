@@ -50,5 +50,8 @@ public interface CuentaDao {
 	public boolean bajaLogicaCuenta(int idCuenta);
 
 	boolean eliminarCuentaFisicamente(int idCuenta);
+	
+    boolean cambiarEstadoCuentasPorCliente(int idCliente, boolean nuevoEstado);
+
 
 }

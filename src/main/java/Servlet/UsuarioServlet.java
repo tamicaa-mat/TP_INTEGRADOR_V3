@@ -24,6 +24,7 @@ import NegocioImpl.LocalidadNegocioImpl;
 import Negocio.ClienteNegocio;
 import NegocioImpl.ClienteNegocioImpl;
 import excepciones.DatosInvalidosException;
+import excepciones.OperacionInvalidaException;
 
 @WebServlet("/UsuarioServlet")
 public class UsuarioServlet extends HttpServlet {
@@ -62,13 +63,30 @@ public class UsuarioServlet extends HttpServlet {
 		}
 
 		case "cambiarEstado": {
-			int idUsuario = Integer.parseInt(request.getParameter("id"));
-			boolean estadoActual = Boolean.parseBoolean(request.getParameter("estado"));
+			 try {
+                 int idUsuario = Integer.parseInt(request.getParameter("id"));
+                 boolean estadoActual = Boolean.parseBoolean(request.getParameter("estado"));
 
-			usuarioNegocio.cambiarEstadoUsuario(idUsuario, !estadoActual);
+                 // Intentamos cambiar el estado. Si hay préstamos, esto lanzará una excepción.
+                 usuarioNegocio.cambiarEstadoUsuario(idUsuario, !estadoActual);
+                 
+                 // Si no hubo excepción, guardamos un mensaje de éxito.
+                 HttpSession session = request.getSession();
+                 session.setAttribute("mensajeUsuario", "¡Estado del usuario cambiado con éxito!");
 
-			response.sendRedirect("UsuarioServlet");
-			break;
+             } catch (OperacionInvalidaException e) { // <-- Atajamos la excepción específica
+                 HttpSession session = request.getSession();
+                 // Guardamos el mensaje de error de la excepción para mostrarlo en el JSP.
+                 session.setAttribute("errorUsuario", e.getMessage());
+             } catch (Exception e) { // Dejamos un catch genérico por si ocurre otro error
+                 HttpSession session = request.getSession();
+                 session.setAttribute("errorUsuario", "Ocurrió un error inesperado.");
+                 e.printStackTrace();
+             }
+             
+             // Al final, siempre redirigimos de vuelta a la lista de usuarios.
+             response.sendRedirect("UsuarioServlet");
+             break;
 		}
 
 		case "resetearPassword": {
@@ -95,6 +113,10 @@ public class UsuarioServlet extends HttpServlet {
 
 	}
 
+	
+	
+	
+	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String action = request.getParameter("action");
