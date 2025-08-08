@@ -55,9 +55,13 @@ public class CuentaDaoImpl implements CuentaDao {
 			+ "INNER JOIN TipoCuenta tc ON c.IdTipoCuenta = tc.IdTipoCuenta "
 			+ "WHERE c.IdCliente = ? AND c.Estado = 1";
 
+	
+	
+	
 	private static final String OBTENER_CUENTAS_POR_CLIENTE = "SELECT c.*, cl.Dni, cl.Cuil, cl.Nombre, cl.Apellido, tc.IdTipoCuenta, tc.Descripcion AS TipoCuentaDescripcion FROM Cuenta c "
-			+ "JOIN Cliente cl ON c.IdCliente = cl.IdCliente "
-			+ "JOIN TipoCuenta tc ON c.IdTipoCuenta = tc.IdTipoCuenta " + "WHERE c.IdCliente = ? AND c.Estado = 1";
+	        + "JOIN Cliente cl ON c.IdCliente = cl.IdCliente "
+	        + "JOIN TipoCuenta tc ON c.IdTipoCuenta = tc.IdTipoCuenta " // Correcto
+	        + "WHERE c.IdCliente = ? AND c.Estado = 1";
 
 	
     private static final String CAMBIAR_ESTADO_CUENTAS_POR_CLIENTE = "UPDATE Cuenta SET Estado = ? WHERE IdCliente = ?";

@@ -29,10 +29,10 @@
 								class="form-select" name="cuentaSeleccionada" required>
 								<option value="" disabled selected>Seleccione una
 									cuenta</option>
-								<c:forEach var="c" items="${cuentas}">
-									<c:if test="${c.estado}">
-										<option value="${c.idCuenta}">${c.numeroCuenta}</option>
-									</c:if>
+								<c:forEach var="cuenta" items="${listaCuentas}">
+   									 <option value="${cuenta.idCuenta}">
+      									  N°: ${cuenta.numeroCuenta} - (${cuenta.tipoCuentaObjeto.descripcion})
+   									 </option>
 								</c:forEach>
 							</select>
 						</div>

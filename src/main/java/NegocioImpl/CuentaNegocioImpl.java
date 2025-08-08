@@ -132,6 +132,29 @@ public class CuentaNegocioImpl implements CuentaNegocio {
 
 	}
 
+	
+	
+	
+	
+	@Override
+	public boolean bajaLogicaCuenta(int idCuenta) {
+		System.out.println("[DEBUG] CuentaNegocioImpl.bajaLogicaCuenta - ID: " + idCuenta);
+
+		if (cuentaDao == null) {
+			System.out.println("[ERROR] cuentaDao es null");
+			return false;
+		}
+
+		boolean resultado = cuentaDao.bajaLogicaCuenta(idCuenta);
+		System.out.println("[DEBUG] CuentaNegocioImpl - Resultado DAO: " + resultado);
+
+		return resultado;
+	}
+
+
+
+	
+	
 	@Override
 	public int obtenerIdCuentaPorNumero(String numeroCuenta) {
 		return cuentaDao.getIdCuentaPorNumeroCuenta(numeroCuenta);
@@ -232,22 +255,8 @@ public class CuentaNegocioImpl implements CuentaNegocio {
 	*/
 	
 	
-	
-	
-	
-	@Override
-	public boolean bajaLogicaCuenta(int idCuenta) {
-		System.out.println("[DEBUG] CuentaNegocioImpl.bajaLogicaCuenta - ID: " + idCuenta);
 
-		if (cuentaDao == null) {
-			System.out.println("[ERROR] cuentaDao es null");
-			return false;
-		}
 
-		boolean resultado = cuentaDao.bajaLogicaCuenta(idCuenta);
-		System.out.println("[DEBUG] CuentaNegocioImpl - Resultado DAO: " + resultado);
 
-		return resultado;
-	}
 
 }
