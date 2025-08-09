@@ -94,7 +94,12 @@
 						href="${pageContext.request.contextPath}/PagoPrestamoServlet"
 						class="btn btn-info btn-sm">Pago Préstamos</a> <a
 						href="ClienteInfoPersonal.jsp" class="btn btn-info btn-sm">Mi
-						Información</a>
+						Información</a> <a
+						href="${pageContext.request.contextPath}/MisCuentasServlet" class="btn btn-info btn-sm">Mis Cuentas
+						</a>
+						
+						
+						
 				</div>
 			</c:if>
 

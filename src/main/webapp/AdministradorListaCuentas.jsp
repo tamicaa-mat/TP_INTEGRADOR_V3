@@ -18,10 +18,8 @@
 	<jsp:include page="masterPage.jsp" />
 
 	<main class="container py-5">
-		<h3 class="mb-3">
-			Gestión de Cuentas para el Cliente DNI: <strong><c:out
-					value="${dniCliente}" /></strong>
-		</h3>
+	
+		<h3 class="mb-3">Gestión de Cuentas para el Cliente DNI: <strong><c:out value="${cliente.dni}" /></strong></h3>
 
 		<div class="card mb-4 shadow-sm">
 			<div class="card-header fw-bold bg-primary text-white">Agregar
@@ -31,7 +29,7 @@
 					class="row g-3 align-items-end">
 					<input type="hidden" name="action" value="agregar" /> <input
 						type="hidden" name="dniCliente"
-						value="<c:out value='${dniCliente}' />" />
+						value="<c:out value='${cliente.dni}' />" />
 
 					<div class="col-md-4">
 						<label for="idTipoCuenta" class="form-label">Tipo de
@@ -94,7 +92,7 @@
 									</td>
 									<td><c:if test="${cuenta.estado}">
 											<a
-												href="CuentaServlet?action=eliminar&idCuenta=${cuenta.idCuenta}&dni=${dniCliente}"
+												href="CuentaServlet?action=eliminar&idCuenta=${cuenta.idCuenta}&dni=${cliente.dni}"
 												onclick="return confirm('¿Está seguro de que desea eliminar esta cuenta?')">
 												Eliminar </a>
 										</c:if> <c:if test="${!cuenta.estado}">
