@@ -1,13 +1,23 @@
 package NegocioImpl;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
 import Negocio.PrestamoNegocio;
 import dao.PrestamoDao;
 import daoImpl.PrestamoDaoImpl;
+import dominio.Cuenta;
+import dominio.Cuota;
+import dominio.Movimiento;
 import dominio.Prestamo;
+import dominio.TipoMovimiento;
 import dominio.Usuario;
+import Negocio.CuentaNegocio;
+import Negocio.MovimientoNegocio;
+import dao.CuotaDao;
+import daoImpl.CuotaDaoImpl;
 
 public class PrestamoNegocioImpl implements PrestamoNegocio {
 
@@ -15,7 +25,96 @@ public class PrestamoNegocioImpl implements PrestamoNegocio {
     private PrestamoDao prestamoDao = new PrestamoDaoImpl();
     
     
+    private CuentaNegocio cuentaNegocio = new CuentaNegocioImpl();
+    private MovimientoNegocio movimientoNegocio = new MovimientoNegocioImpl();
+    private CuotaDao cuotaDao = new CuotaDaoImpl();
+    
+    
+    @Override
+    public boolean aprobarPrestamo(int idPrestamo) {
+        // 1. OBTENER EL PRÉSTAMO
+    	
+        System.out.println("NEGOCIO: Ingresando a aprobarPrestamo para ID: " + idPrestamo);
 
+    	
+        Prestamo prestamo = this.obtenerPrestamoPorId(idPrestamo);
+        if (prestamo == null) {
+            System.err.println("ERROR: No se encontró el préstamo con ID " + idPrestamo);
+            return false;
+        }
+
+        // 2. ACTUALIZAR EL ESTADO DEL PRÉSTAMO A "APROBADO" (Estado = 1)
+        boolean estadoActualizado = this.actualizarEstadoPrestamo(idPrestamo, 1);
+        if (!estadoActualizado) {
+            System.err.println("ERROR: No se pudo actualizar el estado del préstamo.");
+            return false;
+        }
+
+        // 3. ACREDITAR DINERO EN LA CUENTA DEL CLIENTE (Lógica que estaba en el Servlet)
+        // 3.1. Crear el movimiento
+        Movimiento movimiento = new Movimiento();
+        movimiento.setFechaHora(LocalDateTime.now());
+        movimiento.setReferencia("ALTA PRESTAMO ID: " + idPrestamo);
+        movimiento.setImporte(BigDecimal.valueOf(prestamo.getImportePedido()));
+        TipoMovimiento tipo = new TipoMovimiento();
+        tipo.setIdTipoMovimiento(2); // ID para "Alta Préstamo"
+        movimiento.setTipoMovimiento(tipo);
+        movimiento.setCuenta(prestamo.getCuentaAsociada());
+        
+        boolean movimientoCreado = movimientoNegocio.crearMovimiento(movimiento);
+        if (!movimientoCreado) {
+            System.err.println("ERROR: No se pudo crear el movimiento del préstamo.");
+            // Opcional: Podrías hacer un rollback del estado del préstamo aquí.
+            return false;
+        }
+        
+        // 3.2. Actualizar el saldo de la cuenta
+        Cuenta cuenta = prestamo.getCuentaAsociada();
+        BigDecimal nuevoSaldo = cuenta.getSaldo().add(movimiento.getImporte());
+        boolean saldoActualizado = cuentaNegocio.actualizarSaldo(cuenta.getIdCuenta(), nuevoSaldo.doubleValue());
+        if(!saldoActualizado) {
+            System.err.println("ERROR: No se pudo actualizar el saldo de la cuenta.");
+            return false;
+        }
+
+        
+        
+        System.out.println("NEGOCIO: Estado del préstamo y saldo actualizados. Preparando para generar cuotas.");
+        System.out.println("NEGOCIO: El préstamo tiene " + prestamo.getCantidadCuotas() + " cuotas para generar.");
+
+        // 4. *** GENERAR LAS CUOTAS (La nueva lógica) ***
+        for (int i = 1; i <= prestamo.getCantidadCuotas(); i++) {
+            Cuota nuevaCuota = new Cuota();
+
+            // ▼▼▼ ESTA ES LA LÍNEA CLAVE ▼▼▼
+            // Le pasamos el objeto 'prestamo' (la variable) que obtuvimos al inicio del método.
+            nuevaCuota.setPrestamo(prestamo); 
+
+            nuevaCuota.setNumeroCuota(i);
+            nuevaCuota.setMonto(BigDecimal.valueOf(prestamo.getImportePorMes()));
+            nuevaCuota.setEstado(false); // false = No pagada
+
+            boolean cuotaAgregada = cuotaDao.agregar(nuevaCuota);
+            if (!cuotaAgregada) {
+                System.err.println("ERROR: Falla al crear la cuota N°" + i + " para el préstamo " + idPrestamo);
+                return false;
+            }
+        }
+        
+        System.out.println("Préstamo " + idPrestamo + " aprobado y cuotas generadas exitosamente.");
+        return true; // Si todo salió bien
+    }
+    
+    
+    
+    
+    
+    
+
+    @Override
+    public List<Cuota> obtenerCuotasVencidas() {
+        return prestamoDao.obtenerCuotasVencidas();
+    }
 	
 	
 	@Override
@@ -29,7 +128,7 @@ public class PrestamoNegocioImpl implements PrestamoNegocio {
 	}
 
 	public PrestamoNegocioImpl() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 
@@ -115,5 +214,10 @@ public class PrestamoNegocioImpl implements PrestamoNegocio {
 	public boolean pagarCuota(int idCuenta, int idPrestamo, double monto) {
 		return prestamoDao.pagarCuotaConTransaccion(idCuenta, idPrestamo, monto);
 	}
+	
+	
+	
+	
+	
 
 }

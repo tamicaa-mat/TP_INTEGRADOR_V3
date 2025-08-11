@@ -1,5 +1,8 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+	
+	
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -117,6 +120,64 @@
 			}
 			%>
 		</section>
+		
+		
+		
+		
+		<hr>
+<section class="mt-4">
+    <h5 class="mb-3">Reporte de Morosidad de Préstamos</h5>
+    <form method="get" action="ReporteServlet">
+        <input type="hidden" name="action" value="reporteMorosidad" />
+        <p>Busca todas las cuotas de préstamos que no han sido pagadas y cuya fecha de vencimiento ya pasó.</p>
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-danger">Generar Reporte de Morosos</button>
+        </div>
+    </form>
+
+    <%-- Tabla para mostrar los resultados de morosidad --%>
+    <c:if test="${not empty listaMorosos}">
+        <div class="mt-4">
+            <h6 class="text-danger">Resultado: Clientes con Cuotas Vencidas</h6>
+            <table class="table table-bordered text-center align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Cliente</th>
+                        <th>DNI</th>
+                        <th>N° Préstamo</th>
+                        <th>N° Cuota</th>
+                        <th>Monto Cuota</th>
+                        <th>Fecha de Vencimiento</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <c:forEach var="cuota" items="${listaMorosos}">
+                        <tr>
+                            <td>${cuota.prestamo.cliente.nombre} ${cuota.prestamo.cliente.apellido}</td>
+                            <td>${cuota.prestamo.cliente.dni}</td>
+                            <td>${cuota.prestamo.idPrestamo}</td>
+                            <td>${cuota.numeroCuota}</td>
+                            <td><fmt:formatNumber value="${cuota.monto}" type="currency" currencySymbol="$ " /></td>
+                            <td><fmt:formatDate value="${cuota.fechaVencimiento}" pattern="dd/MM/yyyy" /></td>
+                        </tr>
+                    </c:forEach>
+                </tbody>
+            </table>
+        </div>
+    </c:if>
+</section>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 	</main>
 	<script
 		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

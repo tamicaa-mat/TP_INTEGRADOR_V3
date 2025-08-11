@@ -80,7 +80,7 @@ public class CuentaServlet extends HttpServlet {
 	                RequestDispatcher rd = request.getRequestDispatcher("/AdministradorReportes.jsp");
 	                rd.forward(request, response);
 	            }
-	            break; // No te olvides del break
+	            break; 
 	        }
 
 	        case "listar": {
@@ -91,10 +91,10 @@ public class CuentaServlet extends HttpServlet {
 	                request.setAttribute("error", "No se encontró el cliente con DNI: " + dniCliente);
 	                RequestDispatcher rd = request.getRequestDispatcher("/ClienteServlet");
 	                rd.forward(request, response);
-	                return; // Usamos return para cortar la ejecución aquí
+	                return; 
 	            }
 
-	            // La lógica de negocio solo necesita el ID del cliente para buscar sus cuentas
+	            
 	            ArrayList<Cuenta> listaCuentas = cuentaNegocio.getCuentasPorCliente(cliente);
 
 	            request.setAttribute("listaCuentas", listaCuentas);
@@ -199,7 +199,7 @@ public class CuentaServlet extends HttpServlet {
 			ArrayList<Cuenta> listaCuentas = (ArrayList<Cuenta>) cuentaNegocio
 					.obtenerCuentasPorIdCliente(cliente.getIdCliente(), cliente);
 			request.setAttribute("listaCuentas", listaCuentas);
-			request.setAttribute("dniCliente", dniCliente);
+			request.setAttribute("cliente", cliente);
 
 			RequestDispatcher rd = request.getRequestDispatcher("/AdministradorListaCuentas.jsp");
 			rd.forward(request, response);

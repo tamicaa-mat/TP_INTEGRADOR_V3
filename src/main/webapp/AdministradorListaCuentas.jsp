@@ -19,7 +19,14 @@
 
 	<main class="container py-5">
 	
-		<h3 class="mb-3">Gestión de Cuentas para el Cliente DNI: <strong><c:out value="${cliente.dni}" /></strong></h3>
+		<h3 class="mb-3">Gestión de Cuentas para el Cliente: 
+		<strong><c:out value="${cliente.nombre}" /></strong>
+		<strong><c:out value="${cliente.apellido}" /></strong>
+		DNI:
+		<strong><c:out value="${cliente.dni	}" /></strong>
+		
+		
+		</h3>
 
 		<div class="card mb-4 shadow-sm">
 			<div class="card-header fw-bold bg-primary text-white">Agregar

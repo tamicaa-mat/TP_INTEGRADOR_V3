@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import dominio.Cuota;
 import dominio.Prestamo;
 
 public interface PrestamoDao {
@@ -30,7 +31,8 @@ public interface PrestamoDao {
 
 	boolean pagarCuotaConTransaccion(int idCuenta, int idPrestamo, Double monto);
 	
-	
+    List<Cuota> obtenerCuotasVencidas();
+    
 	boolean tienePrestamosActivos(int idCliente);
 
 }

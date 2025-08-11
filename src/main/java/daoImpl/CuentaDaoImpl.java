@@ -764,16 +764,17 @@ public class CuentaDaoImpl implements CuentaDao {
 	public Cuenta buscarCuentaPorIdDao(int idCuenta) {
 
 		Cuenta cuenta = null;
-		Connection cn = null;
+		Connection conn = Conexion.getConexion().getSQLConexion(); 
+
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
 		try {
-			cn = (Connection) Conexion.getConexion();
+			conn = (Connection) Conexion.getConexion();
 
-			System.out.println("Conexión activa? " + (cn != null && !cn.isClosed()));
+			System.out.println("Conexión activa? " + (conn != null && !conn.isClosed()));
 
-			Statement stmt = cn.createStatement();
+			Statement stmt = conn.createStatement();
 			ResultSet rsVerificacion = stmt.executeQuery("SELECT COUNT(*) FROM Cuenta");
 			if (rsVerificacion.next()) {
 				System.out.println("Cantidad de cuentas en la BD conectada: " + rsVerificacion.getInt(1));
@@ -782,7 +783,7 @@ public class CuentaDaoImpl implements CuentaDao {
 			stmt.close();
 
 			String sql = "SELECT * FROM Cuenta WHERE IdCuenta = ? AND Estado = 1";
-			ps = cn.prepareStatement(sql);
+			ps = conn.prepareStatement(sql);
 			ps.setInt(1, idCuenta);
 			rs = ps.executeQuery();
 
@@ -810,8 +811,8 @@ public class CuentaDaoImpl implements CuentaDao {
 					rs.close();
 				if (ps != null)
 					ps.close();
-				if (cn != null)
-					cn.close();
+				if (conn != null)
+					conn.close();
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}

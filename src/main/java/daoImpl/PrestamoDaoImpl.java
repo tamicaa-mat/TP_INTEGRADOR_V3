@@ -15,6 +15,7 @@ import dao.PrestamoDao;
 import dao.MovimientoDao;
 import dominio.Cliente;
 import dominio.Cuenta;
+import dominio.Cuota;
 import dominio.Movimiento;
 import dominio.Prestamo;
 import dominio.TipoMovimiento;
@@ -466,7 +467,7 @@ public class PrestamoDaoImpl implements PrestamoDao {
 				prestamo.setInteres(rs.getDouble("Interes"));
 				prestamo.setFechaAlta(rs.getDate("FechaAlta"));
 				prestamo.setEstado(rs.getInt("Estado"));
-				prestamo.setCantidadCuotas(rs.getInt("CantidadCuotas"));
+	            prestamo.setCantidadCuotas(rs.getInt("CantidadCuotas"));
 
 				Cuenta cuenta = new Cuenta();
 				cuenta.setIdCuenta(rs.getInt("IdCuenta"));
@@ -579,6 +580,27 @@ public class PrestamoDaoImpl implements PrestamoDao {
 
 				System.out.println("[DEBUG] Cuotas actualizadas. Filas afectadas: " + filasAfectadas);
 			}
+			
+			
+			// cmabia el estado de la cuota
+			  System.out.println("[DEBUG] Actualizando estado en la tabla CUOTA.");
+		        String cambiaEstadoCuota = "UPDATE cuota SET Estado = 1, FechaPago = CURDATE() " + 
+		                                "WHERE IdPrestamo = ? AND Estado = 0 " +
+		                                "ORDER BY NumeroCuota ASC LIMIT 1";
+		        
+		        try (PreparedStatement stmtCuota = conn.prepareStatement(cambiaEstadoCuota)) {
+		            stmtCuota.setInt(1, idPrestamo);
+		            int filasCuota = stmtCuota.executeUpdate();
+		            if (filasCuota == 0) {
+		                System.out.println("[ERROR] No se encontró una cuota impaga para actualizar.");
+		                conn.rollback();
+		                return false;
+		            }
+		            System.out.println("[DEBUG] Fila de cuota actualizada. Filas afectadas: " + filasCuota);
+		        }
+	
+			
+			
 
 			conn.commit();
 			System.out.println("Cuota pagada correctamente. Transacción confirmada.");
@@ -606,4 +628,52 @@ public class PrestamoDaoImpl implements PrestamoDao {
 		}
 	}
 
+	
+	
+	@Override
+    public List<Cuota> obtenerCuotasVencidas() {
+        List<Cuota> cuotasVencidas = new ArrayList<>();
+        String sql = "SELECT " +
+                     "c.IdCuota, c.NumeroCuota, c.Monto, " +
+                     "p.IdPrestamo, p.FechaAlta, " +
+                     "DATE_ADD(p.FechaAlta, INTERVAL c.NumeroCuota MONTH) AS FechaVencimiento, " +
+                     "cli.IdCliente, cli.Nombre, cli.Apellido, cli.Dni " +
+                     "FROM Cuota c " +
+                     "INNER JOIN Prestamo p ON c.IdPrestamo = p.IdPrestamo " +
+                     "INNER JOIN Cliente cli ON p.IdCliente = cli.IdCliente " +
+                     "WHERE c.Estado = 0 AND DATE_ADD(p.FechaAlta, INTERVAL c.NumeroCuota MONTH) < CURDATE() " +
+                     "ORDER BY FechaVencimiento ASC;";
+
+        try (Connection conn = Conexion.getConexion().getSQLConexion(); // O como obtengas tu conexión
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                // Creamos los objetos para almacenar los datos
+                Cliente cliente = new Cliente();
+                cliente.setIdCliente(rs.getInt("IdCliente"));
+                cliente.setNombre(rs.getString("Nombre"));
+                cliente.setApellido(rs.getString("Apellido"));
+                cliente.setDni(rs.getString("Dni"));
+
+                Prestamo prestamo = new Prestamo();
+                prestamo.setIdPrestamo(rs.getInt("IdPrestamo"));
+                prestamo.setFechaAlta(rs.getDate("FechaAlta"));
+                prestamo.setCliente(cliente); // Asociamos el cliente al préstamo
+
+                Cuota cuota = new Cuota();
+                cuota.setIdCuota(rs.getInt("IdCuota"));
+                cuota.setNumeroCuota(rs.getInt("NumeroCuota"));
+                cuota.setMonto(rs.getBigDecimal("Monto"));
+                cuota.setFechaVencimiento(rs.getDate("FechaVencimiento")); // Guardamos la fecha calculada
+                cuota.setPrestamo(prestamo); // Asociamos el préstamo a la cuota
+
+                cuotasVencidas.add(cuota);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Es una buena práctica registrar el error
+        }
+        return cuotasVencidas;
+    }
+	
 }
