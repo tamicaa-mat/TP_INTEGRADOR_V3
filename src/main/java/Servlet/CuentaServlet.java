@@ -72,7 +72,8 @@ public class CuentaServlet extends HttpServlet {
 	                request.setAttribute("saldoTotalCuentas", saldoTotal);
 	                request.setAttribute("fechaDesde", fechaDesdeStr);
 	                request.setAttribute("fechaHasta", fechaHastaStr);
-
+	                request.setAttribute("activeTab", "cuentas");
+	                
 	                RequestDispatcher rd = request.getRequestDispatcher("/AdministradorReportes.jsp");
 	                rd.forward(request, response);
 	            } catch (ParseException e) {

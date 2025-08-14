@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
+
 import dao.ClienteDao;
 import dao.CuentaDao;
 import daoImpl.CuentaDaoImpl;
@@ -14,10 +16,19 @@ import daoImpl.Conexion;
 import dominio.Cliente;
 import Negocio.ClienteNegocio;
 
+
 public class ClienteNegocioImpl implements ClienteNegocio {
 
 	private ClienteDao cdao = new ClienteDaoImpl();
 	private CuentaDao cuentaDao = new CuentaDaoImpl();
+	
+	@Override
+	public List<Cliente> obtenerTopClientesPorSaldo(int limite) {
+	   
+	    return cdao.getTopClientesPorSaldo(limite);
+	}
+	
+	
 
 	public ClienteNegocioImpl(ClienteDao cdao) {
 		this.cdao = cdao;

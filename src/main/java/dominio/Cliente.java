@@ -1,5 +1,6 @@
 package dominio;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List; // Importar para FechaNacimiento
@@ -19,6 +20,9 @@ public class Cliente {
 	private Localidad localidad;
 	private Usuario usuario;
 	private boolean estado;
+	
+    private BigDecimal saldoTotal;
+
 
 	private List<Cuenta> cuentas = new ArrayList<>();
 
@@ -47,6 +51,14 @@ public class Cliente {
 	}
 
 	// Getters
+	
+	
+	  public BigDecimal getSaldoTotal() {
+	        return saldoTotal;
+	    }
+
+	    
+	
 	public int getIdCliente() {
 		return idCliente;
 	}
@@ -104,6 +116,14 @@ public class Cliente {
 	}
 
 	// Setters
+	
+	
+	public void setSaldoTotal(BigDecimal saldoTotal) {
+        this.saldoTotal = saldoTotal;
+    }
+
+	
+	
 	public void setIdCliente(int idCliente) {
 		this.idCliente = idCliente;
 	}

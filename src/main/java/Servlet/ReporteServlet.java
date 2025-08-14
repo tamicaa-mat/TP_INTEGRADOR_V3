@@ -31,7 +31,7 @@ public class ReporteServlet extends HttpServlet {
 
         switch (action) {
             case "topClientes":
-               // generarReporteTopClientes(request, response);
+            	generarReporteTopClientes(request, response);
                 break;
            
             case "reporteMorosidad":
@@ -44,31 +44,32 @@ public class ReporteServlet extends HttpServlet {
         }
     }
 
-   /* private void generarReporteTopClientes(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        ClienteNegocio clienteNegocio = new ClienteNegocioImpl();
+    private void generarReporteTopClientes(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         
-        // El '10' es por "Top 10", puedes hacerlo dinámico si quieres
+        ClienteNegocio clienteNegocio = new ClienteNegocioImpl(); 
+        
+        // El 10 es por "Top 10".
         List<Cliente> topClientes = clienteNegocio.obtenerTopClientesPorSaldo(10); 
         
         request.setAttribute("listaTopClientes", topClientes);
+        request.setAttribute("activeTab", "vip");
         
         RequestDispatcher rd = request.getRequestDispatcher("/AdministradorReportes.jsp");
         rd.forward(request, response);
     }
-*/
     
 
 private void generarReporteMorosidad(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    // 1. Instancias la capa de negocio
+  
     PrestamoNegocioImpl prestamoNegocio = new PrestamoNegocioImpl();
-    
-    // 2. Llamas al nuevo método de negocio
     List<Cuota> cuotasVencidas = prestamoNegocio.obtenerCuotasVencidas();
     
-    // 3. Pasas la lista resultante al JSP
-    request.setAttribute("listaMorosos", cuotasVencidas);
     
-    // 4. Rediriges a la página para mostrar los datos
+    request.setAttribute("listaMorosos", cuotasVencidas);
+    request.setAttribute("activeTab", "morosidad");
+
+    
+    
     RequestDispatcher rd = request.getRequestDispatcher("/AdministradorReportes.jsp");
     rd.forward(request, response);
 }

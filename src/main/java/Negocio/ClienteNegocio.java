@@ -1,9 +1,17 @@
 package Negocio;
 
 import java.util.ArrayList;
+import java.util.List;
+
 import dominio.Cliente;
 
 public interface ClienteNegocio {
+	
+	
+    List<Cliente> obtenerTopClientesPorSaldo(int limite);
+
+	
+	
 	public boolean insertarCliente(Cliente cliente);
 
 	public boolean bajaLogicaCliente(String dni);

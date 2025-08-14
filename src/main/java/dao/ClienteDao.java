@@ -1,10 +1,16 @@
 package dao;
 
 import java.util.ArrayList;
+import java.util.List;
+
 import dominio.Cliente;
 
 public interface ClienteDao {
 
+	
+    List<Cliente> getTopClientesPorSaldo(int limite);
+
+	
 	public boolean insertarCliente(Cliente cliente);
 
 	public boolean bajaLogicaCliente(String dni);

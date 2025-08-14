@@ -61,6 +61,7 @@ public class PrestamoServlet extends HttpServlet {
 				request.setAttribute("cantidadPrestamos", cantidadPrestamos);
 				request.setAttribute("fechaInicioPrestamo", desdeStr);
 				request.setAttribute("fechaFinPrestamo", hastaStr);
+				request.setAttribute("activeTab", "prestamos");
 
 				request.getRequestDispatcher("AdministradorReportes.jsp").forward(request, response);
 				return;

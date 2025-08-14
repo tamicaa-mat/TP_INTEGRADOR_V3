@@ -27,6 +27,59 @@ public class ClienteDaoImpl implements ClienteDao {
 	private static final String LEER_TODOS_LOS_CLIENTE_POR_ESTADO = LEER_TODOS + " where c.Estado = ?";
 	private static final String OBTENER_POR_DNI_SIN_FILTRO = LEER_TODOS + " where c.DNI = ?";
 
+	
+	
+	
+	
+	
+	@Override
+	public List<Cliente> getTopClientesPorSaldo(int limite) {
+	    List<Cliente> listaClientes = new ArrayList<>();
+	    // Usamos los nombres exactos de tus tablas y columnas.
+	    String sql = "SELECT " +
+	                 "    c.IdCliente, c.Nombre, c.Apellido, c.Dni, SUM(cu.Saldo) as SaldoTotal " +
+	                 "FROM Cliente c " +
+	                 "JOIN Cuenta cu ON c.IdCliente = cu.IdCliente " +
+	                 "WHERE cu.Estado = 1 " + // Solo cuentas activas
+	                 "GROUP BY c.IdCliente, c.Nombre, c.Apellido, c.Dni " +
+	                 "ORDER BY SaldoTotal DESC " +
+	                 "LIMIT ?;";
+	    
+	    try (Connection conn = Conexion.getConexion().getSQLConexion();
+	         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+	        
+	        pstmt.setInt(1, limite);
+	        
+	        try (ResultSet rs = pstmt.executeQuery()) {
+	            while (rs.next()) {
+	                Cliente cliente = new Cliente();
+	                cliente.setIdCliente(rs.getInt("IdCliente"));
+	                cliente.setNombre(rs.getString("Nombre"));
+	                cliente.setApellido(rs.getString("Apellido"));
+	                cliente.setDni(rs.getString("Dni"));
+	                
+	                // Usamos el campo temporal para guardar el saldo calculado.
+	                cliente.setSaldoTotal(rs.getBigDecimal("SaldoTotal")); 
+	                
+	                listaClientes.add(cliente);
+	            }
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    
+	    return listaClientes;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	@Override
 	public Cliente obtenerClientePorDniSinFiltro(String dni) {
 		Connection conexion = null;
