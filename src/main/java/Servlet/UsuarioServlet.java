@@ -72,7 +72,7 @@ public class UsuarioServlet extends HttpServlet {
                  
                  // Si no hubo excepción, guardamos un mensaje de éxito.
                  HttpSession session = request.getSession();
-                 session.setAttribute("mensajeUsuario", "¡Estado del usuario cambiado con éxito!");
+                 session.setAttribute("mensajeUsuario", "¡Nombre de Usuario Inactivo!");
 
              } catch (OperacionInvalidaException e) { // <-- Atajamos la excepción específica
                  HttpSession session = request.getSession();

@@ -124,6 +124,7 @@ CREATE TABLE Transferencia (
   IdCuentaOrigen INT,
   IdCuentaDestino INT,
   Monto DECIMAL(15, 2) NOT NULL DEFAULT 0,
+  FechaHora DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (IdCuentaOrigen) REFERENCES Cuenta(IdCuenta),
   FOREIGN KEY (IdCuentaDestino) REFERENCES Cuenta(IdCuenta)
 );

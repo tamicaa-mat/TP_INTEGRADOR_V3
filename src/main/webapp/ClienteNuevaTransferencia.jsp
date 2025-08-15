@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+ <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -84,26 +85,36 @@
 
     <h4 class="mb-3">Historial de Transferencias</h4>
     
-    <table id="tablaTransferencias" class="display table table-striped">
+ 	
+ 	
+ 	<table id="tablaTransferencias" class="display table table-striped">
     <thead>
         <tr>
-            <th>ID</th>
+            <th>Fecha</th>
             <th>Cuenta Origen</th>
+            <th>Remitente</th>
             <th>Cuenta Destino</th>
-            <th>Monto</th>
+            <th>Destinatario</th>
+            <th class="text-end">Monto</th>
         </tr>
     </thead>
     <tbody>
         <c:forEach var="t" items="${transferencias}">
             <tr>
-                <td>${t.idTransferencia}</td>
-                <td>${t.idCuentaOrigen}</td>
-                <td>${t.idCuentaDestino}</td>
-                <td>$${t.monto}</td>
+                <td><fmt:formatDate value="${t.fechaHora}" pattern="dd/MM/yyyy HH:mm" /></td>
+                <td>${t.numeroCuentaOrigen}</td>
+                <td>${t.nombreClienteOrigen}</td>
+                <td>${t.numeroCuentaDestino}</td>
+                <td>${t.nombreClienteDestino}</td>
+                <td class="text-end"><fmt:formatNumber value="${t.monto}" type="currency" currencySymbol="$ " /></td>
             </tr>
         </c:forEach>
     </tbody>
 </table>
+ 	
+ 
+ 
+ 
     
     
 </div>

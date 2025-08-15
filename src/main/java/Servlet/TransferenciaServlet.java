@@ -46,6 +46,21 @@ public class TransferenciaServlet extends HttpServlet {
 		CuentaNegocio cuentaNegocio = new CuentaNegocioImpl(new CuentaDaoImpl());
 		List<Cuenta> cuentas = cuentaNegocio.getCuentasPorCliente(clienteLogueado);
 		request.setAttribute("cuentas", cuentas);
+		
+		
+	    if (cuentas != null && !cuentas.isEmpty()) {
+	     
+	        String numeroPrimerCuenta = cuentas.get(0).getNumeroCuenta();
+	        
+	       
+	        TransferenciaNegocio transferenciaNeg = new TransferenciaNegocioImpl(new TransferenciaDaoImpl());
+	        List<Transferencia> transferencias = transferenciaNeg.listarTransferenciasPorCuenta(numeroPrimerCuenta);
+	        
+	    
+	        request.setAttribute("transferencias", transferencias);
+	    }
+		
+		
 
 		request.getRequestDispatcher("ClienteNuevaTransferencia.jsp").forward(request, response);
 	}

@@ -19,7 +19,6 @@ public class TransferenciaDaoImpl implements TransferenciaDao {
 	private static final String INSERTAR_MOVIMIENTO = "INSERT INTO Movimiento (FechaHora, Referencia, Importe, IdTipoMovimiento, IdCuenta) VALUES (NOW(), ?, ?, ?, ?)";
 	private static final String INSERTAR_TRANSFERENCIA = "INSERT INTO Transferencia (IdCuentaOrigen, IdCuentaDestino, Monto) VALUES (?, ?, ?)";
 	private static final int ID_TIPO_MOVIMIENTO_TRANSFERENCIA = 4;
-	private static final String SELECT_TRANSFERENCIAS = "SELECT IdTransferencia, IdCuentaOrigen, IdCuentaDestino, Monto FROM Transferencia WHERE IdCuentaOrigen = ?";
 
 	@Override
 	public boolean ejecutarTransferencia(Cuenta cuentaOrigen, Cuenta cuentaDestino, BigDecimal monto) {
@@ -94,31 +93,57 @@ public class TransferenciaDaoImpl implements TransferenciaDao {
 		return exito;
 	}
 
+
+	
 	@Override
 	public List<Transferencia> obtenerTransferenciasPorCuentaOrigen(int idCuentaOrigen) {
-		List<Transferencia> lista = new ArrayList<>();
+	    List<Transferencia> lista = new ArrayList<>();
+	    
+	    String sql = "SELECT " +
+	                 "    t.IdTransferencia, " +
+	                 "    t.FechaHora, " +
+	                 "    t.Monto, " +
+	                 "    co.NumeroCuenta AS NumeroCuentaOrigen, " +
+	                 "    cd.NumeroCuenta AS NumeroCuentaDestino, " +
+	                 "    CONCAT(cli_o.Nombre, ' ', cli_o.Apellido) AS NombreClienteOrigen, " +
+	                 "    CONCAT(cli_d.Nombre, ' ', cli_d.Apellido) AS NombreClienteDestino " +
+	                 "FROM Transferencia t " +
+	                 "JOIN Cuenta co ON t.IdCuentaOrigen = co.IdCuenta " +
+	                 "JOIN Cliente cli_o ON co.IdCliente = cli_o.IdCliente " +
+	                 "JOIN Cuenta cd ON t.IdCuentaDestino = cd.IdCuenta " +
+	                 "JOIN Cliente cli_d ON cd.IdCliente = cli_d.IdCliente " +
+	                 "WHERE t.IdCuentaOrigen = ? OR t.IdCuentaDestino = ? " + // ver transferencias enviadas Y recibidas
+	                 "ORDER BY t.FechaHora DESC;";
 
-		try (Connection conexion = Conexion.getConexion().getSQLConexion();
-				PreparedStatement ps = conexion.prepareStatement(SELECT_TRANSFERENCIAS)) {
+	    try (Connection conexion = Conexion.getConexion().getSQLConexion();
+	         PreparedStatement ps = conexion.prepareStatement(sql)) {
 
-			ps.setInt(1, idCuentaOrigen);
-			ResultSet rs = ps.executeQuery();
+	        ps.setInt(1, idCuentaOrigen);
+	        ps.setInt(2, idCuentaOrigen); // mismo ID para buscar en origen y destino
+	        ResultSet rs = ps.executeQuery();
 
-			while (rs.next()) {
-				Transferencia t = new Transferencia();
-				t.setIdTransferencia(rs.getInt("IdTransferencia"));
-				t.setIdCuentaOrigen(rs.getInt("IdCuentaOrigen"));
-				t.setIdCuentaDestino(rs.getInt("IdCuentaDestino"));
-				t.setMonto(rs.getDouble("Monto"));
-				lista.add(t);
-			}
+	        while (rs.next()) {
+	            Transferencia t = new Transferencia();
+	            t.setIdTransferencia(rs.getInt("IdTransferencia"));
+	            t.setFechaHora(rs.getTimestamp("FechaHora"));
+	            t.setMonto(rs.getDouble("Monto"));
+	            t.setNumeroCuentaOrigen(rs.getString("NumeroCuentaOrigen"));
+	            t.setNumeroCuentaDestino(rs.getString("NumeroCuentaDestino"));
+	            t.setNombreClienteOrigen(rs.getString("NombreClienteOrigen"));
+	            t.setNombreClienteDestino(rs.getString("NombreClienteDestino"));
+	            
+	       
 
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		return lista;
+	            lista.add(t);
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return lista;
 	}
+	
+	
+	
 
 	@Override
 	public boolean realizarTransferencia(String numeroCuentaOrigen, String numeroCuentaDestino, BigDecimal monto)
@@ -180,7 +205,7 @@ public class TransferenciaDaoImpl implements TransferenciaDao {
 			stmtActualizarDestino.setInt(2, idCuentaDestino);
 			stmtActualizarDestino.executeUpdate();
 
-			String sqlTransferencia = "INSERT INTO Transferencia (IdCuentaOrigen, IdCuentaDestino, Monto) VALUES (?, ?, ?)";
+			String sqlTransferencia = "INSERT INTO Transferencia (IdCuentaOrigen, IdCuentaDestino, Monto, FechaHora) VALUES (?, ?, ?, NOW())";
 			stmtInsertarTransferencia = conexion.prepareStatement(sqlTransferencia);
 			stmtInsertarTransferencia.setInt(1, idCuentaOrigen);
 			stmtInsertarTransferencia.setInt(2, idCuentaDestino);
