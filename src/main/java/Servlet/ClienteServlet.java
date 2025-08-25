@@ -35,152 +35,152 @@ public class ClienteServlet extends HttpServlet {
 		super();
 	}
 
+	
+	
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	        throws ServletException, IOException {
 
-		String action = request.getParameter("Action");
-		String filtro = request.getParameter("filtro");
+	   
+	    String action = request.getParameter("Action");
+	    if (action == null) {
+	        action = "listar"; 
+	    }
 
-		if (action != null && action.equals("mostrarFormulario")) {
-			System.out.println("[DEBUG] Acción recibida: " + action);
+	    //  flujo segun la acción recibida.
+	    switch (action) {
+	        case "mostrarFormulario": {
+	            System.out.println("[DEBUG] Acción recibidaaa: " + action);
 
-			ProvinciaNegocio provNegocio = new ProvinciaNegocioImpl();
-			ArrayList<Provincia> listaProvincias = provNegocio.leerTodasLasProvincias();
+	            ProvinciaNegocio provNegocio = new ProvinciaNegocioImpl();
+	            ArrayList<Provincia> listaProvincias = provNegocio.leerTodasLasProvincias();
 
-			LocalidadNegocio locNegocio = new LocalidadNegocioImpl();
-			ArrayList<Localidad> listaLocalidades = locNegocio.leerTodasLasLocalidades();
+	            LocalidadNegocio locNegocio = new LocalidadNegocioImpl();
+	            ArrayList<Localidad> listaLocalidades = locNegocio.leerTodasLasLocalidades();
 
-			HttpSession session = request.getSession();
-			Cliente clienteTemporal = (Cliente) session.getAttribute("clienteTemporal");
-			if (clienteTemporal != null) {
-				request.setAttribute("clienteARecuperar", clienteTemporal);
-				System.out.println("[DEBUG] Recuperando datos del cliente temporal: " + clienteTemporal.getDni());
-			}
+	            HttpSession session = request.getSession();
+	            Cliente clienteTemporal = (Cliente) session.getAttribute("clienteTemporal");
+	            if (clienteTemporal != null) {
+	                request.setAttribute("clienteARecuperar", clienteTemporal);
+	                System.out.println("[DEBUG] Recuperando datos del cliente temporal: " + clienteTemporal.getDni());
+	            }
 
-			String recargarLocalidades = request.getParameter("recargarLocalidades");
-			String idProvinciaStr = request.getParameter("ddlProvincia");
+	            String recargarLocalidades = request.getParameter("recargarLocalidades");
+	            String idProvinciaStr = request.getParameter("ddlProvincia");
 
-			System.out.println("[DEBUG] recargarLocalidades: " + recargarLocalidades);
-			System.out.println("[DEBUG] ddlProvincia (ID): " + idProvinciaStr);
+	            System.out.println("[DEBUG] recargarLocalidades: " + recargarLocalidades);
+	            System.out.println("[DEBUG] ddlProvincia (ID): " + idProvinciaStr);
 
-			ArrayList<Localidad> listaLocalidadesFiltradas = null;
+	            if ("true".equals(recargarLocalidades) && idProvinciaStr != null && !idProvinciaStr.isEmpty()) {
+	                try {
+	                    int idProvincia = Integer.parseInt(idProvinciaStr);
+	                    System.out.println("[DEBUG] Filtrando localidades por provincia ID: " + idProvincia);
+	                    ArrayList<Localidad> listaLocalidadesFiltradas = locNegocio.leerLocalidadesPorProvincia(idProvincia);
+	                    System.out.println("[DEBUG] Localidades filtradas encontradas: "
+	                            + (listaLocalidadesFiltradas != null ? listaLocalidadesFiltradas.size() : "null"));
+	                    request.setAttribute("listaLocalidadesFiltradas", listaLocalidadesFiltradas);
+	                } catch (NumberFormatException e) {
+	                    System.out.println("[ERROR] No se pudo parsear el ID de provincia: " + idProvinciaStr);
+	                }
+	            }
 
-			if ("true".equals(recargarLocalidades) && idProvinciaStr != null && !idProvinciaStr.isEmpty()) {
-				try {
-					int idProvincia = Integer.parseInt(idProvinciaStr);
-					System.out.println("[DEBUG] Filtrando localidades por provincia ID: " + idProvincia);
+	            request.setAttribute("listaProvincias", listaProvincias);
+	            request.setAttribute("listaLocalidades", listaLocalidades);
 
-					listaLocalidadesFiltradas = locNegocio.leerLocalidadesPorProvincia(idProvincia);
-					System.out.println("[DEBUG] Localidades filtradas encontradas: "
-							+ (listaLocalidadesFiltradas != null ? listaLocalidadesFiltradas.size() : "null"));
-				} catch (NumberFormatException e) {
-					System.out.println("[ERROR] No se pudo parsear el ID de provincia: " + idProvinciaStr);
-				}
-			}
+	            RequestDispatcher rd = request.getRequestDispatcher("/clientesFormulario.jsp");
+	            rd.forward(request, response);
+	            break; 
+	        }
 
-			request.setAttribute("listaProvincias", listaProvincias);
-			request.setAttribute("listaLocalidades", listaLocalidades);
+	        case "editar": {
+	            String dni = request.getParameter("dni");
+	            ClienteNegocio clienteNegocio = new ClienteNegocioImpl();
+	            Cliente clienteAEditar = clienteNegocio.obtenerClientePorDni(dni);
 
-			if (listaLocalidadesFiltradas != null) {
-				System.out.println("[DEBUG] Enviando lista filtrada al JSP");
-				request.setAttribute("listaLocalidadesFiltradas", listaLocalidadesFiltradas);
-			} else {
-				System.out.println("[DEBUG] No se cargó lista filtrada, se usará completa en el JSP");
-			}
+	            ProvinciaNegocio provNegocio = new ProvinciaNegocioImpl();
+	            ArrayList<Provincia> listaProvincias = provNegocio.leerTodasLasProvincias();
+	            LocalidadNegocio locNegocio = new LocalidadNegocioImpl();
+	            ArrayList<Localidad> listaLocalidades = locNegocio.leerTodasLasLocalidades();
 
-			RequestDispatcher rd = request.getRequestDispatcher("/clientesFormulario.jsp");
-			rd.forward(request, response);
-		}
+	            request.setAttribute("clienteAEditar", clienteAEditar);
+	            request.setAttribute("listaProvincias", listaProvincias);
+	            request.setAttribute("listaLocalidades", listaLocalidades);
 
-		else if (action != null && action.equals("editar")) {
-			String dni = request.getParameter("dni");
+	            RequestDispatcher rd = request.getRequestDispatcher("/clientesFormulario.jsp");
+	            rd.forward(request, response);
+	            break;
+	        }
 
-			ClienteNegocio clienteNegocio = new ClienteNegocioImpl();
-			Cliente clienteAEditar = clienteNegocio.obtenerClientePorDni(dni);
+	        case "eliminar": {
+	            String dni = request.getParameter("dni");
+	            ClienteNegocio clienteNegocio = new ClienteNegocioImpl(new ClienteDaoImpl());
+	            if (dni != null) {
+	                clienteNegocio.bajaLogicaCliente(dni);
+	            }
+	            response.sendRedirect(request.getContextPath() + "/ClienteServlet");
+	            break;
+	        }
 
-			ProvinciaNegocio provNegocio = new ProvinciaNegocioImpl();
-			ArrayList<Provincia> listaProvincias = provNegocio.leerTodasLasProvincias();
-			LocalidadNegocio locNegocio = new LocalidadNegocioImpl();
-			ArrayList<Localidad> listaLocalidades = locNegocio.leerTodasLasLocalidades();
+	        case "reactivar": {
+	            System.out.println("[DEBUG] Acción reactivar recibida para DNI: " + request.getParameter("dni"));
+	            String dni = request.getParameter("dni");
+	            if (dni != null) {
+	                ClienteNegocio clienteNegocio = new ClienteNegocioImpl();
+	                boolean reactivado = clienteNegocio.altaLogicaCliente(dni);
+	                System.out.println("[DEBUG] Resultado reactivación: " + reactivado);
+	                if (reactivado) {
+	                    request.getSession().setAttribute("mensaje", "Cliente reactivado con éxito.");
+	                } else {
+	                    request.getSession().setAttribute("mensaje", "Error: No se pudo reactivar el cliente.");
+	                }
+	            } else {
+	                System.out.println("[ERROR] DNI es null en reactivación");
+	                request.getSession().setAttribute("mensaje", "Error: DNI no válido para reactivación.");
+	            }
+	            response.sendRedirect(request.getContextPath() + "/ClienteServlet");
+	            break;
+	        }
 
-			request.setAttribute("clienteAEditar", clienteAEditar);
-			request.setAttribute("listaProvincias", listaProvincias);
-			request.setAttribute("listaLocalidades", listaLocalidades);
+	        case "verDirectorio": {
+	            ClienteNegocio clienteNegocio = new ClienteNegocioImpl();
+	            ArrayList<Cliente> listaClientes = clienteNegocio.leerTodosLosClientes();
+	            request.setAttribute("listaClientes", listaClientes);
+	            RequestDispatcher rd = request.getRequestDispatcher("/AdministradorDirectorioClientes.jsp");
+	            rd.forward(request, response);
+	            break;
+	        }
 
-			RequestDispatcher rd = request.getRequestDispatcher("/clientesFormulario.jsp");
-			rd.forward(request, response);
-		}
+	        case "limpiarTemporal": {
+	            HttpSession session = request.getSession();
+	            session.removeAttribute("clienteTemporal");
+	            session.removeAttribute("datosValidados");
+	            response.sendRedirect(request.getContextPath() + "/ClienteServlet?Action=mostrarFormulario");
+	            break;
+	        }
 
-		else if (action != null && action.equals("eliminar")) {
-			String dni = request.getParameter("dni");
-			ClienteNegocio clienteNegocio = new ClienteNegocioImpl(new ClienteDaoImpl());
-			if (dni != null) {
-				clienteNegocio.bajaLogicaCliente(dni);
-			}
-			response.sendRedirect(request.getContextPath() + "/ClienteServlet");
-		}
+	        default: { // Este caso se ejecuta para "listar" o cualquier otra acción no definida.
+	            String filtro = request.getParameter("filtro");
+	            ClienteNegocio clienteNegocio = new ClienteNegocioImpl();
+	            ArrayList<Cliente> listaClientes;
+	            
+	            if ("inactivos".equals(filtro)) {
+	                listaClientes = clienteNegocio.leerTodosLosClientesInactivos();
+	            } else if ("activos".equals(filtro)) {
+	                listaClientes = clienteNegocio.leerTodosLosClientesActivos();
+	            } else {
+	                listaClientes = clienteNegocio.leerTodosLosClientes();
+	            }
 
-		else if (action != null && action.equals("reactivar")) {
-			System.out.println("[DEBUG] Acción reactivar recibida para DNI: " + request.getParameter("dni"));
-
-			String dni = request.getParameter("dni");
-			if (dni != null) {
-				ClienteNegocio clienteNegocio = new ClienteNegocioImpl();
-				boolean reactivado = clienteNegocio.altaLogicaCliente(dni);
-
-				System.out.println("[DEBUG] Resultado reactivación: " + reactivado);
-
-				if (reactivado) {
-					request.getSession().setAttribute("mensaje", "Cliente reactivado con éxito.");
-				} else {
-					request.getSession().setAttribute("mensaje", "Error: No se pudo reactivar el cliente.");
-				}
-			} else {
-				System.out.println("[ERROR] DNI es null en reactivación");
-				request.getSession().setAttribute("mensaje", "Error: DNI no válido para reactivación.");
-			}
-
-			response.sendRedirect(request.getContextPath() + "/ClienteServlet");
-		}
-
-		else if (action != null && action.equals("verDirectorio")) {
-			ClienteNegocio clienteNegocio = new ClienteNegocioImpl();
-			ArrayList<Cliente> listaClientes = clienteNegocio.leerTodosLosClientes();
-			request.setAttribute("listaClientes", listaClientes);
-
-			RequestDispatcher rd = request.getRequestDispatcher("/AdministradorDirectorioClientes.jsp");
-			rd.forward(request, response);
-
-		}
-
-		else if (action != null && action.equals("limpiarTemporal")) {
-			HttpSession session = request.getSession();
-			session.removeAttribute("clienteTemporal");
-			session.removeAttribute("datosValidados");
-
-			response.sendRedirect(request.getContextPath() + "/ClienteServlet?Action=mostrarFormulario");
-			return;
-		}
-
-		else {
-			ArrayList<Cliente> listaClientes;
-			ClienteNegocio clienteNegocio = new ClienteNegocioImpl();
-
-			if (filtro != null && filtro.equals("inactivos")) {
-				listaClientes = clienteNegocio.leerTodosLosClientesInactivos();
-			} else if (filtro != null && filtro.equals("activos")) {
-				listaClientes = clienteNegocio.leerTodosLosClientesActivos();
-			} else {
-				listaClientes = clienteNegocio.leerTodosLosClientes();
-			}
-
-			request.setAttribute("listaClientes", listaClientes);
-			RequestDispatcher rd = request.getRequestDispatcher("/AdministradorListaClientes.jsp");
-			rd.forward(request, response);
-		}
+	            request.setAttribute("listaClientes", listaClientes);
+	            RequestDispatcher rd = request.getRequestDispatcher("/AdministradorListaClientes.jsp");
+	            rd.forward(request, response);
+	            break;
+	        }
+	    }
 	}
-
+	
+	
+	
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {

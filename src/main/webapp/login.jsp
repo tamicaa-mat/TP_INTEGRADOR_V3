@@ -1,5 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+	<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
+	
 <!DOCTYPE html>
 <html>
 <head>
@@ -42,12 +45,16 @@ body {
 	</header>
 
 	<main
+	
+	
 		class="container-fluid login-container d-flex justify-content-center align-items-center"
 		style="min-height: 80vh;">
 		<div class="col-md-4">
 			<div class="card shadow">
 				<div class="card-body">
 					<h4 class="card-title text-center mb-4">Ingresar al sistema</h4>
+					
+					
 					<form action="LoginServlet" method="post">
 						<div class="mb-3">
 							<input type="text" class="form-control" id="usuario"
@@ -60,18 +67,29 @@ body {
 						<button type="submit"
 							class="btn btn-secondary btn-sm w-50 d-block mx-auto">Ingresar</button>
 					</form>
-					<%
-					if (request.getAttribute("errorLogin") != null) {
-					%>
-					<div class="alert alert-danger text-center mt-3">
-						<%=request.getAttribute("errorLogin")%>
-					</div>
-					<%
-					}
-					%>
+					
+					
+					<c:if test="${not empty errorLogin}">
+						<div class="alert alert-danger text-center mt-3">
+							
+							${errorLogin}
+							
+						
+						</div>
+						
+						
+						
+					
+					</c:if>
+					
+					
+					
+					
 				</div>
 			</div>
 		</div>
+		
+		
 	</main>
 
 	<script
