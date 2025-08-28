@@ -69,15 +69,15 @@ public class CuentaDaoImpl implements CuentaDao {
     
     @Override
     public boolean cambiarEstadoCuentasPorCliente(int idCliente, boolean nuevoEstado) {
-        // Este método no necesita manejar transacciones complejas, puede ser simple.
+        
         try (Connection conn = Conexion.getConexion().getSQLConexion();
              PreparedStatement stmt = conn.prepareStatement(CAMBIAR_ESTADO_CUENTAS_POR_CLIENTE)) {
             
             stmt.setBoolean(1, nuevoEstado);
             stmt.setInt(2, idCliente);
             
-            stmt.executeUpdate(); // Ejecutamos la actualización
-            return true; // Asumimos éxito si no hay excepción
+            stmt.executeUpdate(); 
+            return true; 
             
         } catch (SQLException e) {
             e.printStackTrace();

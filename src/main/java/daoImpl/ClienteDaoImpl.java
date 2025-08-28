@@ -28,9 +28,7 @@ public class ClienteDaoImpl implements ClienteDao {
 	private static final String OBTENER_POR_DNI_SIN_FILTRO = LEER_TODOS + " where c.DNI = ?";
 
 	
-	
-	
-	
+
 	
 	@Override
 	public List<Cliente> getTopClientesPorSaldo(int limite) {
@@ -71,14 +69,7 @@ public class ClienteDaoImpl implements ClienteDao {
 	    return listaClientes;
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
+
 	
 	@Override
 	public Cliente obtenerClientePorDniSinFiltro(String dni) {
@@ -542,4 +533,54 @@ public class ClienteDaoImpl implements ClienteDao {
 
 		return existe;
 	}
+
+
+	@Override
+	public boolean cambiarEstadoCliente(int idCliente, boolean estado) {
+	    
+	    String sql = "UPDATE Cliente SET Estado = ? WHERE IdCliente = ?";
+	    
+	    Connection conn = null;
+	    PreparedStatement stmt = null;
+	    boolean exito = false;
+
+	    try {
+	        conn = Conexion.getConexion().getSQLConexion();
+	        conn.setAutoCommit(false); 
+
+	        stmt = conn.prepareStatement(sql);
+	        stmt.setBoolean(1, estado); 
+	        stmt.setInt(2, idCliente);  
+
+	        
+	        if (stmt.executeUpdate() > 0) {
+	            conn.commit();
+	            exito = true;
+	        } else {
+	            conn.rollback(); 
+	        }
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        try {
+	            if (conn != null) {
+	                conn.rollback(); 
+	            }
+	        } catch (SQLException e2) {
+	            e2.printStackTrace();
+	        }
+	    } finally {
+	        try {
+	            if (stmt != null) stmt.close();
+	            if (conn != null) conn.close();
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	    }
+	    
+	    return exito;
+	}
+	
+	
+	
 }

@@ -100,19 +100,19 @@ public class UsuarioNegocioImpl implements UsuarioNegocio {
             
             if (clienteAsociado != null) {
                
-                // Verifica si cliente tiene prestamos activos.
+                
                 if (prestamoNegocio.clienteTienePrestamosActivos(clienteAsociado.getIdCliente())) {
-                    // Si tiene, lanzamos una excepción para detener el proceso.
+                   
                     throw new OperacionInvalidaException("No se puede desactivar: el cliente tiene préstamos vigentes.");
                 }
                 
-                // Si no tiene préstamos, procedemos con la baja en cascada como antes.
+                
                 clienteNegocio.bajaLogicaCliente(clienteAsociado.getDni());
             }
         }
         
-        // Finalmente, cambiamos el estado del usuario.
-        return usuarioDao.cambiarEstado(idUsuario, nuevoEstado);
+       
+        return usuarioDao.cambiarEstadoUsuario(idUsuario, nuevoEstado);
 	}
 
 	

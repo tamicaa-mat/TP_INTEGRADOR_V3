@@ -36,4 +36,7 @@ public interface ClienteDao {
 	public boolean existeDni(String dni);
 
 	public boolean existeEmail(String email);
+	
+	public boolean cambiarEstadoCliente(int idCliente, boolean estado);
+
 }

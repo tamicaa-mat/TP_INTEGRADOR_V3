@@ -20,7 +20,7 @@ public interface UsuarioDao {
 
 	Usuario obtenerUsuarioPorUsername(String username);
 
-	boolean cambiarEstado(int idUsuario, boolean nuevoEstado);
+	boolean cambiarEstadoUsuario(int idUsuario, boolean nuevoEstado);
 
 	boolean resetearPassword(int idUsuario, String nuevaPassword);
 

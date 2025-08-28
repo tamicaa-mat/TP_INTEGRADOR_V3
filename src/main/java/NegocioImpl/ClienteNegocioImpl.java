@@ -21,6 +21,9 @@ public class ClienteNegocioImpl implements ClienteNegocio {
 
 	private ClienteDao cdao = new ClienteDaoImpl();
 	private CuentaDao cuentaDao = new CuentaDaoImpl();
+	private UsuarioDao usuarioDao = new UsuarioDaoImpl();
+
+	
 	
 	@Override
 	public List<Cliente> obtenerTopClientesPorSaldo(int limite) {
@@ -57,27 +60,41 @@ public class ClienteNegocioImpl implements ClienteNegocio {
 
 	@Override
 	public boolean bajaLogicaCliente(String dni) {
-		 // Obtenemos el cliente para saber su ID
-        Cliente cliente = cdao.obtenerClientePorDni(dni);
-        if (cliente == null) {
-            return false;
-        }
+	    System.out.println("NEGOCIO: Iniciando baja lógica para DNI: " + dni);
+	    
+	    Cliente cliente = cdao.obtenerClientePorDni(dni);
+	    
+	    if(cliente == null || cliente.getUsuario() == null){
+	    	System.err.println("no se encontro el cliente o usuario ");
+	    	return false;
+	    	
+	    	
+	    	
+	    	
+	    }
+	    
+	    
+	    int idUsuario= cliente.getUsuario().getIdUsuario();
+	    int idCliente = cliente.getIdCliente();
+	    
+	    
+	    System.out.println("NEGOCIO: Desactivando usuario ID : " + idUsuario);
+	    
+	    boolean exitoUsuario = usuarioDao.cambiarEstadoUsuario(idUsuario, false);
+	    
+	    System.out.println("NEGOCIO: Desactivando cliente ID: " + idCliente);
+	    boolean exitoCliente = cdao.cambiarEstadoCliente(idCliente, false); 
 
+	 
+	    return exitoUsuario && exitoCliente;
+	    
         
-		// REGLA 1: Desactivamos en cascada
-        // Primero, damos de baja todas las cuentas del cliente.
-        cuentaDao.cambiarEstadoCuentasPorCliente(cliente.getIdCliente(), false);
-
-        
-        // Luego, damos de baja al cliente.
-        return cdao.bajaLogicaCliente(dni);
 	}
 
 	@Override
 	public boolean altaLogicaCliente(String dni) {
-		// REGLA 2: Reactivación selectiva
-        // Solamente damos de alta al cliente. Sus cuentas permanecen inactivas.
-        return cdao.altaLogicaCliente(dni); // Asumo que este método ya existe y funciona
+		
+        return cdao.altaLogicaCliente(dni); 
 	}
 
 	@Override

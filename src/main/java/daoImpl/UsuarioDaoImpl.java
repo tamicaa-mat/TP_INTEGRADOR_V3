@@ -25,35 +25,54 @@ public class UsuarioDaoImpl implements UsuarioDao {
 	private static final String CAMBIAR_ESTADO = "UPDATE Usuario SET Estado = ? WHERE IdUsuario = ?";
 	private static final String RESETEAR_PASS = "UPDATE Usuario SET Password = ? WHERE IdUsuario = ?";
 
-	public boolean cambiarEstado(int idUsuario, boolean nuevoEstado) {
-		boolean exito = false;
+	public boolean cambiarEstadoUsuario(int idUsuario, boolean nuevoEstado) {
+	    Connection conn = null;
+	    PreparedStatement stmt = null;
+	    boolean exito = false;
 
-		try (Connection conn = Conexion.getConexion().getSQLConexion();
-				PreparedStatement stmt = conn.prepareStatement(CAMBIAR_ESTADO)) {
+	    try {
+	        
+	        conn = Conexion.getConexion().getSQLConexion();
+	        conn.setAutoCommit(false);
 
-			conn.setAutoCommit(false);
+	        stmt = conn.prepareStatement(CAMBIAR_ESTADO);
+	        stmt.setBoolean(1, nuevoEstado);
+	        stmt.setInt(2, idUsuario);
 
-			stmt.setBoolean(1, nuevoEstado);
-			stmt.setInt(2, idUsuario);
+	        int filasAfectadas = stmt.executeUpdate();
 
-			int filasAfectadas = stmt.executeUpdate();
+	        if (filasAfectadas > 0) {
+	            conn.commit(); 
+	            exito = true;
+	            System.out.println("Estado del usuario cambiado con éxito. COMMIT realizado.");
+	        } else {
+	            conn.rollback(); 
+	            System.out.println("No se actualizó ninguna fila. ROLLBACK realizado.");
+	        }
 
-			if (filasAfectadas > 0) {
-				conn.commit();
-				exito = true;
-				System.out.println("Estado del usuario cambiado con éxito. COMMIT realizado.");
-			} else {
+	    } catch (SQLException e) {
+	      
+	        try {
+	            if (conn != null) {
+	                System.err.println("Ocurrió un error. ROLLBACK realizado.");
+	                conn.rollback();
+	            }
+	        } catch (SQLException e2) {
+	            e2.printStackTrace();
+	        }
+	        e.printStackTrace();
+	        
+	    } finally {
+	        
+	        try {
+	            if (stmt != null) stmt.close();
+	            if (conn != null) conn.close();
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	    }
 
-				conn.rollback();
-				System.out.println("No se actualizó ninguna fila. ROLLBACK realizado.");
-			}
-
-		} catch (SQLException e) {
-
-			e.printStackTrace();
-		}
-
-		return exito;
+	    return exito;
 	}
 
 	public boolean resetearPassword(int idUsuario, String nuevaPassword) {

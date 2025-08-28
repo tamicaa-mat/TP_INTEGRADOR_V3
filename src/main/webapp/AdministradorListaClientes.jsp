@@ -29,7 +29,7 @@
 				"targets" : [ 6 ],
 				"orderable" : false,
 				"searchable" : false
-					} // columna Acciones sin orden ni búsqueda
+					} 
 				  ]
 				}
 			);
