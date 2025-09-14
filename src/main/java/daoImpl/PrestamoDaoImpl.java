@@ -42,6 +42,34 @@ public class PrestamoDaoImpl implements PrestamoDao {
 	        "SELECT COUNT(*) AS total FROM Prestamo WHERE IdCliente = ? AND Estado = 1 AND CantidadCuotas > 0";
 	
 	
+	
+	
+	@Override
+	public boolean tienePrestamosActivosEnCuenta(int idCuenta) {
+	    String sql = "SELECT COUNT(*) FROM Prestamo WHERE IdCuentaAsociada = ? AND Estado = 1";
+	    int count = 0;
+	    
+	    try (Connection conn = Conexion.getConexion().getSQLConexion();
+	         PreparedStatement stmt = conn.prepareStatement(sql)) {
+	        
+	        stmt.setInt(1, idCuenta);
+	        
+	        try (ResultSet rs = stmt.executeQuery()) {
+	            if (rs.next()) {
+	                count = rs.getInt(1);
+	            }
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    
+	    // Si el conteo es mayor a 0, significa que hay préstamos activos.
+	    return count > 0;
+	}
+	
+	
+	
+	
 	@Override
     public boolean tienePrestamosActivos(int idCliente) {
         int total = 0;
@@ -628,8 +656,6 @@ public class PrestamoDaoImpl implements PrestamoDao {
 		}
 	}
 
-	
-	
 	@Override
     public List<Cuota> obtenerCuotasVencidas() {
         List<Cuota> cuotasVencidas = new ArrayList<>();

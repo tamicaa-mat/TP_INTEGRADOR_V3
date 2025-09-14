@@ -35,6 +35,7 @@ import dominio.Cuenta;
 import dominio.Movimiento;
 import dominio.TipoCuenta;
 import dominio.TipoMovimiento;
+import excepciones.OperacionInvalidaException;
 
 @WebServlet("/CuentaServlet")
 public class CuentaServlet extends HttpServlet {
@@ -107,21 +108,30 @@ public class CuentaServlet extends HttpServlet {
 	        }
 
 	        case "eliminar": {
-	            // --- LÓGICA DE BAJA LÓGICA ---
-	            int idCuenta = Integer.parseInt(request.getParameter("idCuenta"));
-	            String dniCliente = request.getParameter("dni"); // Necesitamos el DNI para saber a dónde volver
+	        	String dniCliente = request.getParameter("dni"); // Necesitamos el DNI para saber a dónde volver
+	            try {
+	                int idCuenta = Integer.parseInt(request.getParameter("idCuenta"));
+	                
+	              
+	                boolean exito = cuentaNegocio.darDeBajaLogicaCuentas(idCuenta);
 
-	            boolean exito = cuentaNegocio.darDeBajaLogicaCuentas(idCuenta);
+	                if (exito) {
+	                    request.getSession().setAttribute("mensaje", "Cuenta desactivada correctamente.");
+	                } else {
+	                    // UPDATE en la BD por si  falla por otra razón.
+	                    request.getSession().setAttribute("mensaje", "Error: No se pudo desactivar la cuenta.");
+	                }
 
-	            if (exito) {
-	                request.getSession().setAttribute("mensaje", "Cuenta desactivada correctamente.");
-	            } else {
-	                request.getSession().setAttribute("mensaje", "Error: No se pudo desactivar la cuenta.");
+	            } catch (OperacionInvalidaException e) { 
+	                request.getSession().setAttribute("mensaje", e.getMessage()); 
+	            } catch (NumberFormatException e) {
+	                request.getSession().setAttribute("mensaje", "Error: ID de cuenta inválido.");
 	            }
-
-	            // Redirigimos de vuelta a la lista de cuentas de ese cliente
+	            
+	            // Al final, siempre redirigimos de vuelta a la lista de cuentas de ese cliente.
 	            response.sendRedirect("CuentaServlet?action=listar&dni=" + dniCliente);
 	            break;
+	        	
 	        }
 	        
 	        default: {

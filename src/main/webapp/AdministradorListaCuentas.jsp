@@ -66,6 +66,16 @@
 						<c:out value="${errorLimiteCuentas}" />
 					</div>
 				</c:if>
+				
+				<c:if test="${not empty sessionScope.mensaje}">
+	   				<div class="alert alert-info text-center" role="alert">
+	       				 <strong><c:out value="${sessionScope.mensaje}" /></strong>
+	    			</div>
+	   				 <c:remove var="mensaje" scope="session" />
+				</c:if>
+				
+				
+				
 			</div>
 		</div>
 
@@ -97,14 +107,19 @@
 											value="${cuenta.saldo}" type="currency" currencySymbol=""
 											minFractionDigits="2" />
 									</td>
-									<td><c:if test="${cuenta.estado}">
+									<td>
+										<c:if test="${cuenta.estado}">
 											<a
 												href="CuentaServlet?action=eliminar&idCuenta=${cuenta.idCuenta}&dni=${cliente.dni}"
 												onclick="return confirm('¿Está seguro de que desea eliminar esta cuenta?')">
-												Eliminar </a>
+												Eliminar 
+											</a>
+											
 										</c:if> <c:if test="${!cuenta.estado}">
 											<span class="text-muted">Cuenta Inactiva</span>
-										</c:if></td>
+										</c:if>
+										
+									</td>
 								</tr>
 							</c:forEach>
 						</c:when>

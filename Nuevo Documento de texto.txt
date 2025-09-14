@@ -1,0 +1,13 @@
+como cliente , teniendo saldo no puedo pagar cuotas de prestamos.
+
+al dar de baja un usuario , se tiene dar de baja las cuentas. 
+
+
+lo que está pasando : elimino las 3 cuentas permitidas, cambian de estado, asigno otras 3 cuentas, crea otras 3 cuentas nuevas, no permite crear mas de 3 cuentas.
+
+desactivo el Usuario , quedan las ultimas 3 cuentas activas, vuelvo a activar el usuario y muestra las ultimas 3 cuentas activas.
+
+lo que está pasando: 
+cuando desactivo un usuario desde gesiton de usuario. si es que ese Usuario tienen prestamos vigentes, no elimina el usuario.
+esto mismo tiene que suceder si intento eliminar una cuenta desde  GESTION DE CUENTAS PARA EL CLIENTE QUE  TENGA PRESTAMOS VIGENTES, que no se elimine la cuenta
+ si tiene prestamos vigentes.

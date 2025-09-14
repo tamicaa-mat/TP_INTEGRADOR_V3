@@ -89,7 +89,7 @@
 								</c:choose></td>
 							<td><c:choose>
 									<c:when test="${cliente.estado}">
-										<a href="ClienteServlet?Action=editar&dni=${cliente.dni}">Editar</a>
+										<a href="ClienteServlet?Action=editar&dni=${cliente.dni}">Editar </a>
 										<a href="ClienteServlet?Action=eliminar&dni=${cliente.dni}"
 											onclick="return confirm('¿Está seguro?');">Eliminar</a>
 										<a href="CuentaServlet?action=listar&dni=${cliente.dni}">Cuentas</a>

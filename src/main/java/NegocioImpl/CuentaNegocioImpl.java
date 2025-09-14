@@ -10,6 +10,9 @@ import daoImpl.CuentaDaoImpl;
 import dominio.Cliente;
 import dominio.Cuenta;
 import Negocio.CuentaNegocio;
+import dao.PrestamoDao;
+import daoImpl.PrestamoDaoImpl;
+import excepciones.OperacionInvalidaException;
 
 public class CuentaNegocioImpl implements CuentaNegocio {
 
@@ -126,8 +129,20 @@ public class CuentaNegocioImpl implements CuentaNegocio {
 
 		return cbuStr + aleatorioStr;
 	}
-
-	public boolean darDeBajaLogicaCuentas(int idCuenta) {
+	
+	
+	//aca tiene que ir esa regla , no bajar cuenta si tiene prestamos por pagar
+	public boolean darDeBajaLogicaCuentas(int idCuenta) throws OperacionInvalidaException {
+		
+		PrestamoDao prestamoDao = new PrestamoDaoImpl();
+		
+		
+		if(prestamoDao.tienePrestamosActivosEnCuenta(idCuenta)) {
+			throw new OperacionInvalidaException("No se puede eliminar la cuenta porque tiene préstamos activos asociados.");
+		}
+		
+		
+		
 		return cuentaDao.delete(idCuenta);
 
 	}

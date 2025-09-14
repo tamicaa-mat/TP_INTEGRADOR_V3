@@ -34,5 +34,8 @@ public interface PrestamoDao {
     List<Cuota> obtenerCuotasVencidas();
     
 	boolean tienePrestamosActivos(int idCliente);
+	
+    boolean tienePrestamosActivosEnCuenta(int idCuenta);
+
 
 }

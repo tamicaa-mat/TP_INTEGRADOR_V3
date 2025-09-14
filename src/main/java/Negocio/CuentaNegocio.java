@@ -6,6 +6,7 @@ import java.util.List;
 
 import dominio.Cliente;
 import dominio.Cuenta;
+import excepciones.OperacionInvalidaException;
 
 public interface CuentaNegocio {
 
@@ -29,7 +30,7 @@ public interface CuentaNegocio {
 
 	public String generarNumeroCbu(String numeroCuenta);
 
-	public boolean darDeBajaLogicaCuentas(int idCuenta);
+	public boolean darDeBajaLogicaCuentas(int idCuenta) throws OperacionInvalidaException;
 
 	public int obtenerIdCuentaPorNumero(String numeroCuenta);
 

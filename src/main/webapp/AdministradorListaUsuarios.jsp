@@ -70,7 +70,8 @@
 											<a
 												href="UsuarioServlet?action=cambiarEstado&id=${usuario.getIdUsuario()}&estado=true"
 												class="btn btn-danger btn-sm"
-												onclick="return confirm('¿Está seguro que desea desactivar este usuario?');">Desactivar</a>
+												onclick="return confirm('¿Está seguro que desea desactivar este usuario?');">Desactivar
+											</a>
 										</c:when>
 										<c:otherwise>
 											<a

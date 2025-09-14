@@ -67,18 +67,26 @@ public class UsuarioServlet extends HttpServlet {
                  int idUsuario = Integer.parseInt(request.getParameter("id"));
                  boolean estadoActual = Boolean.parseBoolean(request.getParameter("estado"));
 
-                 // Intentamos cambiar el estado. Si hay préstamos, esto lanzará una excepción.
+              // Calculamos cuál será el nuevo estado para saber qué mensaje mostrar
+                 boolean nuevoEstado = !estadoActual; 
+               
                  usuarioNegocio.cambiarEstadoUsuario(idUsuario, !estadoActual);
                  
-                 // Si no hubo excepción, guardamos un mensaje de éxito.
+                
                  HttpSession session = request.getSession();
-                 session.setAttribute("mensajeUsuario", "¡Nombre de Usuario Inactivo!");
+                 String mensajeExito;
+                 if (nuevoEstado) { 
+                     mensajeExito = "El usuario ha sido ACTIVADO correctamente.";
+                 } else { 
+                     mensajeExito = "El usuario ha sido DESACTIVADO correctamente.";
+                 }
+                 session.setAttribute("mensajeUsuario", mensajeExito);
 
-             } catch (OperacionInvalidaException e) { // <-- Atajamos la excepción específica
+             } catch (OperacionInvalidaException e) { 
                  HttpSession session = request.getSession();
-                 // Guardamos el mensaje de error de la excepción para mostrarlo en el JSP.
+               
                  session.setAttribute("errorUsuario", e.getMessage());
-             } catch (Exception e) { // Dejamos un catch genérico por si ocurre otro error
+             } catch (Exception e) { 
                  HttpSession session = request.getSession();
                  session.setAttribute("errorUsuario", "Ocurrió un error inesperado.");
                  e.printStackTrace();
