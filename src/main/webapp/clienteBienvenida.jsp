@@ -6,7 +6,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Bienvenido - Sistema Bancario UTN</title>
-<%-- Los estilos de Bootstrap ya están en la masterPage, pero es buena práctica tenerlos por si acaso --%>
+
 <link
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
 	rel="stylesheet">

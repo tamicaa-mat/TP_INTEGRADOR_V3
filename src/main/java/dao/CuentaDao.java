@@ -10,6 +10,9 @@ import dominio.Cliente;
 import dominio.Cuenta;
 
 public interface CuentaDao {
+	
+    double obtenerSaldoTotalActivo(); 
+
 
 	public List<Cuenta> obtenerCuentasPorCliente(int idCliente);
 

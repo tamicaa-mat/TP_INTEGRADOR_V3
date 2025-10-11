@@ -11,5 +11,10 @@ public interface MovimientoNegocio {
 	boolean crearMovimiento(Movimiento movimiento);
 
 	public List<Movimiento> obtenerMovimientosPorCliente(int idCliente);
+	
+	
+	 
+    public double obtenerFlujoNetoDeCapital(java.util.Date desde, java.util.Date hasta);
+    public double obtenerSaldoTotalBanco(); 
 
 }

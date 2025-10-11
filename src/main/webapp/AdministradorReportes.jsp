@@ -38,6 +38,10 @@
         
         <div class="tab-pane fade p-4 ${empty activeTab || activeTab == 'cuentas' ? 'show active' : ''}" id="cuentas-tab-pane" role="tabpanel">
             <h5 class="mb-3">Cuentas creadas y Saldo Total</h5>
+            
+            
+            
+            
             <form method="get" action="CuentaServlet" class="row g-3 align-items-end">
                 <input type="hidden" name="action" value="reporteCuentas" />
                 <div class="col-md-4">
@@ -54,6 +58,52 @@
                     <button type="submit" class="btn btn-primary btn-sm w-50">Buscar</button>
                 </div>
             </form>
+            
+            <c:if test="${not empty totalCuentasNuevas}">
+        <div class="mt-4 p-4 border rounded bg-white">
+            <h6 class="border-bottom pb-2 mb-3 text-primary">
+                Resultados del Período: 
+                <span class="fw-normal text-secondary">${fechaDesde} - ${fechaHasta}</span>
+            </h6>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <div class="card text-center bg-light">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">Cuentas Nuevas</h5>
+                            <p class="card-text display-6 text-success">
+                                <c:out value="${totalCuentasNuevas}" />
+                            </p>
+                            <p class="text-muted small">Creadas en el período</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <div class="card text-center bg-light">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">Flujo Neto de Capital</h5>
+                            <p class="card-text display-6 <c:if test="${flujoNeto >= 0}">text-success</c:if><c:if test="${flujoNeto < 0}">text-danger</c:if>">
+                                $<c:out value="${flujoNeto}" />
+                            </p>
+                            <p class="text-muted small">Ingresos totales - Egresos totales</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <div class="card text-center bg-light">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">Saldo Total Activo</h5>
+                            <p class="card-text display-6 text-primary">
+                                $<c:out value="${saldoTotalActual}" />
+                            </p>
+                            <p class="text-muted small">Capital total del banco (Hoy)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </c:if>
             
             <c:if test="${not empty totalCuentas}">
                 <div class="mt-4">
@@ -76,6 +126,10 @@
                     </table>
                 </div>
             </c:if>
+            
+            
+            
+            
         </div>
 
         <div class="tab-pane fade p-4 ${activeTab == 'prestamos' ? 'show active' : ''}" id="prestamos-tab-pane" role="tabpanel">

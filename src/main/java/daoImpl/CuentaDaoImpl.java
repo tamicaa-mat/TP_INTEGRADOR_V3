@@ -67,6 +67,30 @@ public class CuentaDaoImpl implements CuentaDao {
     private static final String CAMBIAR_ESTADO_CUENTAS_POR_CLIENTE = "UPDATE Cuenta SET Estado = ? WHERE IdCliente = ?";
 
     
+    
+    
+ // Constante para la consulta:
+    private static final String SUMAR_SALDO_TOTAL_ACTIVO = "SELECT COALESCE(SUM(Saldo), 0) FROM Cuenta WHERE Estado = 1";
+
+
+    @Override
+    public double obtenerSaldoTotalActivo() {
+        double total = 0;
+        try (Connection conn = Conexion.getConexion().getSQLConexion();
+             PreparedStatement stmt = conn.prepareStatement(SUMAR_SALDO_TOTAL_ACTIVO);
+             ResultSet rs = stmt.executeQuery()) {
+
+            if (rs.next()) {
+                total = rs.getDouble(1); // O puedes usar el alias si definiste uno
+            }
+        } catch (SQLException e) {
+            System.err.println("Error en obtenerSaldoTotalActivo: " + e.getMessage());
+        }
+        return total;
+    }
+    
+    
+    
     @Override
     public boolean cambiarEstadoCuentasPorCliente(int idCliente, boolean nuevoEstado) {
         

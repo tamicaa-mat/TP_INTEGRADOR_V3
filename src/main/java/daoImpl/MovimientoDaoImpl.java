@@ -1,6 +1,7 @@
 package daoImpl;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,7 +15,38 @@ import dominio.Movimiento;
 import dominio.TipoMovimiento;
 
 public class MovimientoDaoImpl implements MovimientoDao {
+	
+	private static final String SUMAR_INGRESOS_FECHA = 
+		    "SELECT COALESCE(SUM(Importe), 0) FROM Movimiento WHERE DATE(Fecha) BETWEEN ? AND ? AND IdTipoMovimiento IN (1, 2, 4)";
+		    // Asumimos que la Transferencia (tipo 4) es un ingreso si es el movimiento positivo de destino (deberías tener una bandera o tipo para distinguir). 
+		    // Si tu tabla Movimiento no distingue Ingreso/Egreso, deberás revisar la lógica o hacer un JOIN con Cuenta/Transferencia. 
+		    // Si solo registras movimientos EN LA CUENTA, la transferencia de destino es Ingreso.
+	
+	private static final String SUMAR_EGRESOS_FECHA = 
+		    "SELECT COALESCE(SUM(Importe), 0) FROM Movimiento WHERE DATE(Fecha) BETWEEN ? AND ? AND IdTipoMovimiento IN (3, 4)";
+		    // Asumimos 3 (Pago Préstamo) y 4 (Transferencia Origen) como egresos.
+		    // Si tu movimiento solo registra una línea, necesitas un campo adicional 'TipoTransaccion' ('DEBITO'/'CREDITO') en la tabla Movimiento.
 
+	
+	
+	// Para el ejemplo, usaremos la lógica de la consigna:
+	// Ingresos: Alta de cuenta [cite: 43], Alta de préstamo [cite: 44], Transferencia (Depósito)[cite: 46].
+	// Egresos: Pago de préstamo [cite: 45], Transferencia (Extracción)[cite: 46].
+	// Si solo tienes una tabla de Movimientos, lo más seguro es usar un campo adicional en la tabla que indique si es Ingreso o Egreso.
+	// Por simplicidad, asumiremos que tienes 1=AltaCuenta (Ingreso), 2=AltaPrestamo (Ingreso), 3=PagoPrestamo (Egreso), 4=TransferenciaOrigen (Egreso), 5=TransferenciaDestino (Ingreso).
+
+	// Modificamos las consultas para ser más seguras:
+	private static final String SUMAR_INGRESOS_FECHA_FINAL = 
+	    "SELECT COALESCE(SUM(Importe), 0) AS TotalIngreso FROM Movimiento WHERE DATE(FechaHora) BETWEEN ? AND ? AND IdTipoMovimiento IN (1, 2, 5)";
+
+	private static final String SUMAR_EGRESOS_FECHA_FINAL = 
+	    "SELECT COALESCE(SUM(Importe), 0) AS TotalEgreso FROM Movimiento WHERE DATE(FechaHora) BETWEEN ? AND ? AND IdTipoMovimiento IN (3, 4)";
+
+
+	
+	
+	
+	
 	private static final String BUSCAR_MOVIMIENTOS = "SELECT m.IdMovimiento, m.FechaHora, m.Referencia, m.Importe, "
 			+ "tm.IdTipoMovimiento AS tm_id, tm.Descripcion AS tm_desc, " + "m.IdCuenta " + "FROM movimiento m "
 			+ "JOIN tipoMovimiento tm ON m.IdTipoMovimiento = tm.IdTipoMovimiento " + "WHERE 1=1 ";
@@ -25,7 +57,56 @@ public class MovimientoDaoImpl implements MovimientoDao {
 			+ "FROM Movimiento m " + "INNER JOIN TipoMovimiento tm ON m.IdTipoMovimiento = tm.IdTipoMovimiento "
 			+ "INNER JOIN Cuenta c ON m.IdCuenta = c.IdCuenta " + "WHERE c.IdCliente = ? AND c.Estado = 1 "
 			+ "ORDER BY m.FechaHora DESC";
+	
+	
+	@Override
+    public double sumarIngresos(java.util.Date desde, java.util.Date hasta) {
+        double total = 0;
+        // La implementación debe abrir la conexión, usar PreparedStatement con SUMAR_INGRESOS_FECHA
+        // e inyectar las fechas 'desde' y 'hasta' en los parámetros.
+        try (Connection conn = Conexion.getConexion().getSQLConexion();
+             PreparedStatement stmt = conn.prepareStatement(SUMAR_INGRESOS_FECHA_FINAL)) {
+            
+            stmt.setDate(1, new java.sql.Date(desde.getTime()));
+            stmt.setDate(2, new java.sql.Date(hasta.getTime()));
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    total = rs.getDouble("TotalIngreso");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al sumar ingresos: " + e.getMessage());
+        }
+        return total;
+    }
+	
+	
+	@Override
+    public double sumarEgresos(java.util.Date desde, java.util.Date hasta) {
+        double total = 0;
+        // La implementación debe ser similar a sumarIngresos, pero usando SUMAR_EGRESOS_FECHA
+        try (Connection conn = Conexion.getConexion().getSQLConexion();
+             PreparedStatement stmt = conn.prepareStatement(SUMAR_EGRESOS_FECHA_FINAL)) {
+            
+            stmt.setDate(1, new java.sql.Date(desde.getTime()));
+            stmt.setDate(2, new java.sql.Date(hasta.getTime()));
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    total = rs.getDouble("TotalEgreso");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al sumar egresos: " + e.getMessage());
+        }
+        return total;
+    }
 
+	
+	
+	
+	
 	@Override
 	public List<Movimiento> obtenerMovimientosPorCliente(int idCliente) {
 
@@ -231,4 +312,8 @@ public class MovimientoDaoImpl implements MovimientoDao {
 		}
 	}
 
+	
+	
+	
+	
 }

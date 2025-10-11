@@ -60,17 +60,28 @@ public class CuentaServlet extends HttpServlet {
 	        case "reporteCuentas": {
 	            String fechaDesdeStr = request.getParameter("fechaInicio");
 	            String fechaHastaStr = request.getParameter("fechaFin");
+	            MovimientoNegocio movimientoNegocio = new MovimientoNegocioImpl(); 
+	            // ⬅️ SOLUCIÓN: Declarar las variables aquí, fuera del bloque try
+	            java.util.Date fechaDesde = null; 
+	            java.util.Date fechaHasta = null;
 
 	            try {
-	                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-	                Date fechaDesde = sdf.parse(fechaDesdeStr);
-	                Date fechaHasta = sdf.parse(fechaHastaStr);
+	            	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+	                fechaDesde = sdf.parse(fechaDesdeStr); // Asignación dentro del try
+	                fechaHasta = sdf.parse(fechaHastaStr); // Asignación dentro del try
+	                // 1. Crecimiento (Métrica que ya tienes)
+	                int totalCuentasNuevas = cuentaNegocio.contarCuentasCreadasEntreFechas(fechaDesde, fechaHasta);
+	                
+	                // 2. Flujo Neto (NUEVA Métrica Estadística)
+	                double flujoNeto = movimientoNegocio.obtenerFlujoNetoDeCapital(fechaDesde, fechaHasta); 
+	                
+	                // 3. Saldo Total del Banco (Métrica de corte)
+	                double saldoTotalActual = movimientoNegocio.obtenerSaldoTotalBanco(); 
 
-	                int totalCuentas = cuentaNegocio.contarCuentasCreadasEntreFechas(fechaDesde, fechaHasta);
-	                double saldoTotal = cuentaNegocio.obtenerSaldoTotalCuentasCreadasEntreFechas(fechaDesde, fechaHasta);
-
-	                request.setAttribute("totalCuentas", totalCuentas);
-	                request.setAttribute("saldoTotalCuentas", saldoTotal);
+	                request.setAttribute("totalCuentasNuevas", totalCuentasNuevas);
+	                request.setAttribute("flujoNeto", flujoNeto);
+	                request.setAttribute("saldoTotalActual", saldoTotalActual);
+	                
 	                request.setAttribute("fechaDesde", fechaDesdeStr);
 	                request.setAttribute("fechaHasta", fechaHastaStr);
 	                request.setAttribute("activeTab", "cuentas");
