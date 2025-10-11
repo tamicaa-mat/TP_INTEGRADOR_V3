@@ -25,6 +25,7 @@ import daoImpl.ClienteDaoImpl;
 import excepciones.ClienteExistenteException;
 import excepciones.DatosInvalidosException;
 import excepciones.EdadInvalidaException;
+import excepciones.OperacionInvalidaException;
 
 
 @WebServlet("/ClienteServlet")
@@ -112,13 +113,30 @@ public class ClienteServlet extends HttpServlet {
 	        }
 
 	        case "eliminar": {
-	            String dni = request.getParameter("dni");
-	            ClienteNegocio clienteNegocio = new ClienteNegocioImpl(new ClienteDaoImpl());
-	            if (dni != null) {
-	                clienteNegocio.bajaLogicaCliente(dni);
-	            }
-	            response.sendRedirect(request.getContextPath() + "/ClienteServlet");
-	            break;
+	        	 String dni = request.getParameter("dni");
+	        	    ClienteNegocio clienteNegocio = new ClienteNegocioImpl();
+	        	    
+	        	    
+	        	    try {
+	        	        if (dni != null) {
+	        	            clienteNegocio.bajaLogicaCliente(dni); // ⬅️ Puede lanzar OperacionInvalidaException
+	        	            request.getSession().setAttribute("mensaje", "Cliente y usuario desactivados correctamente.");
+	        	        } else {
+	        	            request.getSession().setAttribute("mensaje", "Error: DNI no válido.");
+	        	        }
+	        	    } catch (OperacionInvalidaException e) {
+	        	        // Captura la excepción de la regla de negocio
+	        	    	request.getSession().setAttribute("mensaje", e.getMessage());
+	        	    	// El mensaje contendrá: "No se puede eliminar el cliente porque tiene préstamos activos o pendientes de pago."
+	        	    }
+			         catch (Exception e) {
+			            // Captura cualquier otro error inesperado
+			            request.getSession().setAttribute("mensaje", "Error inesperado al intentar dar de baja: " + e.getMessage());
+			        }
+	        	    
+	        	    // Usar el ContextPath para asegurar la ruta base
+	        	    response.sendRedirect(request.getContextPath() + "/ClienteServlet");
+	        	    break;
 	        }
 
 	        case "reactivar": {

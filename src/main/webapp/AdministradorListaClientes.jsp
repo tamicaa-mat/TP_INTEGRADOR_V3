@@ -43,7 +43,30 @@
 	<jsp:include page="masterPage.jsp" />
 
 	<main class="container py-5">
-
+	
+		
+        <c:if test="${not empty sessionScope.mensaje}">
+            <div class="alert 
+                <c:choose>
+                    <c:when test="${sessionScope.mensaje.contains('Error') || sessionScope.mensaje.contains('No se puede')}">
+                        alert-danger 
+                    </c:when>
+                    <c:otherwise>
+                        alert-success
+                    </c:otherwise>
+                </c:choose>
+                alert-dismissible fade show" role="alert">
+                <c:out value="${sessionScope.mensaje}" />
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+           
+            <c:remove var="mensaje" scope="session" />
+        </c:if>
+	
+	
+	
+	
+	<h4 class="text-center mb-4">Gestión de Clientes del Sistema</h4>
 		<div class="d-flex justify-content-between align-items-center mb-4">
 			<div>
 				<span class="fw-bold me-2">Ver:</span> <a
@@ -51,6 +74,8 @@
 					href="ClienteServlet?filtro=inactivos">Inactivos</a> <a
 					href="ClienteServlet">Todos</a>
 			</div>
+			
+			
 
 			<a href="ClienteServlet?Action=mostrarFormulario"
 				class="btn btn-primary btn-sm">Agregar Nuevo Cliente</a>

@@ -14,14 +14,17 @@ import daoImpl.ClienteDaoImpl;
 import daoImpl.UsuarioDaoImpl;
 import daoImpl.Conexion;
 import dominio.Cliente;
+import excepciones.OperacionInvalidaException;
 import Negocio.ClienteNegocio;
-
+import dao.PrestamoDao;
+import daoImpl.PrestamoDaoImpl;
 
 public class ClienteNegocioImpl implements ClienteNegocio {
 
 	private ClienteDao cdao = new ClienteDaoImpl();
 	private CuentaDao cuentaDao = new CuentaDaoImpl();
 	private UsuarioDao usuarioDao = new UsuarioDaoImpl();
+	private PrestamoDao prestamoDao = new PrestamoDaoImpl();
 
 	
 	
@@ -59,7 +62,7 @@ public class ClienteNegocioImpl implements ClienteNegocio {
 	}
 
 	@Override
-	public boolean bajaLogicaCliente(String dni) {
+	public boolean bajaLogicaCliente(String dni) throws OperacionInvalidaException {
 	    System.out.println("NEGOCIO: Iniciando baja lógica para DNI: " + dni);
 	    
 	    Cliente cliente = cdao.obtenerClientePorDni(dni);
@@ -68,10 +71,15 @@ public class ClienteNegocioImpl implements ClienteNegocio {
 	    	System.err.println("no se encontro el cliente o usuario ");
 	    	return false;
 	    	
-	    	
-	    	
-	    	
 	    }
+	    
+	    
+	    	// se verifica si tiene prestamos activos
+        if (prestamoDao.tienePrestamosActivos(cliente.getIdCliente())) {
+            // lanza una excepción para que el Servlet pueda mostrar el error
+            System.err.println("NEGOCIO: Cliente ID " + cliente.getIdCliente() + " tiene préstamos activos. Operación abortada.");
+            throw new OperacionInvalidaException("No se puede eliminar el cliente porque tiene préstamos activos o pendientes de pago.");
+        }
 	    
 	    
 	    int idUsuario= cliente.getUsuario().getIdUsuario();

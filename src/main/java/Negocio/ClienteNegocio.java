@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dominio.Cliente;
+import excepciones.OperacionInvalidaException;
 
 public interface ClienteNegocio {
 	
@@ -14,7 +15,7 @@ public interface ClienteNegocio {
 	
 	public boolean insertarCliente(Cliente cliente);
 
-	public boolean bajaLogicaCliente(String dni);
+	public boolean bajaLogicaCliente(String dni) throws OperacionInvalidaException;
 
 	public boolean altaLogicaCliente(String dni);
 
