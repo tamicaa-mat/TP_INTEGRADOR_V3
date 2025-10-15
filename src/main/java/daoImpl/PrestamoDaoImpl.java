@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.eclipse.jdt.internal.compiler.ast.ReturnStatement;
+
 import dao.CuentaDao;
 import dao.PrestamoDao;
 import dao.MovimientoDao;
@@ -41,31 +43,43 @@ public class PrestamoDaoImpl implements PrestamoDao {
 	private static final String TIENE_PRESTAMOS_ACTIVOS = 
 	        "SELECT COUNT(*) AS total FROM Prestamo WHERE IdCliente = ? AND Estado = 1 AND CantidadCuotas > 0";
 	
-	
+	// Constante para verificar si hay préstamos APROBADOS con CUOTAS PENDIENTES.
+	private static final String TIENE_PRESTAMOS_ACTIVOS_CUENTA = 
+	    "SELECT 1 FROM Prestamo p " +
+	    "INNER JOIN Cuota c ON p.IdPrestamo = c.IdPrestamo " +
+	    "WHERE p.IdCuentaAsociada = ? " +
+	    "  AND p.Estado = 1 " +        // Asumimos 1 = Aprobado/Vigente
+	    "  AND c.FechaPago IS NULL " + // Busca cuotas que aún no se han pagado
+	    "LIMIT 1";
 	
 	
 	@Override
 	public boolean tienePrestamosActivosEnCuenta(int idCuenta) {
-	    String sql = "SELECT COUNT(*) FROM Prestamo WHERE IdCuentaAsociada = ? AND Estado = 1";
-	    int count = 0;
-	    
-	    try (Connection conn = Conexion.getConexion().getSQLConexion();
-	         PreparedStatement stmt = conn.prepareStatement(sql)) {
-	        
-	        stmt.setInt(1, idCuenta);
-	        
-	        try (ResultSet rs = stmt.executeQuery()) {
-	            if (rs.next()) {
-	                count = rs.getInt(1);
-	            }
-	        }
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	    }
-	    
-	    // Si el conteo es mayor a 0, significa que hay préstamos activos.
-	    return count > 0;
+		
+		 String consultaString = TIENE_PRESTAMOS_ACTIVOS_CUENTA;
+		 
+		 Boolean tieneActivosBoolean = false;
+		 
+		 try(Connection conn = Conexion.getConexion().getSQLConexion();
+				 
+				 PreparedStatement mensajePreparedStatement = conn.prepareStatement(consultaString)){
+				 
+				 
+				 mensajePreparedStatement.setInt(1, idCuenta);
+				 
+				 try(ResultSet rSet = mensajePreparedStatement.executeQuery()){
+			         // Si encuentra al menos una fila (tiene cuota pendiente), rs.next() es true.
+					 tieneActivosBoolean = rSet.next();
+				 }
+	}  catch(SQLException e) {
+		// TODO Auto-generated method stub
+		System.err.println("Error al verificar préstamos activos en cuenta: " + e.getMessage());
+        e.printStackTrace();
 	}
+	return tieneActivosBoolean;
+}
+
+	
 	
 	
 	

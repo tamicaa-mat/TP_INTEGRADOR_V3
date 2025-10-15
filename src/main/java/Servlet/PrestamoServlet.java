@@ -1,10 +1,10 @@
 package Servlet;
 
 import java.io.IOException;
-import java.math.BigDecimal;
+//import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
+//import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -14,19 +14,19 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import Negocio.MovimientoNegocio;
+//import Negocio.MovimientoNegocio;
 import Negocio.PrestamoNegocio;
-import Negocio.CuentaNegocio;
-import NegocioImpl.MovimientoNegocioImpl;
+//import Negocio.CuentaNegocio;
+//import NegocioImpl.MovimientoNegocioImpl;
 import NegocioImpl.PrestamoNegocioImpl;
-import NegocioImpl.CuentaNegocioImpl;
-import daoImpl.MovimientoDaoImpl;
+//import NegocioImpl.CuentaNegocioImpl;
+//import daoImpl.MovimientoDaoImpl;
 import daoImpl.PrestamoDaoImpl;
-import daoImpl.CuentaDaoImpl;
-import dominio.Cuenta;
-import dominio.Movimiento;
+//import daoImpl.CuentaDaoImpl;
+//import dominio.Cuenta;
+//import dominio.Movimiento;
 import dominio.Prestamo;
-import dominio.TipoMovimiento;
+//import dominio.TipoMovimiento;
 
 @WebServlet("/PrestamoServlet")
 public class PrestamoServlet extends HttpServlet {
@@ -37,9 +37,9 @@ public class PrestamoServlet extends HttpServlet {
 
 	}
 
-	private MovimientoNegocio movimientoNegocio = new MovimientoNegocioImpl(new MovimientoDaoImpl());
+	/*private MovimientoNegocio movimientoNegocio = new MovimientoNegocioImpl(new MovimientoDaoImpl());*/
 	private PrestamoNegocio prestamoNegocio = new PrestamoNegocioImpl(new PrestamoDaoImpl());
-	private CuentaNegocio cuentaNegocio = new CuentaNegocioImpl(new CuentaDaoImpl());
+	/*private CuentaNegocio cuentaNegocio = new CuentaNegocioImpl(new CuentaDaoImpl());*/
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
