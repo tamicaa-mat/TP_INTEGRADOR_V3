@@ -57,4 +57,7 @@ public interface CuentaDao {
     boolean cambiarEstadoCuentasPorCliente(int idCliente, boolean nuevoEstado);
 
 
+	BigDecimal obtenerSaldoActual(int idCuenta);
+
+
 }

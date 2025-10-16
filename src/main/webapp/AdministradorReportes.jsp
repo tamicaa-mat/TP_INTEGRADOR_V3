@@ -10,6 +10,10 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="CSS/estilos.css">
 </head>
+
+
+
+
 <body class="bg-light">
 	<jsp:include page="masterPage.jsp" />
 	
@@ -105,36 +109,25 @@
         </div>
     </c:if>
             
-            <c:if test="${not empty totalCuentas}">
-                <div class="mt-4">
-                    <h6>Resultado</h6>
-                    <table class="table table-bordered text-center align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Período</th>
-                                <th>Cantidad de Cuentas</th>
-                                <th>Saldo Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>${fechaDesde} a ${fechaHasta}</td>
-                                <td>${totalCuentas}</td>
-                                <td><fmt:formatNumber value="${saldoTotalCuentas}" type="currency" currencySymbol="$ " /></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </c:if>
+        
             
             
             
             
         </div>
+        
+        
+        
+        
+        
+        
+        
 
         <div class="tab-pane fade p-4 ${activeTab == 'prestamos' ? 'show active' : ''}" id="prestamos-tab-pane" role="tabpanel">
              <h5 class="mb-3">Cantidad de Préstamos y Total Prestado</h5>
-             <form method="get" action="PrestamoServlet" class="row g-3 align-items-end">
+             
+             
+             <form method="get" action="ReporteServlet" class="row g-3 align-items-end">
                 <input type="hidden" name="action" value="reportePrestamos" />
                 <div class="col-md-4">
                     <label for="fechaInicioPrestamo" class="form-label">Desde</label> <input
@@ -151,28 +144,74 @@
                 </div>
             </form>
             
-            <c:if test="${not empty cantidadPrestamos}">
-                <div class="mt-4">
-                    <h6>Resultado</h6>
-                    <table class="table table-bordered text-center align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Período</th>
-                                <th>Cantidad de Préstamos</th>
-                                <th>Total Prestado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>${fechaInicioPrestamo} a ${fechaFinPrestamo}</td>
-                                <td>${cantidadPrestamos}</td>
-                                <td><fmt:formatNumber value="${totalPrestamos}" type="currency" currencySymbol="$ " /></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </c:if>
+            
+            
+           <c:if test="${not empty cantidadPrestamos}">
+			    <div class="mt-4 p-4 border rounded bg-white">
+			        <h6 class="border-bottom pb-2 mb-3 text-secondary">
+			            Análisis de Cartera (Periodo: ${fechaInicioPrestamo} a ${fechaFinPrestamo})
+			        </h6>
+			        <div class="row">
+			
+			            <div class="col-md-3 mb-3">
+			                <div class="card text-center bg-light">
+			                    <div class="card-body">
+			                        <h5 class="card-title fw-bold text-success">Total Desembolsado</h5>
+			                        <p class="card-text display-6">
+			                            <fmt:formatNumber value="${totalPrestamos}" type="currency" currencySymbol="$ " maxFractionDigits="2" />
+			                        </p>
+			                        <p class="text-muted small">Nuevos préstamos aprobados (${cantidadPrestamos})</p>
+			                    </div>
+			                </div>
+			            </div>
+			
+			            <div class="col-md-3 mb-3">
+			                <div class="card text-center bg-info-subtle">
+			                    <div class="card-body">
+			                        <h5 class="card-title fw-bold text-primary">Capital Pendiente</h5>
+			                        <p class="card-text display-6">
+			                            <fmt:formatNumber value="${capitalPendiente}" type="currency" currencySymbol="$ " maxFractionDigits="2" />
+			                        </p>
+			                        <p class="text-muted small">Monto restante por cobrar (Total)</p>
+			                    </div>
+			                </div>
+			            </div>
+			
+			            <div class="col-md-3 mb-3">
+			                <div class="card text-center <c:if test="${prestamosMorosos > 0}">bg-danger-subtle</c:if><c:if test="${prestamosMorosos == 0}">bg-success-subtle</c:if>">
+			                    <div class="card-body">
+			                        <h5 class="card-title fw-bold text-danger">Préstamos Morosos</h5>
+			                        <p class="card-text display-6"><c:out value="${prestamosMorosos}" /></p>
+			                        <p class="text-muted small">Préstamos con cuotas vencidas</p>
+			                    </div>
+			                </div>
+			            </div>
+			
+			            <div class="col-md-3 mb-3">
+			                <div class="card text-center bg-light">
+			                    <div class="card-body">
+			                        <h5 class="card-title fw-bold">Tasa de Morosidad</h5>
+			                        <p class="card-text display-6">
+			                            <c:set var="tasa" value="${(prestamosMorosos / cantidadPrestamos) * 100}" />
+			                            <fmt:formatNumber value="${tasa}" pattern="#0.00" />%
+			                        </p>
+			                        <p class="text-muted small">Morosos / Total Aprobados en periodo</p>
+			                    </div>
+			                </div>
+			            </div>
+			        </div>
+			    </div>
+			</c:if>
+            
+            
+            
+            
         </div>
+
+
+
+
+
 
         <div class="tab-pane fade p-4 ${activeTab == 'morosidad' ? 'show active' : ''}" id="morosidad-tab-pane" role="tabpanel">
             <h5 class="mb-3">Reporte de Morosidad de Préstamos</h5>

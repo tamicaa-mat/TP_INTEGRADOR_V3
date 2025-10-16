@@ -1,5 +1,6 @@
 package Negocio;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -57,4 +58,6 @@ public interface CuentaNegocio {
 	
 
 	public boolean cuentaPerteneceACliente(String numeroCuenta, int idCliente);
+
+	public BigDecimal obtenerSaldoActual(int idCuenta);
 }

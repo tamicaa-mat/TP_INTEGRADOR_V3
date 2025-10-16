@@ -18,6 +18,11 @@ import Negocio.CuentaNegocio;
 import Negocio.MovimientoNegocio;
 import dao.CuotaDao;
 import daoImpl.CuotaDaoImpl;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date; 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 public class PrestamoNegocioImpl implements PrestamoNegocio {
 
@@ -31,12 +36,26 @@ public class PrestamoNegocioImpl implements PrestamoNegocio {
     
     
     @Override
-    public boolean aprobarPrestamo(int idPrestamo) {
-        // 1. OBTENER EL PRÉSTAMO
+    public int contarPrestamosMorosos() {
+    	 // La capa de negocio llama al DAO para ejecutar la consulta SQL compleja.
+        System.out.println("NEGOCIO: Solicitando conteo de préstamos morosos al DAO.");
+        return prestamoDao.contarPrestamosMorosos();
     	
+    }
+    
+
+    public double obtenerCapitalPendienteDeCobro() {
+    	  // La capa de negocio llama al DAO para obtener la suma de los saldos restantes.
+        System.out.println("NEGOCIO: Solicitando cálculo de capital pendiente al DAO.");
+        return prestamoDao.obtenerCapitalPendienteDeCobro();
+    }
+    
+    
+    @Override
+    public boolean aprobarPrestamo(int idPrestamo) {
+    	// 1. OBTENER EL PRÉSTAMO
         System.out.println("NEGOCIO: Ingresando a aprobarPrestamo para ID: " + idPrestamo);
 
-    	
         Prestamo prestamo = this.obtenerPrestamoPorId(idPrestamo);
         if (prestamo == null) {
             System.err.println("ERROR: No se encontró el préstamo con ID " + idPrestamo);
@@ -50,8 +69,9 @@ public class PrestamoNegocioImpl implements PrestamoNegocio {
             return false;
         }
 
-        // 3. ACREDITAR DINERO EN LA CUENTA DEL CLIENTE (Lógica que estaba en el Servlet)
-        // 3.1. Crear el movimiento
+        // 3. ACREDITAR DINERO Y ACTUALIZAR SALDO 
+        
+        // 3.1. Crear el movimiento (Acreditación)
         Movimiento movimiento = new Movimiento();
         movimiento.setFechaHora(LocalDateTime.now());
         movimiento.setReferencia("ALTA PRESTAMO ID: " + idPrestamo);
@@ -61,39 +81,55 @@ public class PrestamoNegocioImpl implements PrestamoNegocio {
         movimiento.setTipoMovimiento(tipo);
         movimiento.setCuenta(prestamo.getCuentaAsociada());
         
-        boolean movimientoCreado = movimientoNegocio.crearMovimiento(movimiento);
+        boolean movimientoCreado = movimientoNegocio.crearMovimiento(movimiento); // ⬅️ Vuelve a llamar a tu MovimientoNegocio
         if (!movimientoCreado) {
-            System.err.println("ERROR: No se pudo crear el movimiento del préstamo.");
-            // Opcional: Podrías hacer un rollback del estado del préstamo aquí.
+            System.err.println("ERROR: No se pudo crear el movimiento del préstamo (ACREDITACIÓN).");
+            // Aquí deberías revertir el estado del préstamo (volver a Pendiente: 0)
             return false;
         }
         
         // 3.2. Actualizar el saldo de la cuenta
         Cuenta cuenta = prestamo.getCuentaAsociada();
-        BigDecimal nuevoSaldo = cuenta.getSaldo().add(movimiento.getImporte());
+     // 🚨 CORRECCIÓN CLAVE: Usar el ID de la cuenta para obtener el saldo actual de la BD 🚨
+        // Usamos cuenta.getIdCuenta() en lugar de cuenta.getSaldo()
+        BigDecimal saldoActual = cuentaNegocio.obtenerSaldoActual(cuenta.getIdCuenta()); 
+        
+        BigDecimal nuevoSaldo = saldoActual.add(movimiento.getImporte());
         boolean saldoActualizado = cuentaNegocio.actualizarSaldo(cuenta.getIdCuenta(), nuevoSaldo.doubleValue());
         if(!saldoActualizado) {
             System.err.println("ERROR: No se pudo actualizar el saldo de la cuenta.");
             return false;
         }
-
         
-        
-        System.out.println("NEGOCIO: Estado del préstamo y saldo actualizados. Preparando para generar cuotas.");
-        System.out.println("NEGOCIO: El préstamo tiene " + prestamo.getCantidadCuotas() + " cuotas para generar.");
+        System.out.println("NEGOCIO: Préstamo acreditado. Preparando para generar cuotas.");
 
-        // 4. *** GENERAR LAS CUOTAS (La nueva lógica) ***
+     // 1. Obtener los milisegundos desde el Epoch
+        long timeInMilliseconds = prestamo.getFechaAlta().getTime(); // Es seguro asignar la subclase a la superclase
+        
+     // 2. Convertir los milisegundos a un objeto Instant, y de ahí a LocalDate
+        LocalDate fechaBase = new Date(timeInMilliseconds)
+                .toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+        
+        // 4. *** GENERAR LAS CUOTAS ***
         for (int i = 1; i <= prestamo.getCantidadCuotas(); i++) {
             Cuota nuevaCuota = new Cuota();
 
-            // ▼▼▼ ESTA ES LA LÍNEA CLAVE ▼▼▼
-            // Le pasamos el objeto 'prestamo' (la variable) que obtuvimos al inicio del método.
-            nuevaCuota.setPrestamo(prestamo); 
+            LocalDate fechaVencimientoLocal = fechaBase.plusMonths(i);
 
+            // CONVERSIÓN a java.util.Date
+            Date fechaVencimientoUtil = Date.from(
+                fechaVencimientoLocal.atStartOfDay(ZoneId.systemDefault()).toInstant()
+            );
+            
+            // ASIGNACIÓN DE DATOS CLAVE
+            nuevaCuota.setPrestamo(prestamo); 
             nuevaCuota.setNumeroCuota(i);
             nuevaCuota.setMonto(BigDecimal.valueOf(prestamo.getImportePorMes()));
-            nuevaCuota.setEstado(false); // false = No pagada
-
+            nuevaCuota.setEstado(false); 
+            nuevaCuota.setFechaVencimiento(fechaVencimientoUtil); 
+            
             boolean cuotaAgregada = cuotaDao.agregar(nuevaCuota);
             if (!cuotaAgregada) {
                 System.err.println("ERROR: Falla al crear la cuota N°" + i + " para el préstamo " + idPrestamo);
@@ -101,8 +137,9 @@ public class PrestamoNegocioImpl implements PrestamoNegocio {
             }
         }
         
-        System.out.println("Préstamo " + idPrestamo + " aprobado y cuotas generadas exitosamente.");
-        return true; // Si todo salió bien
+        System.out.println("Préstamo " + idPrestamo + " aprobado, acreditado y cuotas generadas exitosamente.");
+        return true;
+    	
     }
     
     

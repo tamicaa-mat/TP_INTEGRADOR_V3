@@ -45,37 +45,14 @@ public class PrestamoServlet extends HttpServlet {
 			throws ServletException, IOException {
 		String action = request.getParameter("action");
 
-		if (action != null && action.equals("reportePrestamos")) {
-			String desdeStr = request.getParameter("fechaInicioPrestamo");
-			String hastaStr = request.getParameter("fechaFinPrestamo");
-
-			try {
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-				Date desde = sdf.parse(desdeStr);
-				Date hasta = sdf.parse(hastaStr);
-
-				double totalPrestamos = prestamoNegocio.obtenerSumaImporteEntreFechas(desde, hasta);
-				int cantidadPrestamos = prestamoNegocio.contarPrestamosEntreFechas(desde, hasta);
-
-				request.setAttribute("totalPrestamos", totalPrestamos);
-				request.setAttribute("cantidadPrestamos", cantidadPrestamos);
-				request.setAttribute("fechaInicioPrestamo", desdeStr);
-				request.setAttribute("fechaFinPrestamo", hastaStr);
-				request.setAttribute("activeTab", "prestamos");
-
-				request.getRequestDispatcher("AdministradorReportes.jsp").forward(request, response);
-				return;
-
-			} catch (ParseException e) {
-				request.setAttribute("error", "Formato de fecha inv�lido. Use el formato YYYY-MM-DD");
-				request.getRequestDispatcher("AdministradorReportes.jsp").forward(request, response);
-				return;
-			} catch (Exception e) {
-				request.setAttribute("error", "Hubo un error al generar el reporte. Por favor intente nuevamente.");
-				request.getRequestDispatcher("AdministradorReportes.jsp").forward(request, response);
-				return;
-			}
-		}
+		
+		
+		
+		
+		
+		
+		
+		
 
 		List<Prestamo> prestamos = prestamoNegocio.listarPrestamos();
 		request.setAttribute("prestamos", prestamos);

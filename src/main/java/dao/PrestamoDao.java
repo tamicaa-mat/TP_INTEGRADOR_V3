@@ -37,5 +37,9 @@ public interface PrestamoDao {
 	
     boolean tienePrestamosActivosEnCuenta(int idCuenta);
 
+	int contarPrestamosMorosos();
+
+	double obtenerCapitalPendienteDeCobro();
+
 
 }

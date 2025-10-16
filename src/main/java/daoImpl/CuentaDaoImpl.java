@@ -73,6 +73,34 @@ public class CuentaDaoImpl implements CuentaDao {
     private static final String SUMAR_SALDO_TOTAL_ACTIVO = "SELECT COALESCE(SUM(Saldo), 0) FROM Cuenta WHERE Estado = 1";
 
 
+    
+    private static final String OBTENER_SALDO_ACTUAL = "SELECT Saldo FROM Cuenta WHERE IdCuenta = ?";
+    
+    @Override
+    public BigDecimal obtenerSaldoActual(int idCuenta) {
+        BigDecimal saldo = BigDecimal.ZERO;
+
+        try (Connection conn = Conexion.getConexion().getSQLConexion();
+             PreparedStatement stmt = conn.prepareStatement(OBTENER_SALDO_ACTUAL)) {
+
+            stmt.setInt(1, idCuenta);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    // Obtiene el saldo como BigDecimal
+                    saldo = rs.getBigDecimal("Saldo"); 
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al obtener saldo actual de cuenta ID " + idCuenta + ": " + e.getMessage());
+            e.printStackTrace();
+            // En caso de error, retorna BigDecimal.ZERO
+        }
+        return saldo;
+    }
+    
+    
+    
     @Override
     public double obtenerSaldoTotalActivo() {
         double total = 0;

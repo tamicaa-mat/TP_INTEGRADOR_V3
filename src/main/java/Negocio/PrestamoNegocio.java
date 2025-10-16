@@ -49,4 +49,8 @@ public interface PrestamoNegocio{
 	     * @return true si todo el proceso fue exitoso.
 	     */
 	    boolean aprobarPrestamo(int idPrestamo);
+
+	int contarPrestamosMorosos();
+
+	double obtenerCapitalPendienteDeCobro();
 }

@@ -53,6 +53,55 @@ public class PrestamoDaoImpl implements PrestamoDao {
 	    "LIMIT 1";
 	
 	
+	private static final String CONTAR_PRESTAMOS_MOROSOS = 
+		    "SELECT COUNT(DISTINCT p.IdPrestamo) FROM Prestamo p " +
+		    "INNER JOIN Cuota c ON p.IdPrestamo = c.IdPrestamo " +
+		    "WHERE p.Estado = 1 " + 
+		    "  AND c.FechaPago IS NULL " + 
+		    "  AND c.FechaVencimiento < CURDATE()";
+	
+	
+	private static final String CAPITAL_PENDIENTE_DE_COBRO = 
+		    "SELECT COALESCE(SUM(c.Monto), 0) FROM Cuota c " +
+		    "INNER JOIN Prestamo p ON c.IdPrestamo = p.IdPrestamo " +
+		    "WHERE p.Estado = 1 " + // Solo préstamos aprobados/vigentes
+		    "  AND c.FechaPago IS NULL"; // Solo cuotas que aún no han sido saldadas
+
+	
+	@Override
+	public double obtenerCapitalPendienteDeCobro() {
+	    double capital = 0;
+	    try (Connection conn = Conexion.getConexion().getSQLConexion();
+	         PreparedStatement stmt = conn.prepareStatement(CAPITAL_PENDIENTE_DE_COBRO);
+	         ResultSet rs = stmt.executeQuery()) {
+	        
+	        if (rs.next()) {
+	            capital = rs.getDouble(1);
+	        }
+	    } catch (SQLException e) {
+	        System.err.println("Error al obtener capital pendiente: " + e.getMessage());
+	    }
+	    return capital;
+	}
+	
+	
+	
+	@Override
+	public int contarPrestamosMorosos() {
+	    int cantidad = 0;
+	    try (Connection conn = Conexion.getConexion().getSQLConexion();
+	         PreparedStatement stmt = conn.prepareStatement(CONTAR_PRESTAMOS_MOROSOS);
+	         ResultSet rs = stmt.executeQuery()) {
+	        
+	        if (rs.next()) {
+	            cantidad = rs.getInt(1);
+	        }
+	    } catch (SQLException e) {
+	        System.err.println("Error al contar préstamos morosos: " + e.getMessage());
+	    }
+	    return cantidad;
+	}
+	
 	@Override
 	public boolean tienePrestamosActivosEnCuenta(int idCuenta) {
 		

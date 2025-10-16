@@ -9,7 +9,11 @@ import dominio.Cuota;
 
 public class CuotaDaoImpl implements CuotaDao {
 
-    private static final String INSERT = "INSERT INTO Cuota (IdPrestamo, NumeroCuota, Monto, Estado) VALUES (?, ?, ?, ?)";
+  
+	
+	private static final String INSERT = 
+		    "INSERT INTO Cuota (IdPrestamo, NumeroCuota, Monto, FechaVencimiento, FechaPago, Estado) " + 
+		    "VALUES (?, ?, ?, ?, ?, ?)";
 
     @Override
     public boolean agregar(Cuota cuota) {
@@ -28,7 +32,31 @@ public class CuotaDaoImpl implements CuotaDao {
             stmt.setInt(1, cuota.getPrestamo().getIdPrestamo());
             stmt.setInt(2, cuota.getNumeroCuota());
             stmt.setBigDecimal(3, cuota.getMonto());
-            stmt.setBoolean(4, cuota.isEstado());
+            
+            
+            
+         //  Insertar la Fecha de Vencimiento 
+            // objeto Cuota ahora tiene getFechaVencimiento() que devuelve un LocalDate o similar.
+            // Convertimos a java.sql.Date para el PreparedStatement.
+            if (cuota.getFechaVencimiento() != null) {
+            	// 🎯 SOLUCIÓN FINAL: Crear un nuevo java.sql.Date a partir de los milisegundos 🎯
+                // Esto funciona si cuota.getFechaVencimiento() devuelve un java.util.Date (o java.sql.Date)
+                stmt.setDate(4, new java.sql.Date(cuota.getFechaVencimiento().getTime())); 
+            } else {
+                // Manejo de error si la fecha de vencimiento no se calculó en el negocio
+                System.err.println("ERROR: Fecha de vencimiento es nula.");
+                conn.rollback();
+                return false;
+            }
+            
+            stmt.setNull(5, java.sql.Types.DATE);
+            
+            // Si la constante INSERT está bien definida, no necesitarías setear FechaPago aquí 
+            // porque se maneja con NULL en la sentencia SQL.
+
+            
+            //Estado (TINYINT(1), seteado como boolean)
+            stmt.setBoolean(6, cuota.isEstado());
 
             if (stmt.executeUpdate() > 0) {
                 conn.commit(); // PASO 2: Confirmar la transacción para que sea permanente
@@ -39,6 +67,7 @@ public class CuotaDaoImpl implements CuotaDao {
             }
 
         } catch (SQLException e) {
+        	System.err.println("SQL ERROR AL INSERTAR CUOTA:");
             e.printStackTrace();
             try {
                 if (conn != null) {
@@ -57,6 +86,8 @@ public class CuotaDaoImpl implements CuotaDao {
         }
         return exito;
     }
+    
+    
 
     
 

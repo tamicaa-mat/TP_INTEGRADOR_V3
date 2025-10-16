@@ -1,5 +1,6 @@
 package NegocioImpl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -190,6 +191,15 @@ public class CuentaNegocioImpl implements CuentaNegocio {
 	public boolean cuentaPerteneceACliente(String numeroCuenta, int idCliente) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+	
+	
+	
+	@Override
+	public BigDecimal obtenerSaldoActual(int idCuenta) {
+	    System.out.println("NEGOCIO: Solicitando saldo actual para cuenta ID: " + idCuenta);
+	    // Llama al método del DAO para obtener el saldo de la base de datos
+	    return cuentaDao.obtenerSaldoActual(idCuenta); 
 	}
 
 	
